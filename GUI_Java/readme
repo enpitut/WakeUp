@@ -1,0 +1,7 @@
+//実行方法、特に何もきにする必要はないハズ・・・
+javac ugenGui.java
+java ugenGui
+
+//説明
+ボタン作って
+押したらlsが実行される
