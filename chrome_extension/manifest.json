@@ -1,0 +1,21 @@
+{
+  "manifest_version": 2,
+  "name": "UGEN",
+  "version": "0.0.1",
+  "description": "人間関係を利用した行動強制アプリケーション",
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "author": "Wake Up!",
+  "background": {
+    "scripts": [
+      "javascripts/background.js"
+    ],
+    "persistent": false
+  },
+  "permissions": [
+    "tabs"
+  ]
+}
