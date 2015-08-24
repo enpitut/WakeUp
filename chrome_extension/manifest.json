@@ -11,11 +11,15 @@
   "author": "Wake Up!",
   "background": {
     "scripts": [
+      "javascripts/jquery-1.11.3.min.js",
+      "javascripts/oauth.js",
+      "javascripts/sha1.js",
       "javascripts/background.js"
     ],
     "persistent": false
   },
   "permissions": [
-    "tabs"
+    "tabs",
+    "https://api.twitter.com/*"
   ]
 }
