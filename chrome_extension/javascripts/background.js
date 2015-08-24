@@ -1,10 +1,17 @@
+
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     if (!("url" in changeInfo)) return;
     if (!tab.url.match(/^https?:\/\/[^/]+\.nicovideo\.jp\//)) return;
+    tweet("おっぱい");
+});
+
+
+function tweet(str){
     var OAUTH_CONSUMER_KEY = "mqnjswbYNsvfnwp8N3aoPs5TU";
     var OAUTH_CONSUMER_SECRET = "dbaio9YDq5S1X3cL5AceWbFgsaADOaA9B8TrRU2TnDLlYZTVLP";
     var OAUTH_ACCESS_TOKEN = "3315564288-FJpzTyav8c4STsgiJw9FTU2STSPPn7Fqh1asjMH";
     var OAUTH_ACCESS_SECRET = "trRn3vIiKNQdLee8kpl2OWRfVv6rFNVd4VD1RJo8XeRT0";
+
     var message = {
         method: "POST",
         action: "https://api.twitter.com/1.1/statuses/update.json",
@@ -12,7 +19,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
             oauth_signature_method: "HMAC-SHA1",
             oauth_consumer_key: OAUTH_CONSUMER_KEY,
             oauth_token: OAUTH_ACCESS_TOKEN,
-            status: "Hello, world! " + new Date().getTime()
+            status: str
         }
     };
     OAuth.setTimestampAndNonce(message);
@@ -32,4 +39,4 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
             console.log(a.responseText);
         }
     });
-});
+};
