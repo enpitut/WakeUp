@@ -15,11 +15,11 @@
       "javascripts/oauth.js",
       "javascripts/sha1.js",
       "javascripts/background.js"
-    ],
-    "persistent": false
+    ]
   },
   "permissions": [
     "tabs",
+    "alarms",
     "https://api.twitter.com/*"
   ]
 }

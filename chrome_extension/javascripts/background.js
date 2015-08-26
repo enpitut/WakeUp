@@ -1,10 +1,37 @@
+var previousUrl = "chrome://newtab";
+var cumulativeVisitDuration = 0;
+var currentTab = {url: "chrome://newtab"};
 
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-    if (!("url" in changeInfo)) return;
-    if (!tab.url.match(/^https?:\/\/[^/]+\.nicovideo\.jp\//)) return;
-    tweet("おっぱい");
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    currentTab = tab;
 });
 
+var timerID = setTimeout(function mainLoop() {
+    clearTimeout(timerID);
+
+    var url = currentTab.url;
+    console.log(url);
+
+    if (isNgSite(previousUrl) && isNgSite(url)) cumulativeVisitDuration++;
+    previousUrl = url;
+
+    if (cumulativeVisitDuration == 5) {
+        alert("あと5秒ニコニコ動画に滞在するとTwitterに報告されます");
+    }
+    if (cumulativeVisitDuration == 10) {
+        tweet("有言不実行！ " + new Date().toString());
+    }
+    if (cumulativeVisitDuration >= 10 && isNgSite(url)) {
+        chrome.tabs.update(currentTab.id, {url: "chrome://newtab"});
+    }
+
+    timerID = setTimeout(mainLoop, 1000);
+}, 0);
+
+function isNgSite(url) {
+    if (url.match(/^https?:\/\/[^/]+\.nicovideo\.jp\//)) return true;
+    return false;
+}
 
 function tweet(str){
     var OAUTH_CONSUMER_KEY = "mqnjswbYNsvfnwp8N3aoPs5TU";
