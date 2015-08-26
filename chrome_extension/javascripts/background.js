@@ -12,18 +12,18 @@ var timerID = setTimeout(function mainLoop() {
     var url = currentTab.url;
 
     if (isNgSite(previousUrl) && isNgSite(url)) {
-      cumulativeVisitDuration++;
+        cumulativeVisitDuration++;
     }
     if (cumulativeVisitDuration == 5) {
-      alert("あと5秒ニコニコ動画に滞在するとTwitterに報告されます");
+        alert("あと5秒ニコニコ動画に滞在するとTwitterに報告されます");
     }
     if (cumulativeVisitDuration == 10) {
-      tweet("有言不実行！ " + new Date().toString());
-      cumulativeVisitDuration++;
+        tweet("有言不実行！ " + new Date().toString());
+        cumulativeVisitDuration++;
     }
     if (cumulativeVisitDuration >= 10 && isNgSite(url)) {
-      chrome.tabs.update(currentTab.id, {url: "chrome://newtab"});
-      cumulativeVisitDuration = 0;
+        chrome.tabs.update(currentTab.id, {url: "chrome://newtab"});
+        cumulativeVisitDuration = 0;
     }
     previousUrl = url;
     timerID = setTimeout(mainLoop, 1000);
