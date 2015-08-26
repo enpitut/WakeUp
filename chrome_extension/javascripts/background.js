@@ -1,6 +1,6 @@
 var cumulativeVisitDuration = 0;
 
-(function mainLoop() {
+function mainLoop() {
     function next() {
         setTimeout(mainLoop, 1000);
     }
@@ -23,7 +23,8 @@ var cumulativeVisitDuration = 0;
         }
         next();
     });
-})();
+}
+mainLoop();
 
 function isNgSite(url) {
     if (url.match(/^https?:\/\/[^/]+\.nicovideo\.jp\//)) return true;
