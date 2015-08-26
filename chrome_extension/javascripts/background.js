@@ -10,11 +10,9 @@ var timerID = setTimeout(function mainLoop() {
     clearTimeout(timerID);
 
     var url = currentTab.url;
-    console.log(url);
 
     if (isNgSite(previousUrl) && isNgSite(url)) cumulativeVisitDuration++;
     previousUrl = url;
-
     if (cumulativeVisitDuration == 5) {
         alert("あと5秒ニコニコ動画に滞在するとTwitterに報告されます");
     }
@@ -23,8 +21,8 @@ var timerID = setTimeout(function mainLoop() {
     }
     if (cumulativeVisitDuration >= 10 && isNgSite(url)) {
         chrome.tabs.update(currentTab.id, {url: "chrome://newtab"});
+        cumulativeVisitDuration = 0;
     }
-
     timerID = setTimeout(mainLoop, 1000);
 }, 0);
 
