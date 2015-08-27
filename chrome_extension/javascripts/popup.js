@@ -1,17 +1,33 @@
+var bg = chrome.extension.getBackgroundPage();
+
 var form = document.createElement("form");
-var btn = document.createElement("input");
-btn.id = "button1";
-btn.type = "button";
-btn.value = "監視スタート";
-form.appendChild(btn);
+
+var taskTimeText = document.createElement("input");
+$(taskTimeText).val("10").attr("type","text").attr("id","tasktimetext");
+var minutesText = document.createTextNode("分");
+$(form).append(taskTimeText).append(minutesText).append($("<br>"));
+
+var startButton = document.createElement("input");
+$(startButton).val("監視スタート").attr("type","button").attr("id","startbutton").bind("click",callBackGround);
+$(form).append(startButton);
+
+var endButton = document.createElement("input");
+$(endButton).val("タスク完了").attr("type","button").attr("id","endbutton").bind("click",stopTimer);
+$(form).append(endButton);
+
 document.body.appendChild(form);
-btn.addEventListener("click", callBackGround, false);
 
 window.onload = function(){
-	//alert("popup.htmlのonloadです！");
+    //alert("popup.htmlのonloadです！");
 };
 
 function callBackGround(){
-	var bg = chrome.extension.getBackgroundPage();
-	bg.mainLoop();
+    var time = Number(taskTimeText.value) * 60;
+    console.log(time);
+    //bg.setTimer(time);
+    //bg.mainLoop();
+}
+
+function stopTimer(){
+    //bg.stopTimer();
 }
