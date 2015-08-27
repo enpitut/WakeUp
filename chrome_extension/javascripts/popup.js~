@@ -54,18 +54,17 @@ var addUrlListForm = document.createElement("form");
 
 
 var addUrlListText = document.createElement("input");
-addUrlListText.id = "addUrlListText";
-addUrlListText.type = "text";
-addUrlListText.value = "http://xxxx.com";
+timeText.id = "addUrlListText";
+timeText.type = "text";
+timeText.value = "http://xxxx.com";
 addUrlListForm.appendChild(addUrlListText);
-document.body.appendChild(addUrlListForm);
 
 var addUrlListBtn = document.createElement("input");
 addUrlListBtn.id = "addUrlListBtn";
-addUrlListBtn.type = "button";
+addUrlListBtn.type = "addUrlListBtn";
 addUrlListBtn.value = "ブロックリスト追加";
-
 addUrlListForm.appendChild(addUrlListBtn);
+
 addUrlListBtn.addEventListener("click",addUrlList,false);
 document.body.appendChild(addUrlListForm);
 

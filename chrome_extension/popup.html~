@@ -5,7 +5,7 @@
 </head>
 <body>
 ボタンを押すと監視がはじまります。
-<script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="path/to/jquery.js"></script>
 <script type="text/javascript" src="javascripts/popup.js"></script>
 
 <form id="form1">
