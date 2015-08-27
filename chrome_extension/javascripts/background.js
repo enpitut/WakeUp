@@ -25,6 +25,11 @@ function mainLoop() {
         next();
     });
 }
+function addUrlList(){
+	var strbuffer = addUrlListText.value;
+	strbuffer = strbuffer.replace('/./',"/.");
+	urlList.push();
+}
 
 function isNgSite(url) {
 	for(var i = 0;i < urlList.length;i++){
