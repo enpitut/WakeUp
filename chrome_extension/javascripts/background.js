@@ -3,7 +3,7 @@ var ALERT_TIME = 5;
 var TWEET_TIME = 10;
 
 var startButtonVisible = true;
-var timeTextVisible = true;
+var taskTimeTextVisible = true;
 
 function mainLoop() {
     function next() {

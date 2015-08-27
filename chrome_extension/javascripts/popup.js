@@ -18,9 +18,10 @@ if(!bg.taskTimeTextVisible){
 document.body.appendChild(form);
 
 var startButton = document.createElement("input");
-startButton.id = "startbutton";
-startButton.type = "button";
-startButton.value = "監視スタート";
+$(startButton).val("監視スタート").attr("type","button").attr("id","startbutton");
+//startButton.id = "startbutton";
+//startButton.type = "button";
+//startButton.value = "監視スタート";
 if(!bg.startButtonVisible)startButton.style.visibility = "hidden";
 form.appendChild(startButton);
 document.body.appendChild(form);
