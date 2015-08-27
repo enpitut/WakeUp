@@ -45,17 +45,11 @@ function mainLoop() {
 }
 
 function setTimer(arg) {
-    if(arg < 0) return null;
     isTimerOn = true;
     limitSeconds = arg;
 }
 
-function stopTimer(done) {
-    if (done === undefined) done = false;
-    if (done) {
-        var message =  (limitSeconds / 60.0).toString() + "分かかるとして見積もって取り掛かった作業を" + (elapsedSeconds / 60.0).toString() + "分で終えました " + new Date().toString();
-        tweet(message);
-    }
+function stopTimer() {
     isTimerOn = false;
     elapsedSeconds = 0;
 }
