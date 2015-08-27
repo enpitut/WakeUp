@@ -15,7 +15,7 @@ function mainLoop() {
 
     function checkElapsedTime() {
         if (elapsedSeconds >= limitSeconds) {
-            tweet("残念！！！タスクが制限時間内に終わりませんでした！！！！");
+            tweet("残念！！！タスクが制限時間内に終わりませんでした！！！！ "+ new Date().toString());
             isTimerEnabled = false;
             stopTimer();
         }
@@ -33,7 +33,7 @@ function mainLoop() {
         stayNgSiteSeconds++;
         switch (stayNgSiteSeconds) {
         case ALERT_TIME:
-            alert("あと" + (TWEET_TIME - ALERT_TIME) + "秒ニコニコ動画に滞在するとTwitterに報告されます");
+            alert("あと" + (TWEET_TIME - ALERT_TIME) + "秒ニコニコ動画に滞在するとTwitterに報告されます " + new Date().toString());
             break;
         case TWEET_TIME:
             chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
@@ -52,7 +52,7 @@ function setTimer(arg) {
 
 function stopTimer() {
     if (isTimerEnabled) {
-        tweet("タスク完了しました！！有言実行！！！");
+        tweet("タスク完了しました！！有言実行！！！ " + new Date().toString());
     }
     isTimerEnabled = false;
     elapsedSeconds = 0;
