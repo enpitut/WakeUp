@@ -5,7 +5,7 @@ var TWEET_TIME = 10;
 var isTimerEnabled = false;
 
 var startButtonVisible = true;
-var timeTextVisible = true;
+var taskTimeTextVisible = true;
 
 function mainLoop() {
     function next() {
