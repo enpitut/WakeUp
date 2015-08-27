@@ -26,7 +26,6 @@ function mainLoop() {
         next();
     });
 }
-mainLoop();
 
 function isNgSite(url) {
     if (url.match(/^https?:\/\/[^/]+\.nicovideo\.jp\//)) return true;
