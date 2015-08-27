@@ -1,30 +1,32 @@
-var previousUrl = "chrome://newtab";
-var cumulativeVisitDuration = 0;
-var currentTab = {url: "chrome://newtab"};
+var staySeconds = 0;
+var ALERT_TIME = 5;
+var TWEET_TIME = 10;
 
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-    currentTab = tab;
-});
-
-var timerID = setTimeout(function mainLoop() {
-    clearTimeout(timerID);
-
-    var url = currentTab.url;
-
-    if (isNgSite(previousUrl) && isNgSite(url)) cumulativeVisitDuration++;
-    previousUrl = url;
-    if (cumulativeVisitDuration == 5) {
-        alert("あと5秒ニコニコ動画に滞在するとTwitterに報告されます");
+function mainLoop() {
+    function next() {
+        setTimeout(mainLoop, 1000);
     }
-    if (cumulativeVisitDuration == 10) {
-        tweet("有言不実行！ " + new Date().toString());
-    }
-    if (cumulativeVisitDuration >= 10 && isNgSite(url)) {
-        chrome.tabs.update(currentTab.id, {url: "chrome://newtab"});
-        cumulativeVisitDuration = 0;
-    }
-    timerID = setTimeout(mainLoop, 1000);
-}, 0);
+
+    chrome.tabs.query({currentWindow: true, active: true}, function (tabs) {
+        var currentTab = tabs[0];
+        if (currentTab == null) return next();
+        if (!isNgSite(currentTab.url)) return next();
+
+        staySeconds++;
+        switch (staySeconds) {
+        case ALERT_TIME:
+            alert("あと" + (TWEET_TIME - ALERT_TIME) + "秒ニコニコ動画に滞在するとTwitterに報告されます");
+            break;
+        case TWEET_TIME:
+            chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
+            tweet("有言不実行！ " + new Date().toString());
+            staySeconds = 0;
+            break;
+        }
+        next();
+    });
+}
+mainLoop();
 
 function isNgSite(url) {
     if (url.match(/^https?:\/\/[^/]+\.nicovideo\.jp\//)) return true;
