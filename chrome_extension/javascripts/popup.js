@@ -24,10 +24,10 @@ window.onload = function(){
 function callBackGround(){
     var time = Number(taskTimeText.value) * 60;
     console.log(time);
-    //bg.setTimer(time);
-    //bg.mainLoop();
+    bg.setTimer(time);
+    bg.mainLoop();
 }
 
 function stopTimer(){
-    //bg.stopTimer();
+    bg.stopTimer();
 }

@@ -1,5 +1,6 @@
 var stayNgSiteSeconds = 0;
 var elapsedSeconds = 0;
+var limitSeconds = 0;
 var ALERT_TIME = 5;
 var TWEET_TIME = 10;
 var isTimerEnabled = false;
@@ -12,6 +13,17 @@ function mainLoop() {
         setTimeout(mainLoop, 1000);
     }
 
+    function checkElapsedTime() {
+        if (elapsedSeconds >= limitSeconds) {
+            tweet("残念！！！タスクが制限時間内に終わりませんでした！！！！");
+            isTimerEnabled = false;
+            stopTimer();
+        }
+    }
+
+    if(!isTimerEnabled) return next();
+
+    checkElapsedTime();
     elapsedSeconds++;
     chrome.tabs.query({currentWindow: true, active: true}, function (tabs) {
         var currentTab = tabs[0];
@@ -29,17 +41,18 @@ function mainLoop() {
             stayNgSiteSeconds = 0;
             break;
         }
-        if(isTimerEnabled) next();
+        next();
     });
 }
 
-function setTimer() {
+function setTimer(arg) {
     isTimerEnabled = true;
+    limitSeconds = arg;
 }
 
 function stopTimer() {
     if (isTimerEnabled) {
-        tweet("タスク完了しました！！有限実行！！！本物の男！！！！ #UGEN");
+        tweet("タスク完了しました！！有言実行！！！");
     }
     isTimerEnabled = false;
     elapsedSeconds = 0;
