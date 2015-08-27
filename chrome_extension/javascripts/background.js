@@ -1,6 +1,7 @@
 var staySeconds = 0;
 var ALERT_TIME = 5;
 var TWEET_TIME = 10;
+var isTimerEnabled = false;
 
 function mainLoop() {
     function next() {
@@ -23,8 +24,16 @@ function mainLoop() {
             staySeconds = 0;
             break;
         }
-        next();
+        if(isTimerEnabled) next();
     });
+}
+
+function setTimer() {
+    isTimerEnabled = true;
+}
+
+function stopTimer() {
+    isTimerEnabled = false;
 }
 
 function isNgSite(url) {
