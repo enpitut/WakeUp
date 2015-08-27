@@ -1,4 +1,6 @@
 var staySeconds = 0;
+var ALERT_TIME = 5;
+var TWEET_TIME = 10;
 
 function mainLoop() {
     function next() {
@@ -12,10 +14,10 @@ function mainLoop() {
 
         staySeconds++;
         switch (staySeconds) {
-        case 5:
-            alert("あと5秒ニコニコ動画に滞在するとTwitterに報告されます");
+        case ALERT_TIME:
+            alert("あと" + (TWEET_TIME - ALERT_TIME) + "秒ニコニコ動画に滞在するとTwitterに報告されます");
             break;
-        case 10:
+        case TWEET_TIME:
             chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
             tweet("有言不実行！ " + new Date().toString());
             staySeconds = 0;
