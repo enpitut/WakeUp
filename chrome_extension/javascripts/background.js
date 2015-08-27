@@ -15,7 +15,7 @@ function mainLoop() {
 
     function checkElapsedTime() {
         if (elapsedSeconds >= limitSeconds) {
-            tweet("@UGEN_teacher 突然のメンション失礼致します。作業が時間内に終わりませんでした。誠に申し訳ありません。 "+ new Date().toString());
+            tweet("@UGEN_teacher 突然のメンション失礼致します。このたび私事ながら作業が間に合いませんでした。誠に申し訳ありません。 "+ new Date().toString());
             stopTimer();
         }
     }
@@ -24,6 +24,8 @@ function mainLoop() {
 
     checkElapsedTime();
     elapsedSeconds++;
+    chrome.browserAction.setBadgeText({"text": Math.round((limitSeconds - elapsedSeconds) / 60).toString()})
+
     chrome.tabs.query({currentWindow: true, active: true}, function (tabs) {
         var currentTab = tabs[0];
         if (currentTab == null) return next();
@@ -36,7 +38,7 @@ function mainLoop() {
             break;
         case TWEET_TIME:
             chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
-            tweet("端的に言ってサボりました！有言不実行！！ " + new Date().toString());
+            tweet("サボりました！有言不実行！！ " + new Date().toString());
             stayNgSiteSeconds = 0;
             break;
         }
@@ -52,6 +54,7 @@ function setTimer(arg) {
 function stopTimer() {
     isTimerOn = false;
     elapsedSeconds = 0;
+    chrome.browserAction.setBadgeText({"text": ""})
 }
 
 function isNgSite(url) {
