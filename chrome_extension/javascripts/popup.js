@@ -29,5 +29,5 @@ function callBackGround(){
 }
 
 function stopTimer(){
-    bg.stopTimer();
+    bg.stopTimer(true);
 }

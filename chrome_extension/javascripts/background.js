@@ -3,7 +3,7 @@ var elapsedSeconds = 0;
 var limitSeconds = 0;
 var ALERT_TIME = 5;
 var TWEET_TIME = 10;
-var isTimerEnabled = false;
+var isTimerOn = false;
 
 var startButtonVisible = true;
 var taskTimeTextVisible = true;
@@ -15,13 +15,12 @@ function mainLoop() {
 
     function checkElapsedTime() {
         if (elapsedSeconds >= limitSeconds) {
-            tweet("残念！！！タスクが制限時間内に終わりませんでした！！！！ "+ new Date().toString());
-            isTimerEnabled = false;
+            tweet("@UGEN_teacher 突然のメンション失礼致します。作業が時間内に終わりませんでした。誠に申し訳ありません。 "+ new Date().toString());
             stopTimer();
         }
     }
 
-    if(!isTimerEnabled) return next();
+    if(!isTimerOn) return next();
 
     checkElapsedTime();
     elapsedSeconds++;
@@ -37,7 +36,7 @@ function mainLoop() {
             break;
         case TWEET_TIME:
             chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
-            tweet("有言不実行！ " + new Date().toString());
+            tweet("端的に言ってサボりました！有言不実行！！ " + new Date().toString());
             stayNgSiteSeconds = 0;
             break;
         }
@@ -46,15 +45,18 @@ function mainLoop() {
 }
 
 function setTimer(arg) {
-    isTimerEnabled = true;
+    if(arg < 0) return null;
+    isTimerOn = true;
     limitSeconds = arg;
 }
 
-function stopTimer() {
-    if (isTimerEnabled) {
-        tweet("タスク完了しました！！有言実行！！！ " + new Date().toString());
+function stopTimer(done) {
+    if (done === undefined) done = false;
+    if (done) {
+        var message =  (limitSeconds / 60.0).toString() + "分かかるとして見積もって取り掛かった作業を" + (elapsedSeconds / 60.0).toString() + "分で終えました " + new Date().toString();
+        tweet(message);
     }
-    isTimerEnabled = false;
+    isTimerOn = false;
     elapsedSeconds = 0;
 }
 
