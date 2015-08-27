@@ -1,4 +1,4 @@
-var cumulativeVisitDuration = 0;
+var staySeconds = 0;
 
 function mainLoop() {
     function next() {
@@ -10,15 +10,15 @@ function mainLoop() {
         if (currentTab == null) return next();
         if (!isNgSite(currentTab.url)) return next();
 
-        cumulativeVisitDuration++;
-        switch (cumulativeVisitDuration) {
+        staySeconds++;
+        switch (staySeconds) {
         case 5:
             alert("あと5秒ニコニコ動画に滞在するとTwitterに報告されます");
             break;
         case 10:
             chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
             tweet("有言不実行！ " + new Date().toString());
-            cumulativeVisitDuration = 0;
+            staySeconds = 0;
             break;
         }
         next();
