@@ -4,6 +4,9 @@ var ALERT_TIME = 5;
 var TWEET_TIME = 10;
 var isTimerEnabled = false;
 
+var startButtonVisible = true;
+var timeTextVisible = true;
+
 function mainLoop() {
     function next() {
         setTimeout(mainLoop, 1000);
