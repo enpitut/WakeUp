@@ -1,12 +1,11 @@
 var staySeconds = 0;
 var ALERT_TIME = 5;
 var TWEET_TIME = 10;
-
+var urlList = ["nicovideo\.jp","youtube\.com"];
 function mainLoop() {
     function next() {
         setTimeout(mainLoop, 1000);
     }
-
     chrome.tabs.query({currentWindow: true, active: true}, function (tabs) {
         var currentTab = tabs[0];
         if (currentTab == null) return next();
@@ -28,8 +27,12 @@ function mainLoop() {
 }
 
 function isNgSite(url) {
-    if (url.match(/^https?:\/\/[^/]+\.nicovideo\.jp\//)) return true;
-    return false;
+	for(var i = 0;i < urlList.length;i++){
+		var str=urlList[i]; 
+		var re = new RegExp("^https?:\/\/[^/]+\."+str+"\/");
+		if (url.match(re)) return true;
+	}
+		return false;
 }
 
 function tweet(str){
