@@ -1,4 +1,5 @@
-var staySeconds = 0;
+var stayNgSiteSeconds = 0;
+var elapsedSeconds = 0;
 var ALERT_TIME = 5;
 var TWEET_TIME = 10;
 var isTimerEnabled = false;
@@ -8,20 +9,21 @@ function mainLoop() {
         setTimeout(mainLoop, 1000);
     }
 
+    elapsedSeconds++;
     chrome.tabs.query({currentWindow: true, active: true}, function (tabs) {
         var currentTab = tabs[0];
         if (currentTab == null) return next();
         if (!isNgSite(currentTab.url)) return next();
 
-        staySeconds++;
-        switch (staySeconds) {
+        stayNgSiteSeconds++;
+        switch (stayNgSiteSeconds) {
         case ALERT_TIME:
             alert("あと" + (TWEET_TIME - ALERT_TIME) + "秒ニコニコ動画に滞在するとTwitterに報告されます");
             break;
         case TWEET_TIME:
             chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
             tweet("有言不実行！ " + new Date().toString());
-            staySeconds = 0;
+            stayNgSiteSeconds = 0;
             break;
         }
         if(isTimerEnabled) next();
@@ -33,7 +35,11 @@ function setTimer() {
 }
 
 function stopTimer() {
+    if (isTimerEnabled) {
+        tweet("タスク完了しました！！有限実行！！！本物の男！！！！ #UGEN");
+    }
     isTimerEnabled = false;
+    elapsedSeconds = 0;
 }
 
 function isNgSite(url) {
