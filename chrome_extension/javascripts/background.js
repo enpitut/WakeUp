@@ -25,10 +25,10 @@ function mainLoop() {
     checkElapsedTime();
     elapsedSeconds++;
     var remainingSeconds = limitSeconds - elapsedSeconds;
-    if(remainingSeconds > 60){
+    if (remainingSeconds > 60) {
         chrome.browserAction.setBadgeText({"text": Math.round((remainingSeconds) / 60).toString()});
         chrome.browserAction.setBadgeBackgroundColor({color:[0, 0, 255, 100]});
-    }else{
+    } else {
         chrome.browserAction.setBadgeText({"text": Math.round((remainingSeconds)).toString()});
         chrome.browserAction.setBadgeBackgroundColor({color:[255, 0, 0, 100]});
         
