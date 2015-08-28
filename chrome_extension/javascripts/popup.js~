@@ -23,7 +23,7 @@ document.body.appendChild(form);
 var addUrlForm = document.createElement("form");
 
 var addUrlText = document.createElement("input");
-$(addUrlText).val("http://www.xxx.com").attr("type","text").attr("id","addurltext");
+$(addUrlText).val("10").attr("type","text").attr("id","addurltext");
 $(addUrlForm).append(addUrlText);
 
 var addUrlButton = document.createElement("input");

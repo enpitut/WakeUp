@@ -55,13 +55,13 @@ function stopTimer() {
 }
 
 function isNgSite(url) {
-    for(var i = 0; i < urlList.length; i++){
-        var str = urlList[i]; 
-        console.log(str);
-        var re = new RegExp(str.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1"));
-        if ( url.match(re) ) return true;
-    }
-    return false;
+	for(var i = 0; i < urlList.length; i++){
+		var str=urlList[i]; 
+		console.log(str);
+		var re = new RegExp(".*"+str+".*");
+		if ( url.match(re) ) return true;
+	}
+		return false;
 }
 
 function tweet(str){
