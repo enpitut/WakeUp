@@ -24,7 +24,15 @@ function mainLoop() {
 
     checkElapsedTime();
     elapsedSeconds++;
-    chrome.browserAction.setBadgeText({"text": Math.round((limitSeconds - elapsedSeconds) / 60).toString()})
+    var remainingSeconds = limitSeconds - elapsedSeconds;
+    if(remainingSeconds > 60){
+        chrome.browserAction.setBadgeText({"text": Math.round((remainingSeconds) / 60).toString()});
+        chrome.browserAction.setBadgeBackgroundColor({color:[0, 0, 255, 100]});
+    }else{
+        chrome.browserAction.setBadgeText({"text": Math.round((remainingSeconds)).toString()});
+        chrome.browserAction.setBadgeBackgroundColor({color:[255, 0, 0, 100]});
+        
+    }
 
     chrome.tabs.query({currentWindow: true, active: true}, function (tabs) {
         var currentTab = tabs[0];
