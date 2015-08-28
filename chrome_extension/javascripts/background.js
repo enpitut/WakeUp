@@ -13,7 +13,8 @@ function mainLoop() {
     }
     function checkElapsedTime() {
         if (elapsedSeconds >= limitSeconds) {
-            tweet("@UGEN_teacher 突然のメンション失礼致します。このたび私事ながら作業が間に合いませんでした。誠に申し訳ありません。 "+ new Date().toString());
+            tweet("@UGEN_teacher 突然のメンション失礼致します。このたび私事ながら作業が間に合いませんでした。誠に申し訳ありません。 "+ new Date().toString(),
+                    function(){ alert("tweetしたよ^_^"); });
             stopTimer();
         }
     }
@@ -44,7 +45,8 @@ function mainLoop() {
             break;
         case TWEET_TIME:
             chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
-            tweet("サボりました！有言不実行！！ " + new Date().toString());
+            tweet("サボりました！有言不実行！！ " + new Date().toString(),
+                function(){ alert("tweetしたよ^_^");});
             stayNgSiteSeconds = 0;
             break;
         }
@@ -73,7 +75,7 @@ function isNgSite(url) {
     return false;
 }
 
-function tweet(str){
+function tweet(str, callBack){
     var OAUTH_CONSUMER_KEY = "mqnjswbYNsvfnwp8N3aoPs5TU";
     var OAUTH_CONSUMER_SECRET = "dbaio9YDq5S1X3cL5AceWbFgsaADOaA9B8TrRU2TnDLlYZTVLP";
     var OAUTH_ACCESS_TOKEN = "3315564288-FJpzTyav8c4STsgiJw9FTU2STSPPn7Fqh1asjMH";
@@ -101,6 +103,7 @@ function tweet(str){
         dataType: "json",
         success: function(data) {
             console.log(data);
+            if( callBack !== undefined) callBack();
         },
         error: function(a) {
             console.log(a.responseText);
