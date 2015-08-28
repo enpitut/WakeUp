@@ -1,6 +1,9 @@
-var staySeconds = 0;
+var stayNgSiteSeconds = 0;
+var elapsedSeconds = 0;
+var limitSeconds = 0;
 var ALERT_TIME = 5;
 var TWEET_TIME = 10;
+var isTimerOn = false;
 
 var startButtonVisible = true;
 var taskTimeTextVisible = true;
@@ -10,24 +13,48 @@ function mainLoop() {
         setTimeout(mainLoop, 1000);
     }
 
+    function checkElapsedTime() {
+        if (elapsedSeconds >= limitSeconds) {
+            tweet("@UGEN_teacher 突然のメンション失礼致します。このたび私事ながら作業が間に合いませんでした。誠に申し訳ありません。 "+ new Date().toString());
+            stopTimer();
+        }
+    }
+
+    if(!isTimerOn) return next();
+
+    checkElapsedTime();
+    elapsedSeconds++;
+    chrome.browserAction.setBadgeText({"text": Math.round((limitSeconds - elapsedSeconds) / 60).toString()})
+
     chrome.tabs.query({currentWindow: true, active: true}, function (tabs) {
         var currentTab = tabs[0];
         if (currentTab == null) return next();
         if (!isNgSite(currentTab.url)) return next();
 
-        staySeconds++;
-        switch (staySeconds) {
+        stayNgSiteSeconds++;
+        switch (stayNgSiteSeconds) {
         case ALERT_TIME:
-            alert("あと" + (TWEET_TIME - ALERT_TIME) + "秒ニコニコ動画に滞在するとTwitterに報告されます");
+            alert("あと" + (TWEET_TIME - ALERT_TIME) + "秒ニコニコ動画に滞在するとTwitterに報告されます " + new Date().toString());
             break;
         case TWEET_TIME:
             chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
-            tweet("有言不実行！ " + new Date().toString());
-            staySeconds = 0;
+            tweet("サボりました！有言不実行！！ " + new Date().toString());
+            stayNgSiteSeconds = 0;
             break;
         }
         next();
     });
+}
+
+function setTimer(arg) {
+    isTimerOn = true;
+    limitSeconds = arg;
+}
+
+function stopTimer() {
+    isTimerOn = false;
+    elapsedSeconds = 0;
+    chrome.browserAction.setBadgeText({"text": ""})
 }
 
 function isNgSite(url) {

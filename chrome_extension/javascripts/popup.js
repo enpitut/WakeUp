@@ -24,10 +24,15 @@ window.onload = function(){
 function callBackGround(){
     var time = Number(taskTimeText.value) * 60;
     console.log(time);
-    //bg.setTimer(time);
-    //bg.mainLoop();
+    if(time < 0) return false;
+    bg.setTimer(time);
+    bg.mainLoop();
 }
 
 function stopTimer(){
-    //bg.stopTimer();
+    if(bg.isTimerOn){
+        var message =  Math.round(bg.limitSeconds / 60).toString() + "分かかると見積もった作業を" + Math.round(bg.elapsedSeconds / 60).toString() + "分で終えました!" + new Date().toString();
+        bg.tweet(message);
+    }
+    bg.stopTimer();
 }
