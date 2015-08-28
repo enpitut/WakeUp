@@ -5,6 +5,7 @@ var form = document.createElement("form");
 
 var taskTimeText = document.createElement("input");
 $(taskTimeText).val("10").attr("type","text").attr("id","tasktimetext");
+
 var minutesText = document.createTextNode("分");
 $(form).append(taskTimeText).append(minutesText).append($("<br>"));
 
@@ -29,6 +30,8 @@ var addUrlButton = document.createElement("input");
 $(addUrlButton).val("ブロックサイト追加").attr("type","button").attr("id","addUrlbutton").bind("click",addUrlList);
 $(addUrlForm).append(addUrlButton);
 document.body.appendChild(addUrlForm);
+
+
 
 window.onload = function(){
     //alert("popup.htmlのonloadです！");
@@ -56,4 +59,9 @@ function addUrlList(){
     strbuffer = strbuffer.replace(/\./,"\.");
     console.log(strbuffer);
     bg.urlList.push(strbuffer);
+}
+
+function stopTimer(){
+    var bg = chrome.extension.getBackgroundPage();
+    bg.stopTimer();
 }

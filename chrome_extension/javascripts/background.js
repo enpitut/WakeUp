@@ -8,11 +8,11 @@ var startButtonVisible = true;
 var taskTimeTextVisible = true;
 var urlList = ["nicovideo\.jp","youtube\.com"];
 
+
 function mainLoop() {
     function next() {
         setTimeout(mainLoop, 1000);
     }
-
     function checkElapsedTime() {
         if (elapsedSeconds >= limitSeconds) {
             tweet("@UGEN_teacher 突然のメンション失礼致します。このたび私事ながら作業が間に合いませんでした。誠に申し訳ありません。 "+ new Date().toString());
@@ -44,6 +44,11 @@ function mainLoop() {
         }
         next();
     });
+}
+function addUrlList(){
+	var strbuffer = addUrlListText.value;
+	strbuffer = strbuffer.replace('/./',"/.");
+	urlList.push();
 }
 
 function setTimer(arg) {
