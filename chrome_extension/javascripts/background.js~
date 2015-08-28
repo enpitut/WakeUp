@@ -4,9 +4,9 @@ var limitSeconds = 0;
 var ALERT_TIME = 5;
 var TWEET_TIME = 10;
 var isTimerOn = false;
+
 var startButtonVisible = true;
 var taskTimeTextVisible = true;
-var urlList = ["nicovideo\.jp","youtube\.com"];
 
 function mainLoop() {
     function next() {
@@ -58,13 +58,8 @@ function stopTimer() {
 }
 
 function isNgSite(url) {
-	for(var i = 0;i < urlList.length;i++){
-		var str=urlList[i]; 
-		console.log(str);
-		var re = new RegExp(".*"+str+".*");
-		if (url.match(re)) return true;
-	}
-		return false;
+    if (url.match(/^https?:\/\/[^/]+\.nicovideo\.jp\//)) return true;
+    return false;
 }
 
 function tweet(str){
