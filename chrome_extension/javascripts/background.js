@@ -98,6 +98,7 @@ function tweet(str){
         dataType: "json",
         success: function(data) {
             console.log(data);
+            alert("ツイートしたよ ^_^");
         },
         error: function(a) {
             console.log(a.responseText);
