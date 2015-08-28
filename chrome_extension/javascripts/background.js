@@ -1,5 +1,5 @@
 var stayNgSiteSeconds = 0;
-var elapsedSeconds = 0;
+var elapsedSeconds = -1;
 var limitSeconds = 0;
 var ALERT_TIME = 5;
 var TWEET_TIME = 10;
@@ -7,30 +7,27 @@ var isTimerOn = false;
 var startButtonVisible = true;
 var taskTimeTextVisible = true;
 var urlList = ["nicovideo.jp", "youtube.com"];
+
+var timerId;
 function mainLoop() {
     function next() {
-        setTimeout(mainLoop, 1000);
-    }
-    function checkElapsedTime() {
-        if (elapsedSeconds >= limitSeconds) {
-            tweet("@UGEN_teacher 突然のメンション失礼致します。このたび私事ながら作業が間に合いませんでした。誠に申し訳ありません。 "+ new Date().toString(),
-                    function(){ alert("tweetしたよ^_^"); });
-            stopTimer();
-        }
+        timerId = setTimeout(mainLoop, 1000);
     }
 
-    if(!isTimerOn) return next();
-
-    checkElapsedTime();
     elapsedSeconds++;
     var remainingSeconds = limitSeconds - elapsedSeconds;
     if (remainingSeconds > 60) {
-        chrome.browserAction.setBadgeText({"text": Math.round((remainingSeconds) / 60).toString()});
+        chrome.browserAction.setBadgeText({"text": Math.round(remainingSeconds / 60).toString()});
         chrome.browserAction.setBadgeBackgroundColor({color:[0, 0, 255, 100]});
     } else {
-        chrome.browserAction.setBadgeText({"text": Math.round((remainingSeconds)).toString()});
+        chrome.browserAction.setBadgeText({"text": Math.round(remainingSeconds).toString()});
         chrome.browserAction.setBadgeBackgroundColor({color:[255, 0, 0, 100]});
-        
+    }
+    if (elapsedSeconds >= limitSeconds) {
+        tweet("@UGEN_teacher 突然のメンション失礼致します。このたび私事ながら作業が間に合いませんでした。誠に申し訳ありません。 " + new Date().toString(),
+                function(){ alert("tweetしたよ^_^"); });
+        stopTimer();
+        return;
     }
 
     chrome.tabs.query({currentWindow: true, active: true}, function (tabs) {
@@ -53,16 +50,18 @@ function mainLoop() {
         next();
     });
 }
-function setTimer(arg) {
-    isTimerOn = true;
+function startTimer(arg) {
     limitSeconds = arg;
+    isTimerOn = true;
+    mainLoop();
 }
 
 function stopTimer() {
-    isTimerOn = false;
-    elapsedSeconds = 0;
+    elapsedSeconds = -1;
     chrome.browserAction.setBadgeText({"text": ""})
     chrome.browserAction.setIcon({path:"../images/icon16.png"});
+    isTimerOn = false;
+    clearTimeout(timerId);
 }
 
 function isNgSite(url) {

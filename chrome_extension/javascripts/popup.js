@@ -43,8 +43,7 @@ function callBackGround(){
     console.log(time);
     if(time < 0) return false;
     chrome.browserAction.setIcon({path:"../images/watchicon16.png"});
-    bg.setTimer(time);
-    bg.mainLoop();
+    bg.startTimer(time);
 }
 
 function stopTimer(){
