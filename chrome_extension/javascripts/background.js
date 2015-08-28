@@ -63,6 +63,7 @@ function stopTimer() {
     isTimerOn = false;
     elapsedSeconds = 0;
     chrome.browserAction.setBadgeText({"text": ""})
+    chrome.browserAction.setIcon({path:"../images/icon16.png"});
 }
 
 function isNgSite(url) {
