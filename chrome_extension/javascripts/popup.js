@@ -49,15 +49,10 @@ function callBackGround(){
 
 function stopTimer(){
     chrome.browserAction.setIcon({path:"../images/icon16.png"});
-    if(bg.isTimerOn){
+    if( bg.isTimerOn ){
         var message =  Math.round(bg.limitSeconds / 60).toString() + "分かかると見積もった作業を" + Math.round(bg.elapsedSeconds / 60).toString() + "分で終えました!" + new Date().toString();
         bg.tweet(message, function(){ alert("tweetしたよ^_^");});
     }
-    bg.stopTimer();
-}
-
-function stopTimer(){
-    var bg = chrome.extension.getBackgroundPage();
     bg.stopTimer();
 }
 
