@@ -29,6 +29,7 @@ $(addUrlForm).append(addUrlText);
 var addUrlButton = document.createElement("input");
 $(addUrlButton).val("ブロックサイト追加").attr("type","button").attr("id","addUrlbutton").bind("click",addUrlList);
 $(addUrlForm).append(addUrlButton);
+
 document.body.appendChild(addUrlForm);
 
 
@@ -53,15 +54,14 @@ function stopTimer(){
     bg.stopTimer();
 }
 
+function stopTimer(){
+    var bg = chrome.extension.getBackgroundPage();
+    bg.stopTimer();
+}
 
 function addUrlList(){
     var strbuffer = addUrlText.value;
     strbuffer = strbuffer.replace(/\./,"\.");
     console.log(strbuffer);
     bg.urlList.push(strbuffer);
-}
-
-function stopTimer(){
-    var bg = chrome.extension.getBackgroundPage();
-    bg.stopTimer();
 }

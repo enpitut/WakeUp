@@ -63,5 +63,5 @@ function addUrlList(){
 
 function stopTimer(){
     var bg = chrome.extension.getBackgroundPage();
-    //bg.stopTimer();
+    bg.stopTimer();
 }

@@ -3,21 +3,16 @@ var elapsedSeconds = 0;
 var limitSeconds = 0;
 var ALERT_TIME = 5;
 var TWEET_TIME = 10;
-<<<<<<< HEAD
 var isTimerOn = false;
 var startButtonVisible = true;
 var taskTimeTextVisible = true;
 var urlList = ["nicovideo\.jp","youtube\.com"];
 
-=======
-var urlList = ["nicovideo\.jp","youtube\.com"];
->>>>>>> e27e3d3b5e47d40c2f87d59011a02078ec1a90fe
+
 function mainLoop() {
     function next() {
         setTimeout(mainLoop, 1000);
     }
-<<<<<<< HEAD
-
     function checkElapsedTime() {
         if (elapsedSeconds >= limitSeconds) {
             tweet("@UGEN_teacher 突然のメンション失礼致します。このたび私事ながら作業が間に合いませんでした。誠に申し訳ありません。 "+ new Date().toString());
@@ -31,8 +26,6 @@ function mainLoop() {
     elapsedSeconds++;
     chrome.browserAction.setBadgeText({"text": Math.round((limitSeconds - elapsedSeconds) / 60).toString()})
 
-=======
->>>>>>> e27e3d3b5e47d40c2f87d59011a02078ec1a90fe
     chrome.tabs.query({currentWindow: true, active: true}, function (tabs) {
         var currentTab = tabs[0];
         if (currentTab == null) return next();
@@ -72,12 +65,8 @@ function stopTimer() {
 function isNgSite(url) {
 	for(var i = 0;i < urlList.length;i++){
 		var str=urlList[i]; 
-<<<<<<< HEAD
 		console.log(str);
 		var re = new RegExp(".*"+str+".*");
-=======
-		var re = new RegExp("^https?:\/\/[^/]+\."+str+"\/");
->>>>>>> e27e3d3b5e47d40c2f87d59011a02078ec1a90fe
 		if (url.match(re)) return true;
 	}
 		return false;
