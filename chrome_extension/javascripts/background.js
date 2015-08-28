@@ -6,7 +6,7 @@ var TWEET_TIME = 10;
 var isTimerOn = false;
 var startButtonVisible = true;
 var taskTimeTextVisible = true;
-var urlList = ["nicovideo.jp","youtube.com"];
+var urlList = ["nicovideo.jp", "youtube.com"];
 
 var timerId;
 function mainLoop() {
@@ -67,7 +67,6 @@ function stopTimer() {
 function isNgSite(url) {
     for(var i = 0; i < urlList.length; i++){
         var str = urlList[i]; 
-        console.log(str);
         var re = new RegExp(str.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1"));
         if ( url.match(re) ) return true;
     }
