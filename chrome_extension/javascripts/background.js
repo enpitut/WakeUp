@@ -37,7 +37,7 @@ function mainLoop() {
         stayNgSiteSeconds++;
         switch (stayNgSiteSeconds) {
         case ALERT_TIME:
-            alert("あと" + (TWEET_TIME - ALERT_TIME) + "秒このサイトに滞在するとTwitterに報告されます");
+            alert("あと" + (TWEET_TIME - ALERT_TIME) + "秒"+currentTab.title+"サイトに滞在するとTwitterに報告されます");
             break;
         case TWEET_TIME:
             chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
