@@ -12,6 +12,7 @@ $(function () {
         urlList.push($("#add_url_text").val());
         localStorage.setItem("urlList", JSON.stringify(urlList));
         listNgSites();
+        $('#add_url_text').val('http://');
     });
     listNgSites();
 });
