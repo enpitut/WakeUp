@@ -6,7 +6,6 @@ var TWEET_TIME = 10;
 var isTimerOn = false;
 var startButtonVisible = true;
 var taskTimeTextVisible = true;
-var urlList = ["nicovideo.jp", "youtube.com"];
 
 var timerId;
 function mainLoop() {
@@ -64,11 +63,15 @@ function stopTimer() {
     clearTimeout(timerId);
 }
 
+if (localStorage.getItem("urlList") === null) {
+    localStorage.setItem("urlList", JSON.stringify(["nicovideo.jp", "youtube.com"]));
+}
 function isNgSite(url) {
+    var urlList = JSON.parse(localStorage.getItem("urlList"));
     for(var i = 0; i < urlList.length; i++){
         var str = urlList[i]; 
         var re = new RegExp(str.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1"));
-        if ( url.match(re) ) return true;
+        if (url.match(re)) return true;
     }
     return false;
 }
