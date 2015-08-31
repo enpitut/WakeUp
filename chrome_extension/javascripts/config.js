@@ -1,7 +1,7 @@
-var bg = chrome.extension.getBackgroundPage();
-
 $(function () {
     $("#add_url_button").click(function () {
-        bg.urlList.push($("#add_url_text").val());
+        var urlList = JSON.parse(localStorage.getItem("urlList"));
+        urlList.push($("#add_url_text").val());
+        localStorage.setItem("urlList", JSON.stringify(urlList));
     });
 });
