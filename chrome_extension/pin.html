@@ -2,14 +2,17 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>バックグラウンドページ</title>
+<title>PIN入力</title>
 <script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="javascripts/sha1.js"></script>
 <script type="text/javascript" src="javascripts/oauth.js"></script>
 <script type="text/javascript" src="javascripts/consumer_key_and_secret.js"></script>
-<script type="text/javascript" src="javascripts/background.js"></script>
+<script type="text/javascript" src="javascripts/pin.js"></script>
+<link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body>
-これはバックグラウンドページです
+    <p>
+        PIN: <input type="text" size="7" id="pin_text"><input type="button" value="認証" id="pin_button">
+    </p>
 </body>
 </html>
