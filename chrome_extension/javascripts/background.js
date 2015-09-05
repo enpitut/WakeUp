@@ -97,7 +97,7 @@ function tweet(str, callBack){
         headers: {
             "Authorization": OAuth.getAuthorizationHeader("", message.parameters)
         },
-        data: originalParameters,
+        data: OAuth.formEncode(originalParameters),
         dataType: "json",
         success: function (responseJson) {
             if (callBack !== undefined) callBack();
