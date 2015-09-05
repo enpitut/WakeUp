@@ -15,4 +15,37 @@ $(function () {
         $("#add_url_text").val("http://");
     });
     listNgSites();
+
+    $("#oauth_button").click(function () {
+        var message = {
+            method: "POST",
+            action: "https://api.twitter.com/oauth/request_token",
+            parameters: {
+                oauth_callback: "oob"
+            }
+        };
+        OAuth.completeRequest(message, {
+            consumerKey: CONSUMER_KEY,
+            consumerSecret: CONSUMER_SECRET
+        });
+        $.ajax({
+            type: message.method,
+            url: message.action,
+            headers: {
+                "Authorization": OAuth.getAuthorizationHeader("", message.parameters)
+            },
+            dataType: "text",
+            success: function (responseText) {
+                chrome.tabs.query({currentWindow: true, active: true}, function (tabs) {
+                    var currentTab = tabs[0];
+                    var queryMap = OAuth.getParameterMap(responseText);
+                    queryMap["window_id"] = currentTab.windowId.toString();
+                    open(OAuth.addToURL("pin.html", queryMap), "", "width=300, height=100");
+                });
+            },
+            error: function (responseObject) {
+                alert("Error: " + responseObject.status + " " + responseObject.statusText + "\n" + responseObject.responseText);
+            }
+        });
+    });
 });
