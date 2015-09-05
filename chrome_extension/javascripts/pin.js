@@ -29,7 +29,7 @@ $(function () {
             },
             dataType: "text",
             success: function (responseText) {
-                var accessTokenMap = OAuth.getParameterMap(responseText.replace(/\n/g, ""));
+                var accessTokenMap = OAuth.getParameterMap(responseText);
                 localStorage.setItem("accessToken", accessTokenMap["oauth_token"]);
                 localStorage.setItem("accessTokenSecret", accessTokenMap["oauth_token_secret"]);
                 $("body > p").text("Twitter連携の設定が完了しました。");
