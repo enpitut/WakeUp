@@ -108,7 +108,9 @@ function tweet(str, callBack){
     });
 };
 
-function searchTweets(str, callBack){
+function searchTweets(str,callBack){
+    var results = "";
+
     var message = {
         method: "GET",
         action: "https://api.twitter.com/1.1/search/tweets.json",
@@ -132,8 +134,7 @@ function searchTweets(str, callBack){
         data: OAuth.formEncode(originalParameters),
         dataType: "json",
         success: function (responseJson) {
-            var rank = getRank(responseJson);
-            if (callBack !== undefined) callBack(rank);
+            if (callBack !== undefined) callBack(responseJson);
         },
         error: function (responseObject) {
             alert("Error: " + responseObject.status + " " + responseObject.statusText + "\n" + responseObject.responseText);
@@ -141,11 +142,27 @@ function searchTweets(str, callBack){
     });
 }
 
+function showRank(){
+    searchTweets("#UGEN_DONE", function (responseJson) { alert("あなたは" + getRank(responseJson) + "位です！"); });
+}
+
 function getRank(responseJson){
-    for(var i=0;i<5;i++){
+    var tweetMax = 3;
+    var tweets = [];
+    
+    for (var i=0;i<responseJson.statuses.length;i++) {
         var tweet = responseJson.statuses[i];
-        alert( "最近のツイート（" + i + "）" + tweet.text );
+        if ( tweet.lang=="ja" ) {
+            tweets.push(tweet);
+        }
+        if ( tweets.length == tweetMax ) {
+            break;
+        }
     }
+    
+    for ( var i=0;i<tweets.length;i++ ) {
+        alert(tweets[i].text);
+    } 
     
     return 1;
 }
