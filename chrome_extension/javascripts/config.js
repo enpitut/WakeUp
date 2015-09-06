@@ -23,7 +23,6 @@ $(function () {
     $("#modify_account_button").click(function () {
         localStorage.setItem("replyAccount", $("#modify_account_text").val());
         flushReplyAccount();
-        $("#modify_account_text").val(localStorage.getItem("replyAccount"));
     });
     flushReplyAccount();
 
