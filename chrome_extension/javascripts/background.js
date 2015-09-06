@@ -143,12 +143,13 @@ function searchTweets(str,callBack){
 }
 
 function showRank(){
-    searchTweets("#UGEN_DONE", function (responseJson) { alert("あなたは" + getRank(responseJson) + "位です！"); });
+    searchTweets("UGEN_DONE", function (responseJson) { alert("あなたは" + getRank(responseJson) + "位です！"); });
 }
 
 function getRank(responseJson){
     var tweetMax = 3;
     var tweets = [];
+    var rank = tweetMax + 1;
     
     for (var i=0;i<responseJson.statuses.length;i++) {
         var tweet = responseJson.statuses[i];
@@ -161,8 +162,12 @@ function getRank(responseJson){
     }
     
     for ( var i=0;i<tweets.length;i++ ) {
-        alert(tweets[i].text);
-    } 
+        var splitTweet = (tweets[i].text).split("分かかると見積もった作業を");
+        var doneWordDeleted = splitTweet[1].replace("分で終えました!","");
+        var secondsStr = doneWordDeleted.replace(" #UGEN_DONE","");
+        var tweetRank = Number(secondsStr);
+        if((elapsedSeconds / 60) <= tweetRank)rank -= 1;
+    }
     
-    return 1;
+    return rank;
 }
