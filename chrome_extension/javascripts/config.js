@@ -6,6 +6,10 @@ function listNgSites() {
     }
 }
 
+function flushReplyAccount() {
+        $("#account").text("現在の宛先: " + localStorage.getItem("replyAccount"));
+}
+
 $(function () {
     $("#add_url_button").click(function () {
         var urlList = JSON.parse(localStorage.getItem("urlList"));
@@ -17,8 +21,10 @@ $(function () {
     listNgSites();
 
     $("#modify_account_text").val(localStorage.getItem("replyAccount"));
+    flushReplyAccount();
     $("#modify_account_button").click(function () {
         localStorage.setItem("replyAccount", $("#modify_account_text").val());
+        flushReplyAccount();
     });
 
     $("#oauth_button").click(function () {
