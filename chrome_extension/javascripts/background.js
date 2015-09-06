@@ -107,3 +107,45 @@ function tweet(str, callBack){
         }
     });
 };
+
+function searchTweets(str, callBack){
+    var message = {
+        method: "GET",
+        action: "https://api.twitter.com/1.1/search/tweets.json",
+        parameters: {
+            q: str
+        }
+    };
+    var originalParameters = $.extend({}, message.parameters);
+    OAuth.completeRequest(message, {
+        consumerKey: CONSUMER_KEY,
+        consumerSecret: CONSUMER_SECRET,
+        token: localStorage.getItem("accessToken"),
+        tokenSecret: localStorage.getItem("accessTokenSecret")
+    });
+    $.ajax({
+        type: message.method,
+        url: message.action,
+        headers: {
+            "Authorization": OAuth.getAuthorizationHeader("", message.parameters)
+        },
+        data: OAuth.formEncode(originalParameters),
+        dataType: "json",
+        success: function (responseJson) {
+            var rank = getRank(responseJson);
+            if (callBack !== undefined) callBack(rank);
+        },
+        error: function (responseObject) {
+            alert("Error: " + responseObject.status + " " + responseObject.statusText + "\n" + responseObject.responseText);
+        }
+    });
+}
+
+function getRank(responseJson){
+    for(var i=0;i<5;i++){
+        var tweet = responseJson.statuses[i];
+        alert( "最近のツイート（" + i + "）" + tweet.text );
+    }
+    
+    return 1;
+}
