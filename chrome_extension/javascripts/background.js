@@ -23,7 +23,7 @@ function mainLoop() {
         chrome.browserAction.setBadgeBackgroundColor({color:[255, 0, 0, 100]});
     }
     if (elapsedSeconds >= limitSeconds) {
-        tweet("@UGEN_teacher 突然のメンション失礼致します。このたび私事ながら作業が間に合いませんでした。誠に申し訳ありません。 " + new Date().toString(),
+        tweet("@" + localStorage.getItem("replyAccount") + " 突然のメンション失礼致します。このたび私事ながら作業が間に合いませんでした。誠に申し訳ありません。 " + new Date().toString(),
                 function(){ alert("tweetしたよ^_^"); });
         stopTimer();
         return;
@@ -66,6 +66,11 @@ function stopTimer() {
 if (localStorage.getItem("urlList") === null) {
     localStorage.setItem("urlList", JSON.stringify(["nicovideo.jp", "youtube.com"]));
 }
+
+if (localStorage.getItem("replyAccount") === null) {
+    localStorage.setItem("replyAccount", "UGEN_teacher");
+}
+
 function isNgSite(url) {
     var urlList = JSON.parse(localStorage.getItem("urlList"));
     for(var i = 0; i < urlList.length; i++){
