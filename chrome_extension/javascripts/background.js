@@ -40,8 +40,9 @@ function mainLoop() {
             alert("あと" + (TWEET_TIME - ALERT_TIME) + "秒" + currentTab.title + "に滞在するとTwitterに報告されます");
             break;
         case TWEET_TIME:
+            title = currentTab.title;
             chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
-            tweet("サボりました！有言不実行！！ " + new Date().toString(),
+            tweet("現在私は作業をサボって " + title + " を閲覧しています！" + new Date().toString(),
                 function(){ alert("tweetしたよ^_^");});
             stayNgSiteSeconds = 0;
             break;
