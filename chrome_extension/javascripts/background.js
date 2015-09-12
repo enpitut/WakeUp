@@ -1,11 +1,10 @@
-var stayNgSiteSeconds = 0;
-var elapsedSeconds = -1;
-var limitSeconds = 0;
+var limitSeconds;
+var elapsedSeconds;
+var stayNgSiteSeconds;
+var isTimerOn = false;
+
 var ALERT_TIME = 5;
 var TWEET_TIME = 10;
-var isTimerOn = false;
-var startButtonVisible = true;
-var taskTimeTextVisible = true;
 
 var timerId;
 function mainLoop() {
@@ -53,15 +52,17 @@ function mainLoop() {
 }
 function startTimer(arg) {
     limitSeconds = arg;
+    elapsedSeconds = -1;
+    stayNgSiteSeconds = -1;
     isTimerOn = true;
+    chrome.browserAction.setIcon({path: "../images/watchicon16.png"});
     mainLoop();
 }
 
 function stopTimer() {
-    elapsedSeconds = -1;
+    isTimerOn = false;
     chrome.browserAction.setBadgeText({"text": ""})
     chrome.browserAction.setIcon({path:"../images/icon16.png"});
-    isTimerOn = false;
     clearTimeout(timerId);
 }
 
