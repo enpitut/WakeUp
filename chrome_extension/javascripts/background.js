@@ -23,7 +23,7 @@ function mainLoop() {
         chrome.browserAction.setBadgeBackgroundColor({color:[255, 0, 0, 100]});
     }
     if (elapsedSeconds >= limitSeconds) {
-        tweet("@" + localStorage.getItem("replyAccount") + " 突然のメンション失礼致します。このたび私事ながら作業が間に合いませんでした。誠に申し訳ありません。 " + new Date().toString(),
+        tweet("@" + localStorage.getItem("replyAccount") + " 突然のメンション失礼致します。このたび私事ながら作業が間に合いませんでした。誠に申し訳ありません #UGEN " + new Date().toString(),
                 function(){ alert("tweetしたよ^_^"); });
         stopTimer();
         return;
@@ -43,7 +43,7 @@ function mainLoop() {
             tweet_title = currentTab.title;
             tweet_url = currentTab.url;
             chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
-            tweet("現在私は作業をサボって " + tweet_title + "(" + tweet_url + ") を見ています" + new Date().toString(),
+            tweet("現在私は作業をサボって " + tweet_title + " " + tweet_url + " を見ています #UGEN " + new Date().toString(),
                 function(){ alert("tweetしたよ^_^");});
             stayNgSiteSeconds = 0;
             break;
