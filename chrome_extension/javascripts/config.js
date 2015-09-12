@@ -7,7 +7,7 @@ function listNgSites() {
 }
 
 function flushReplyAccount() {
-        $("#account").text("現在の宛先: " + localStorage.getItem("replyAccount"));
+    $("#account").text("現在の宛先: " + localStorage.getItem("replyAccount"));
 }
 
 $(function () {
@@ -59,4 +59,15 @@ $(function () {
             }
         });
     });
+
+    $("#tweet_tabinfo_checkbox").change(function () {
+        if ($(this).is(":checked")) {
+            localStorage.setItem("tweetTabinfo", "True");
+        } else {
+            localStorage.setItem("tweetTabinfo", "False");
+        }
+    });
+    if (localStorage.getItem("tweetTabinfo") === "True") {
+        $("#tweet_tabinfo_checkbox").prop('checked', true);
+    }
 });
