@@ -68,6 +68,6 @@ $(function () {
         }
     });
     if (localStorage.getItem("tweetTabinfo") === "True") {
-        $("#tweet_tabinfo_checkbox").prop('checked', true);
+        $("#tweet_tabinfo_checkbox").prop("checked", true);
     }
 });
