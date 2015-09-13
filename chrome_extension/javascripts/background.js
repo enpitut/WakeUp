@@ -39,8 +39,8 @@ function mainLoop() {
             alert("あと" + (TWEET_TIME - ALERT_TIME) + "秒" + currentTab.title + "に滞在するとTwitterに報告されます");
             break;
         case TWEET_TIME:
-            tweet_title = currentTab.title;
-            tweet_url = currentTab.url;
+            var tweetTitle = currentTab.title;
+            var tweetUrl = currentTab.url;
             chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
             if(localStorage.getItem("tweetTabinfo") === "True") {
                 tweet("私は作業をサボって " + tweet_title + " (" + tweet_url + ") を見ていました #UGEN " + new Date().toString(),
