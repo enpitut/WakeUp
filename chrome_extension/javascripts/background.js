@@ -39,16 +39,14 @@ function mainLoop() {
             alert("あと" + (TWEET_TIME - ALERT_TIME) + "秒" + currentTab.title + "に滞在するとTwitterに報告されます");
             break;
         case TWEET_TIME:
-            var tweetTitle = currentTab.title;
-            var tweetUrl = currentTab.url;
-            chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
             if(localStorage.getItem("tweetTabinfo") === "True") {
-                tweet("私は作業をサボって " + tweet_title + " (" + tweet_url + ") を見ていました #UGEN " + new Date().toString(),
+                tweet("私は作業をサボって " + currentTab.title + " (" + currentTab.url + ") を見ていました #UGEN " + new Date().toString(),
                     function(){ alert("tweetしたよ^_^");});
             } else {
                 tweet("私は作業をサボっていました #UGEN " + new Date().toString(),
                     function(){ alert("tweetしたよ^_^");});
             }
+            chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
             stayNgSiteSeconds = 0;
             break;
         }
