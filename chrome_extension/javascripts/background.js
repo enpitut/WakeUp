@@ -22,7 +22,7 @@ function mainLoop() {
         chrome.browserAction.setBadgeBackgroundColor({color:[255, 0, 0, 100]});
     }
     if (elapsedSeconds >= limitSeconds) {
-        tweet("@" + localStorage.getItem("replyAccount") + " 突然のリプライ失礼致します。このたび私事ながら作業時間の見積もりに失敗しました。誠に申し訳ありません #UGEN " + new Date().toString(),
+        tweet(`@${localStorage.getItem("replyAccount")} 突然のリプライ失礼致します。このたび私事ながら作業時間の見積もりに失敗しました。誠に申し訳ありません ${new Date().toString()} #UGEN`,
                 function(){ alert("tweetしたよ^_^"); });
         stopTimer();
         return;
@@ -30,20 +30,20 @@ function mainLoop() {
 
     chrome.tabs.query({currentWindow: true, active: true}, function (tabs) {
         var currentTab = tabs[0];
-        if (currentTab == null) return next();
+        if (currentTab === null) return next();
         if (!isNgSite(currentTab.url)) return next();
 
         stayNgSiteSeconds++;
         switch (stayNgSiteSeconds) {
         case ALERT_TIME:
-            alert("あと" + (TWEET_TIME - ALERT_TIME) + "秒" + currentTab.title + "に滞在するとTwitterに報告されます");
+            alert(`あと ${(TWEET_TIME - ALERT_TIME)} 秒 ${currentTab.title} に滞在するとTwitterに報告されます`);
             break;
         case TWEET_TIME:
             if(localStorage.getItem("tweetTabinfo") === "True") {
-                tweet("私は作業をサボって " + currentTab.title + " (" + currentTab.url + ") を見ていました #UGEN " + new Date().toString(),
+                tweet(`私は作業をサボって ${currentTab.title.substr(0, 40).replace(/(@|#)/g, "$1\u200c")} (${currentTab.url}) を見ていました ${new Date().toString()} #UGEN`.substr(0,140),
                     function(){ alert("tweetしたよ^_^");});
             } else {
-                tweet("私は作業をサボっていました #UGEN " + new Date().toString(),
+                tweet(`私は作業をサボっていました ${new Date().toString()} #UGEN`,
                     function(){ alert("tweetしたよ^_^");});
             }
             chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
@@ -64,7 +64,7 @@ function startTimer(arg) {
 
 function stopTimer() {
     isTimerOn = false;
-    chrome.browserAction.setBadgeText({"text": ""})
+    chrome.browserAction.setBadgeText({"text": ""});
     chrome.browserAction.setIcon({path:"../images/icon16.png"});
     clearTimeout(timerId);
 }
@@ -114,7 +114,7 @@ function tweet(str, callBack){
             if (callBack !== undefined) callBack();
         },
         error: function (responseObject) {
-            alert("Error: " + responseObject.status + " " + responseObject.statusText + "\n" + responseObject.responseText);
+            alert(`Error: ${responseObject.status} ${responseObject.statusText}\n ${responseObject.responseText}`);
         }
     });
 };
