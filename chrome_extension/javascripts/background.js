@@ -2,6 +2,7 @@ var limitSeconds;
 var elapsedSeconds;
 var stayNgSiteSeconds;
 var isTimerOn = false;
+var oneMinuteAlerted = false;
 
 var ALERT_TIME = 5;
 var TWEET_TIME = 10;
@@ -18,6 +19,10 @@ function mainLoop() {
         chrome.browserAction.setBadgeText({"text": Math.round(remainingSeconds / 60).toString()});
         chrome.browserAction.setBadgeBackgroundColor({color:[0, 0, 255, 100]});
     } else {
+        if (!oneMinuteAlerted){
+            var nortification = new Notification("あと1分です");
+            oneMinuteAlerted = true;
+        }
         chrome.browserAction.setBadgeText({"text": Math.round(remainingSeconds).toString()});
         chrome.browserAction.setBadgeBackgroundColor({color:[255, 0, 0, 100]});
     }
