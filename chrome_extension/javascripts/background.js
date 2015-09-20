@@ -20,7 +20,11 @@ function mainLoop() {
         chrome.browserAction.setBadgeBackgroundColor({color:[0, 0, 255, 100]});
     } else {
         if (!oneMinuteAlerted){
-            var nortification = new Notification("あと1分です");
+            var options = {
+                body : "",
+                icon : "../images/ugenchan.png"
+            }
+            var notification = new Notification("あと1分です",options);
             oneMinuteAlerted = true;
         }
         chrome.browserAction.setBadgeText({"text": Math.round(remainingSeconds).toString()});
