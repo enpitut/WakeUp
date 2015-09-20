@@ -25,6 +25,7 @@ function mainLoop() {
                 icon : "../images/ugenchan.png"
             }
             var notification = new Notification("あと1分です",options);
+            setTimeout(notification.close.bind(notification),2000);
             oneMinuteAlerted = true;
         }
         chrome.browserAction.setBadgeText({"text": Math.round(remainingSeconds).toString()});
