@@ -64,6 +64,7 @@ function startTimer(arg) {
     stayNgSiteSeconds = -1;
     isTimerOn = true;
     chrome.browserAction.setIcon({path: "../images/watchicon16.png"});
+    oneMinuteNotified = false;
     mainLoop();
 }
 
