@@ -40,7 +40,7 @@ function mainLoop() {
             break;
         case TWEET_TIME:
             if(localStorage.getItem("tweetTabinfo") === "True") {
-                tweet(`私は作業をサボって ${currentTab.title.substr(0, 40).replace(/(@|#)/g, "$1\u200c")}(${currentTab.url}) を見ていました ${new Date().toString()}`.substr(0, 135) + " #UGEN",
+                tweet(`私は作業をサボって ${currentTab.title.substr(0, 40).replace(/(@|#|＃|＠)/g, "$1\u200c")}(${currentTab.url}) を見ていました ${new Date().toString()}`.substr(0, 135) + " #UGEN",
                     function(){ alert("tweetしたよ^_^");});
             } else {
                 tweet(`私は作業をサボっていました ${new Date().toString()} #UGEN`,
