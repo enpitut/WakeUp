@@ -43,7 +43,22 @@ function mainLoop() {
             tweet("サボりました！有言不実行！！ " + new Date().toString(),
                 function(){ alert("tweetしたよ^_^");});
             stayNgSiteSeconds = 0;
-            break;
+            <!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>バックグラウンドページ</title>
+<script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="javascripts/sha1.js"></script>
+<script type="text/javascript" src="javascripts/oauth.js"></script>
+<script type="text/javascript" src="javascripts/consumer_key_and_secret.js"></script>
+<script type="text/javascript" src="javascripts/background.js"></script>
+</head>
+<body>
+これはバックグラウンドページです
+</body>
+</html>
+break;
         }
         next();
     });
@@ -113,3 +128,9 @@ function tweet(str, callBack){
         }
     });
 };
+
+function roopTimer(workTerm,restTerm,roopNumber){
+	for(i = 0;i < roopNumber;i++){
+		setTimeout(startTimer(workTime),miriSecond*i);
+	}
+}
