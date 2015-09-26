@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>設定ページ</title>
+<script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="javascripts/sha1.js"></script>
+<script type="text/javascript" src="javascripts/oauth.js"></script>
+<script type="text/javascript" src="javascripts/consumer_key_and_secret.js"></script>
+<script type="text/javascript" src="javascripts/config.js"></script>
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body>
+    <h1>ブロックサイト一覧</h1>
+    <ul id="url_list"></ul>
+    <p>
+        <input type="text" value="http://example.com/" id="add_url_text"><input type="button" value="追加" id="add_url_button">
+    </p>
+    <h1>タスク失敗時にリプライを送る相手</h1>
+    <span id="account"></span>
+    <p>
+        @<input type="text" size="15" id="modify_account_text">に<input type="button" value="修正" id="modify_account_button">
+    </p>
+    <h1>Twitter連携</h1>
+    <p>
+        <input type="button" value="連携する" id="oauth_button">
+    </p>
+    <p>
+        <a href="popup.html">戻る</a>
+    </p>
+</body>
+</html>
