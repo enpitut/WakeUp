@@ -17,7 +17,7 @@ $(function () {
         flushButtonArea();
     });
     $("#end_button").click(function () {
-        var message = Math.round(bg.limitSeconds / 60).toString() + "分かかると見積もった作業を" + Math.round(bg.elapsedSeconds / 60).toString() + "分で終えました!" + new Date().toString();
+        var message = Math.round(bg.limitSeconds / 60).toString() + "分かかると見積もった作業を" + Math.round(bg.elapsedSeconds / 60).toString() + "分で終えました! #UGEN " + new Date().toString();
         bg.tweet(message, function(){ bg.alert("tweetしたよ^_^"); });
         bg.stopTimer();
         flushButtonArea();
