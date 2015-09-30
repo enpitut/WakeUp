@@ -4,6 +4,7 @@ var limitSeconds;
 var elapsedSeconds;
 var stayNgSiteSeconds;
 var isTimerOn = false;
+var oneMinuteNotified = false;
 
 const ALERT_TIME = 5;
 const TWEET_TIME = 10;
@@ -20,6 +21,15 @@ function mainLoop() {
         chrome.browserAction.setBadgeText({"text": Math.round(remainingSeconds / 60).toString()});
         chrome.browserAction.setBadgeBackgroundColor({color:[0, 0, 255, 100]});
     } else {
+        if (!oneMinuteNotified){
+            var options = {
+                body : "",
+                icon : "../images/ugenchan.png"
+            }
+            var notification = new Notification("あと1分でtweetされます",options);
+            setTimeout(notification.close.bind(notification),2000);
+            oneMinuteNotified = true;
+        }
         chrome.browserAction.setBadgeText({"text": Math.round(remainingSeconds).toString()});
         chrome.browserAction.setBadgeBackgroundColor({color:[255, 0, 0, 100]});
     }
@@ -61,6 +71,7 @@ function startTimer(arg) {
     stayNgSiteSeconds = -1;
     isTimerOn = true;
     chrome.browserAction.setIcon({path: "../images/watchicon16.png"});
+    oneMinuteNotified = false;
     mainLoop();
 }
 
