@@ -24,7 +24,7 @@ function mainLoop() {
                 body : "",
                 icon : "../images/ugenchan.png"
             }
-            var notification = new Notification("あと1分です",options);
+            var notification = new Notification("あと1分でtweetされます",options);
             setTimeout(notification.close.bind(notification),2000);
             oneMinuteNotified = true;
         }
