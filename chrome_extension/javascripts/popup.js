@@ -22,5 +22,9 @@ $(function () {
         bg.stopTimer();
         flushButtonArea();
     });
+    $("#goto_option").click(function () {
+        var options_url = chrome.extension.getURL("options.html");
+        window.open(options_url);
+    });
     flushButtonArea();
 });
