@@ -1,34 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>設定ページ</title>
-<script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
-<script type="text/javascript" src="javascripts/sha1.js"></script>
-<script type="text/javascript" src="javascripts/oauth.js"></script>
-<script type="text/javascript" src="javascripts/consumer_key_and_secret.js"></script>
-<script type="text/javascript" src="javascripts/config.js"></script>
-<link rel="stylesheet" href="style.css" type="text/css">
+    <meta charset="UTF-8">
+    <title>設定ページ</title>
+    <script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="javascripts/sha1.js"></script>
+    <script type="text/javascript" src="javascripts/oauth.js"></script>
+    <script type="text/javascript" src="javascripts/consumer_key_and_secret.js"></script>
+    <script type="text/javascript" src="javascripts/config.js"></script>
+    <link rel="stylesheet" href="options.css" type="text/css">
 </head>
 <body>
-<div class="wrapper">
-  <h1>詳細設定</h1>
-  <div class="container">
-    <h2>ブロックサイト一覧</h2>
-    <p>
-    <input type="text" value="http://example.com/" id="add_url_text"><input type="button" value="追加" id="add_url_button">
-    </p>
-    <ul id="url_list"></ul>
-    <h2>タスク失敗時にリプライを送る相手</h2>
-    <span id="account"></span>
-    <p>
-    @<input type="text" size="15" id="modify_account_text">に<input type="button" value="修正" id="modify_account_button">
-    </p>
-    <h2>Twitter連携</h2>
-    <p>
-    <input type="button" value="連携する" id="oauth_button">
-    </p>
-  </div>
-</div>
+    <div class="wrapper">
+        <div class="container">
+            <h1>詳細設定</h1>
+            <section>
+                <h2>ブロックサイト一覧</h2>
+                <p>
+                    <input type="text" value="http://example.com/" id="add_url_text"><input type="button" value="追加" id="add_url_button">
+                </p>
+                <ul id="url_list"></ul>
+            </section>
+            <section>
+                <h2>タスク失敗時にリプライを送る相手</h2>
+                <p>
+                    @<input type="text" size="15" id="modify_account_text">に<input type="button" value="修正" id="modify_account_button">
+                </p>
+                <span id="account"></span>
+            </section>
+            <section>
+                <h2>Twitter連携</h2>
+                <p>
+                    <input type="button" value="連携する" id="oauth_button">
+                </p>
+            </section>
+            <section>
+                <h2>追加機能(非推奨)</h2>
+                <span>
+                    <input type="checkbox" id="tweet_tabinfo_checkbox">サボり通知ツイートにタブの情報を含める
+                </span>
+            </section>
+        </div>
+    </div>
 </body>
 </html>
