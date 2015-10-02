@@ -1,12 +1,7 @@
-html {
-    width : 250px;
-}
 h1 {
-    font-size : small;
+    text-align: left;
 }
 a {
     color : #555555;
 }
-p {
-    text-align : center;
-}
+
