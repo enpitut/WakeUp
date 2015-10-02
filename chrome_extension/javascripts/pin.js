@@ -1,4 +1,6 @@
-var queryMap = OAuth.getParameterMap(location.search.replace(/\?/, ""));
+"use strict";
+
+let queryMap = OAuth.getParameterMap(location.search.replace(/\?/, ""));
 chrome.tabs.create({
     windowId: parseInt(queryMap["window_id"], 10),
     url: OAuth.addToURL("http://twitter.com/oauth/authorize", {
@@ -6,9 +8,9 @@ chrome.tabs.create({
     })
 });
 
-$(function () {
-    $("#pin_button").click(function () {
-        var message = {
+$(() => {
+    $("#pin_button").click(() => {
+        let message = {
             method: "POST",
             action: "https://api.twitter.com/oauth/access_token",
             parameters: {
@@ -28,16 +30,16 @@ $(function () {
                 "Authorization": OAuth.getAuthorizationHeader("", message.parameters)
             },
             dataType: "text",
-            success: function (responseText) {
-                var accessTokenMap = OAuth.getParameterMap(responseText);
+            success: responseText => {
+                let accessTokenMap = OAuth.getParameterMap(responseText);
                 localStorage.setItem("accessToken", accessTokenMap["oauth_token"]);
                 localStorage.setItem("accessTokenSecret", accessTokenMap["oauth_token_secret"]);
                 $("body > p").text("Twitter連携の設定が完了しました。");
                 setTimeout(close, 2000);
             },
-            error: function (responseObject) {
+            error: responseObject => {
                 $("body > p").empty()
-                    .append(document.createTextNode("Error: " + responseObject.status + " " + responseObject.statusText))
+                    .append(document.createTextNode(`Error: ${responseObject.status} ${responseObject.statusText}`))
                     .append(document.createElement("br"))
                     .append(document.createTextNode(responseObject.responseText));
             }
