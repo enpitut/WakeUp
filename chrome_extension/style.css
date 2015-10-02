@@ -10,3 +10,6 @@ a {
 p {
     text-align : center;
 }
+table {
+    width: 100%;
+}
