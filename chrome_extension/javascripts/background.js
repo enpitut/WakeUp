@@ -161,11 +161,9 @@ function searchTweets(str,callBack){
             alert("Error: " + responseObject.status + " " + responseObject.statusText + "\n" + responseObject.responseText);
         }
     });
-    alert("search");
 }
 
 function showRank(){
-    alert("show");
     searchTweets("UGEN_DONE", function (responseJson) {
         var ranks = calculateRank(responseJson);
         var notification = new Notification("ここ" + ranks["all"] + "件中あなたは" + ranks["me"] + "位です！");
@@ -178,10 +176,8 @@ function calculateRank(responseJson){
     var myRank = tweetNum + 1;
     var re = /\d+分かかると見積もった作業を\d+分で終えました!.*/
     
-    alert("結果 is " + responseJson.statuses.length);
     for (var i=0;i<responseJson.statuses.length;i++) {
         var tweet = responseJson.statuses[i];
-        alert(tweet.text + " is " + (tweet.text).match(re));
         if ( tweet.lang=="ja"  && (tweet.text).match(re)) {
             tweets.push(tweet);
         }
@@ -199,13 +195,13 @@ function calculateRank(responseJson){
         var splitTweet = (tweets[i].text).split("分かかると見積もった作業を");
         var doneWordDeleted = splitTweet[1].replace("分で終えました!","");
         var secondsStr = doneWordDeleted.replace(" #UGEN_DONE","");
-        var tweetRank = Number(secondsStr);
-        if((elapsedSeconds / 60) <= tweetRank)myRank -= 1;
+        var seconds = Number(secondsStr);
+        if((elapsedSeconds / 60) >= seconds)myRank -= 1;
     }
     
     var ranks = {
         "me" : myRank,
-        "all" : tweetNum
+        "all" : (tweetNum+1)
     };
 
     return ranks;
