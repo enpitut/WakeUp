@@ -132,14 +132,14 @@ function tweet(str, callBack){
 };
 
 function searchTweets(str,callBack){
-    var message = {
+    let message = {
         method: "GET",
         action: "https://api.twitter.com/1.1/search/tweets.json",
         parameters: {
             q: str
         }
     };
-    var originalParameters = $.extend({}, message.parameters);
+    let originalParameters = $.extend({}, message.parameters);
     OAuth.completeRequest(message, {
         consumerKey: CONSUMER_KEY,
         consumerSecret: CONSUMER_SECRET,
@@ -154,32 +154,31 @@ function searchTweets(str,callBack){
         },
         data: OAuth.formEncode(originalParameters),
         dataType: "json",
-        success: function (responseJson) {
-            if (callBack !== undefined) callBack(responseJson);
+        success: responseJson => {
+            if (callBack !== undefined) callBack();
         },
-        error: function (responseObject) {
-            alert("Error: " + responseObject.status + " " + responseObject.statusText + "\n" + responseObject.responseText);
+        error: responseObject => {
+            alert(`Error: ${responseObject.status} ${responseObject.statusText}\n${responseObject.responseText}`);
         }
     });
 }
 
 function showRank(){
-    searchTweets("UGEN_DONE", function (responseJson) {
+    searchTweets("UGEN_DONE", responseJson) => {
         var ranks = calculateRank(responseJson);
-        var notification = new Notification("ここ" + ranks["all"] + "件中あなたは" + ranks["me"] + "位です！");
+        var notification = new Notification(`ここ${ranks["all"]}件中あなたは${ranks["me"]}位です！`);
         });
 }
 
 function calculateRank(responseJson){
-    var tweetNum = 3;
-    var tweets = [];
-    var myRank = tweetNum + 1;
-    var re = /\d+分かかると見積もった作業を\d+分で終えました!.*/
+    let tweetNum = 10;
+    let tweets = [];
+    let myRank = tweetNum + 1;
+    let re = /\d+分かかると見積もった作業を\d+分で終えました!.*/;
     
-    for (var i=0;i<responseJson.statuses.length;i++) {
-        var tweet = responseJson.statuses[i];
+    for ( let tweet of responseJson.statuses ) {
         if ( tweet.lang=="ja"  && (tweet.text).match(re)) {
-            tweets.push(tweet);
+            tweets.push(tweet.text);
         }
         if ( tweets.length == tweetNum ) {
             break;
@@ -191,15 +190,15 @@ function calculateRank(responseJson){
         myRank = tweetNum + 1;
     }
     
-    for ( var i=0;i<tweets.length;i++ ) {
-        var splitTweet = (tweets[i].text).split("分かかると見積もった作業を");
-        var doneWordDeleted = splitTweet[1].replace("分で終えました!","");
-        var secondsStr = doneWordDeleted.replace(" #UGEN_DONE","");
-        var seconds = Number(secondsStr);
+    for ( let text of tweets ) {
+        let splitTweet = text.split("分かかると見積もった作業を");
+        let doneWordDeleted = splitTweet[1].replace("分で終えました!","");
+        let secondsStr = doneWordDeleted.replace(" #UGEN_DONE","");
+        let seconds = Number(secondsStr);
         if((elapsedSeconds / 60) >= seconds)myRank -= 1;
     }
     
-    var ranks = {
+    let ranks = {
         "me" : myRank,
         "all" : (tweetNum+1)
     };
