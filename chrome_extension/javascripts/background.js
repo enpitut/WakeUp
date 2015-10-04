@@ -132,8 +132,6 @@ function tweet(str, callBack){
 };
 
 function searchTweets(str,callBack){
-    var results = "";
-
     var message = {
         method: "GET",
         action: "https://api.twitter.com/1.1/search/tweets.json",
@@ -163,25 +161,37 @@ function searchTweets(str,callBack){
             alert("Error: " + responseObject.status + " " + responseObject.statusText + "\n" + responseObject.responseText);
         }
     });
+    alert("search");
 }
 
 function showRank(){
-    searchTweets("UGEN_DONE", function (responseJson) { alert("あなたは" + getRank(responseJson) + "位です！"); });
+    alert("show");
+    searchTweets("UGEN_DONE", function (responseJson) {
+        var ranks = calculateRank(responseJson);
+        var notification = new Notification("ここ" + ranks["all"] + "件中あなたは" + ranks["me"] + "位です！");
+        });
 }
 
-function getRank(responseJson){
-    var tweetMax = 3;
+function calculateRank(responseJson){
+    var tweetNum = 3;
     var tweets = [];
-    var rank = tweetMax + 1;
+    var myRank = tweetNum + 1;
+    var re = new RegExp("\d+分かかると見積もった作業を\d+分で終えました!.*");
     
     for (var i=0;i<responseJson.statuses.length;i++) {
         var tweet = responseJson.statuses[i];
-        if ( tweet.lang=="ja" ) {
+        alert(tweet.text);
+        if ( tweet.lang=="ja"  && tweet.text.match(re)) {
             tweets.push(tweet);
         }
-        if ( tweets.length == tweetMax ) {
+        if ( tweets.length == tweetNum ) {
             break;
         }
+    }
+    
+    if(tweets.length < tweetNum){
+        tweetNum = tweets.length;
+        myRank = tweetNum + 1;
     }
     
     for ( var i=0;i<tweets.length;i++ ) {
@@ -189,8 +199,14 @@ function getRank(responseJson){
         var doneWordDeleted = splitTweet[1].replace("分で終えました!","");
         var secondsStr = doneWordDeleted.replace(" #UGEN_DONE","");
         var tweetRank = Number(secondsStr);
-        if((elapsedSeconds / 60) <= tweetRank)rank -= 1;
+        if((elapsedSeconds / 60) <= tweetRank)myRank -= 1;
+        alert(tweets[i]);
     }
     
-    return rank;
+    var ranks = {
+        "me" : myRank,
+        "all" : tweetNum
+    };
+
+    return ranks;
 }
