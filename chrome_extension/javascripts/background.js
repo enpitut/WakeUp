@@ -176,12 +176,13 @@ function calculateRank(responseJson){
     var tweetNum = 3;
     var tweets = [];
     var myRank = tweetNum + 1;
-    var re = new RegExp("\d+分かかると見積もった作業を\d+分で終えました!.*");
+    var re = /\d+分かかると見積もった作業を\d+分で終えました!.*/
     
+    alert("結果 is " + responseJson.statuses.length);
     for (var i=0;i<responseJson.statuses.length;i++) {
         var tweet = responseJson.statuses[i];
-        alert(tweet.text);
-        if ( tweet.lang=="ja"  && tweet.text.match(re)) {
+        alert(tweet.text + " is " + (tweet.text).match(re));
+        if ( tweet.lang=="ja"  && (tweet.text).match(re)) {
             tweets.push(tweet);
         }
         if ( tweets.length == tweetNum ) {
@@ -200,7 +201,6 @@ function calculateRank(responseJson){
         var secondsStr = doneWordDeleted.replace(" #UGEN_DONE","");
         var tweetRank = Number(secondsStr);
         if((elapsedSeconds / 60) <= tweetRank)myRank -= 1;
-        alert(tweets[i]);
     }
     
     var ranks = {
