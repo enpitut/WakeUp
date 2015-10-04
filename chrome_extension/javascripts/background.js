@@ -130,3 +130,78 @@ function tweet(str, callBack){
         }
     });
 };
+
+function searchTweets(str,callBack){
+    let message = {
+        method: "GET",
+        action: "https://api.twitter.com/1.1/search/tweets.json",
+        parameters: {
+            q: str
+        }
+    };
+    let originalParameters = $.extend({}, message.parameters);
+    OAuth.completeRequest(message, {
+        consumerKey: CONSUMER_KEY,
+        consumerSecret: CONSUMER_SECRET,
+        token: localStorage.getItem("accessToken"),
+        tokenSecret: localStorage.getItem("accessTokenSecret")
+    });
+    $.ajax({
+        type: message.method,
+        url: message.action,
+        headers: {
+            "Authorization": OAuth.getAuthorizationHeader("", message.parameters)
+        },
+        data: OAuth.formEncode(originalParameters),
+        dataType: "json",
+        success: responseJson => {
+            if (callBack !== undefined) callBack(responseJson);
+        },
+        error: responseObject => {
+            alert(`Error: ${responseObject.status} ${responseObject.statusText}\n${responseObject.responseText}`);
+        }
+    });
+}
+
+function notifyRank(){
+    searchTweets("UGEN_DONE", responseJson => {
+        var ranks = calculateRank(responseJson);
+        var notification = new Notification(`ここ${ranks["all"]}件中あなたは${ranks["me"]}位です！`);
+        });
+}
+
+function calculateRank(responseJson){
+    let tweetNum = 10;
+    let tweets = [];
+    let myRank = tweetNum + 1;
+    let re = new RegExp("\\d+分かかると見積もった作業を\\d+分で終えました!.*");
+    
+    for ( let tweet of responseJson.statuses ) {
+        if ( tweet.lang=="ja"  && (tweet.text).match(re)) {
+            tweets.push(tweet.text);
+        }
+        if ( tweets.length == tweetNum ) {
+            break;
+        }
+    }
+    
+    if(tweets.length < tweetNum){
+        tweetNum = tweets.length;
+        myRank = tweetNum + 1;
+    }
+    
+    for ( let text of tweets ) {
+        let splitTweet = text.split("分かかると見積もった作業を");
+        let doneWordDeleted = splitTweet[1].replace("分で終えました!","");
+        let secondsStr = doneWordDeleted.replace(" #UGEN_DONE","");
+        let seconds = Number(secondsStr);
+        if((elapsedSeconds / 60) >= seconds)myRank -= 1;
+    }
+    
+    let ranks = {
+        "me": myRank,
+        "all": (tweetNum+1)
+    };
+    
+    return ranks;
+}
