@@ -25,4 +25,14 @@ $(() => {
         flushButtonArea();
     });
     flushButtonArea();
+    
+    $("#register_ngsite_button").click(() => {
+        chrome.tabs.query({currentWindow: true, active: true}, tabs => {
+                let currentTab = tabs[0];
+                let urlList = JSON.parse(localStorage.getItem("urlList"));
+                urlList.push(currentTab.url);
+                localStorage.setItem("urlList", JSON.stringify(urlList));
+        });
+    });
 });
+
