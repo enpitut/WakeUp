@@ -155,7 +155,7 @@ function searchTweets(str,callBack){
         data: OAuth.formEncode(originalParameters),
         dataType: "json",
         success: responseJson => {
-            if (callBack !== undefined) callBack();
+            if (callBack !== undefined) callBack(responseJson);
         },
         error: responseObject => {
             alert(`Error: ${responseObject.status} ${responseObject.statusText}\n${responseObject.responseText}`);
@@ -163,8 +163,8 @@ function searchTweets(str,callBack){
     });
 }
 
-function showRank(){
-    searchTweets("UGEN_DONE", responseJson) => {
+function notifyRank(){
+    searchTweets("UGEN_DONE", responseJson => {
         var ranks = calculateRank(responseJson);
         var notification = new Notification(`ここ${ranks["all"]}件中あなたは${ranks["me"]}位です！`);
         });
@@ -174,7 +174,7 @@ function calculateRank(responseJson){
     let tweetNum = 10;
     let tweets = [];
     let myRank = tweetNum + 1;
-    let re = /\d+分かかると見積もった作業を\d+分で終えました!.*/;
+    let re = new RegExp("\\d+分かかると見積もった作業を\\d+分で終えました!.*");
     
     for ( let tweet of responseJson.statuses ) {
         if ( tweet.lang=="ja"  && (tweet.text).match(re)) {
@@ -199,9 +199,9 @@ function calculateRank(responseJson){
     }
     
     let ranks = {
-        "me" : myRank,
-        "all" : (tweetNum+1)
+        "me": myRank,
+        "all": (tweetNum+1)
     };
-
+    
     return ranks;
 }
