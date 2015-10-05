@@ -25,7 +25,7 @@ $(() => {
         flushButtonArea();
     });
     $("#goto_option").click(() => {
-        let options_url = chrome.extension.getURL("config.html");
+        let optionsUrl = chrome.extension.getURL("config.html");
         window.open(options_url);
     });
     flushButtonArea();
