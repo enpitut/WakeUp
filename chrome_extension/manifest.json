@@ -22,5 +22,5 @@
     "default_title": "UGEN",
     "default_popup": "popup.html"
   },
-  "options_page": "options.html"
+  "options_page": "config.html"
 }
