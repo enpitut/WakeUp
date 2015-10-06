@@ -28,7 +28,9 @@ $(() => {
     });
     $("#end_button").click(() => {
         let message = `${Math.round(bg.limitSeconds / 60)}分かかると見積もった作業を${Math.round(bg.elapsedSeconds / 60)}分で終えました! #UGEN ${new Date()}`;
-        bg.tweet(message, () => { bg.alert("tweetしたよ^_^"); });
+        bg.tweet(message)
+            .then(() => { bg.alert("tweetしたよ^_^"); })
+            .catch(e => { bg.alert(e.message); });
         bg.stopTimer();
         flushButtonArea();
         refreshGuideMessage();
