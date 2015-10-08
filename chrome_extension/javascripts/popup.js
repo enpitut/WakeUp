@@ -24,5 +24,9 @@ $(() => {
         bg.stopTimer();
         flushButtonArea();
     });
+    $("#goto_option").click(() => {
+        let optionsUrl = chrome.extension.getURL("config.html");
+        open(optionsUrl);
+    });
     flushButtonArea();
 });
