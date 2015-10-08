@@ -13,9 +13,9 @@ $(() => {
     }
     function refreshGuideMessage() {
         if (bg.isTimerOn) {
-            $("#guide_message").html("監視中");
+            $("#guide_message").text("監視中");
         } else {
-            $("#guide_message").html("ボタンを押すと監視がはじまるよ！");
+            $("#guide_message").text("ボタンを押すと監視がはじまるよ！");
         }
     }
 
