@@ -13,19 +13,18 @@ $(function () {
     $("#start_button").click(function () {
         var time = Number($("#task_time_text").val()) * 60;
         if(isNaN(time) || time < 0) return false;
-        bg.startTimer(time);
+        bg.roopTimer(time);
         flushButtonArea();
     });
 
     $("#roop_button").click(function () {
-        var tasktime = Number($("#task_time_text").val()) * 60;
-        var restTime = Number($("#rest_time_text").val()) * 60;
-        var roopcount = Number($("#roop_count_text").val());
-        if(isNaN(time) || time < 0) return false;
-        bg.roopTimer(time,restTime,roopCount);
+        var taskTime = Number($("#task_time_text").val()) * 60;
+        var restTime = Number($("#rest_time_text").val()) * 60 * 1000;
+        var roopCount = Number($("#roop_count_text").val());
+        if(isNaN(taskTime) || taskTime < 0) return false;
+        var timerID = setInterval(bg.startTimer(taskTime,restTime,roopCount),restTime+restTime);
         flushButtonArea();
     });
-
     $("#end_button").click(function () {
         var message = Math.round(bg.limitSeconds / 60).toString() + "分かかると見積もった作業を" + Math.round(bg.elapsedSeconds / 60).toString() + "分で終えました!" + new Date().toString();
         bg.tweet(message, function(){ bg.alert("tweetしたよ^_^"); });
