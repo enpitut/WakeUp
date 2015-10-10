@@ -131,7 +131,7 @@ function tweet(str, callBack){
     });
 };
 
-function searchTweets(str,callBack){
+function searchTweets(str, callBack){
     let message = {
         method: "GET",
         action: "https://api.twitter.com/1.1/search/tweets.json",
@@ -149,6 +149,7 @@ function searchTweets(str,callBack){
     $.ajax({
         type: message.method,
         url: message.action,
+        timeout: 10000,
         headers: {
             "Authorization": OAuth.getAuthorizationHeader("", message.parameters)
         },
@@ -164,44 +165,19 @@ function searchTweets(str,callBack){
 }
 
 function showRank(){
-    searchTweets("UGEN_DONE", responseJson) => {
-        var ranks = calculateRank(responseJson);
-        var notification = new Notification(`ここ${ranks["all"]}件中あなたは${ranks["me"]}位です！`);
-        });
+    searchTweets("UGEN", responseJson => {
+      if(responseJson != undefined) {
+        let ranks = calculateRank(responseJson);
+        new Notification(`ここ${ranks["all"]}件中あなたは${ranks["me"]}位です！`);
+      }
+    });
 }
 
 function calculateRank(responseJson){
-    let tweetNum = 10;
-    let tweets = [];
-    let myRank = tweetNum + 1;
-    let re = /\d+分かかると見積もった作業を\d+分で終えました!.*/;
-    
-    for ( let tweet of responseJson.statuses ) {
-        if ( tweet.lang=="ja"  && (tweet.text).match(re)) {
-            tweets.push(tweet.text);
-        }
-        if ( tweets.length == tweetNum ) {
-            break;
-        }
-    }
-    
-    if(tweets.length < tweetNum){
-        tweetNum = tweets.length;
-        myRank = tweetNum + 1;
-    }
-    
-    for ( let text of tweets ) {
-        let splitTweet = text.split("分かかると見積もった作業を");
-        let doneWordDeleted = splitTweet[1].replace("分で終えました!","");
-        let secondsStr = doneWordDeleted.replace(" #UGEN_DONE","");
-        let seconds = Number(secondsStr);
-        if((elapsedSeconds / 60) >= seconds)myRank -= 1;
-    }
-    
-    let ranks = {
-        "me" : myRank,
-        "all" : (tweetNum+1)
-    };
-
-    return ranks;
+  let re = new RegExp("\d+分かかると見積もった作業を\d+分で終えました!");
+  let tweets = responseJson.statuses.filter(tweet => tweet.lang == "ja" && tweet.text.match(re)).slice(0, 10).map(tweet => tweet.text);
+  return {
+    me: tweets.filter(text => Number(text.match(re)[1]) > elapsedSeconds / 60).length + 1,
+    all: tweets.length + 1
+  };
 }
