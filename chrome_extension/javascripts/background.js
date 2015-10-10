@@ -164,7 +164,7 @@ function searchTweets(str, callBack){
     });
 }
 
-function showRank(){
+function notifyRank(){
     searchTweets("UGEN", responseJson => {
       if(responseJson != undefined) {
         let ranks = calculateRank(responseJson);
