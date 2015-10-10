@@ -1,25 +1,31 @@
 "use strict";
 
-function listNgSites() {
-    $("#url_list").empty();
-    for (let url of JSON.parse(localStorage.getItem("urlList"))) {
-        $("#url_list").append($(document.createElement("li")).text(url));
-    }
-}
-
 function flushReplyAccount() {
     $("#account").text(`現在の宛先: ${localStorage.getItem("replyAccount")}`);
 }
 
 $(() => {
+    function addRow(targetUrl) {
+        let tr = $('<tr><td></td><td><input type="button" value="×"></td></tr>');
+        tr.children(":first").text(targetUrl);
+        tr.find("input").click(() => {
+            tr.remove();
+            let urlList = JSON.parse(localStorage.getItem("urlList"));
+            urlList.splice(urlList.findIndex(url => url == targetUrl), 1);
+            localStorage.setItem("urlList", JSON.stringify(urlList));
+        });
+        $("#url_list > tbody").append(tr);
+    }
+    for (let url of JSON.parse(localStorage.getItem("urlList"))) {
+        addRow(url);
+    }
     $("#add_url_button").click(() => {
         let urlList = JSON.parse(localStorage.getItem("urlList"));
         urlList.push($("#add_url_text").val());
         localStorage.setItem("urlList", JSON.stringify(urlList));
-        listNgSites();
+        addRow($("#add_url_text").val());
         $("#add_url_text").val("http://");
     });
-    listNgSites();
 
     $("#modify_account_text").val(localStorage.getItem("replyAccount"));
     flushReplyAccount();
