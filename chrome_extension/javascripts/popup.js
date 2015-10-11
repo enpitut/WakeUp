@@ -17,10 +17,11 @@ $(function () {
         flushButtonArea();
     });
 
-    $("#roop_button").click(function () {
+    $("#loop_button").click(function () {
+	    var bg = chrome.extension.getBackgroundPage();
         var taskTime = Number($("#task_time_text").val()) * 60;
         var restTime = Number($("#rest_time_text").val()) * 60 * 1000;
-        var roopCount = Number($("#roop_count_text").val());
+        var roopCount = Number($("#loop_count_text").val());
         if(isNaN(taskTime) || taskTime < 0) return false;
         var timerID = setInterval(bg.startTimer(taskTime,restTime,roopCount),restTime+restTime);
         flushButtonArea();
