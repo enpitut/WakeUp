@@ -24,12 +24,14 @@ function onRegisterNgSiteButtonClickHandler(info, tab) {
     if(info.menuItemId == "register_ngsite_button" && index ==-1){
       urlList.push(domain);
       localStorage.setItem("urlList", JSON.stringify(urlList));
-      new Notification(domain + "をNGサイトに登録しました");
+      var notification = new Notification(domain + "をNGサイトに登録しました");
+      setTimeout(notification.close.bind(notification),2000);
     }
     if(info.menuItemId == "remove_ngsite_button" && index != -1){
       urlList.splice(index, 1);
       localStorage.setItem("urlList", JSON.stringify(urlList));
-      new Notification(domain + "をNGサイトから除外しました");
+      var notification = new Notification(domain + "をNGサイトから除外しました");
+      setTimeout(notification.close.bind(notification),2000);
     }
   });
 }
