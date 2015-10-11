@@ -22,11 +22,14 @@ function onRegisterNgSiteButtonClickHandler(info, tab) {
     let index = urlList.findIndex(url => url == domain);
     
     if(info.menuItemId == "register_ngsite_button" && index ==-1){
-        urlList.push(domain);
+      urlList.push(domain);
+      localStorage.setItem("urlList", JSON.stringify(urlList));
+      new Notification(domain + "をNGサイトに登録しました");
     }
     if(info.menuItemId == "remove_ngsite_button" && index != -1){
-        urlList.splice(index, 1);
+      urlList.splice(index, 1);
+      localStorage.setItem("urlList", JSON.stringify(urlList));
+      new Notification(domain + "をNGサイトから除外しました");
     }
-    localStorage.setItem("urlList", JSON.stringify(urlList));
   });
 }
