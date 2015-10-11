@@ -81,6 +81,7 @@ $(() => {
     $("#show_register_ngsite_button_checkbox").change(function () {
         if ($(this).is(":checked")) {
             localStorage.setItem("showRegisterNgSiteButton", "True");
+            createRegisterNgSiteButton();
         } else {
             localStorage.setItem("showRegisterNgSiteButton", "False");
             chrome.contextMenus.removeAll();
@@ -88,41 +89,5 @@ $(() => {
     });
     if (localStorage.getItem("showRegisterNgSiteButton") === "True") {
         $("#show_register_ngsite_button_checkbox").prop("checked", true);
-        createRegisterNgSiteButton();
     }
 });
-
-function createRegisterNgSiteButton(){
-  chrome.contextMenus.create({
-      "title": "現在のタブをNGサイトに登録",
-      "type" :"normal",
-      "id": "register_ngsite_button"
-  });
-  chrome.contextMenus.create({
-      "title": "現在のタブをNGサイトから除外",
-      "type" :"normal",
-      "id": "remove_ngsite_button"
-  });
-  chrome.contextMenus.onClicked.addListener(onRegisterNgSiteButtonClickHandler);
-}
-
-function onRegisterNgSiteButtonClickHandler(info, tab) {
-      alert("clocke");
-  chrome.tabs.query({currentWindow: true, active: true}, tabs => {
-    let currentTab = tabs[0];
-    let urlList = JSON.parse(localStorage.getItem("urlList"));
-    let domain = (currentTab.url.split("/"))[2];
-    let index = urlList.findIndex(url => url == domain);
-    alert(info.menuItemId + "re" + index);
-    
-    if(info.menuItemId == "register_ngsite_button" && index ==-1){
-      alert("re");
-        urlList.push(domain);
-    }
-    if(info.menuItemId == "remove_ngsite_button" && index != -1){
-      alert("ng");
-        urlList.splice(index, 1);
-    }
-    localStorage.setItem("urlList", JSON.stringify(urlList));
-  });
-}
