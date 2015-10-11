@@ -16,7 +16,8 @@
     "tabs",
     "alarms",
     "https://api.twitter.com/*",
-    "notifications"
+    "notifications",
+    "contextMenus"
   ],
     "browser_action": {
     "default_title": "UGEN",

@@ -77,4 +77,17 @@ $(() => {
     if (localStorage.getItem("tweetTabinfo") === "True") {
         $("#tweet_tabinfo_checkbox").prop("checked", true);
     }
+    
+    $("#show_register_ngsite_button_checkbox").change(function () {
+        if ($(this).is(":checked")) {
+            localStorage.setItem("showRegisterNgSiteButton", "True");
+            createRegisterNgSiteButton();
+        } else {
+            localStorage.setItem("showRegisterNgSiteButton", "False");
+            chrome.contextMenus.removeAll();
+        }
+    });
+    if (localStorage.getItem("showRegisterNgSiteButton") === "True") {
+        $("#show_register_ngsite_button_checkbox").prop("checked", true);
+    }
 });
