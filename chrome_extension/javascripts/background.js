@@ -156,7 +156,7 @@ function searchTweets(str, callBack){
         data: OAuth.formEncode(originalParameters),
         dataType: "json",
         success: responseJson => {
-            if (callBack !== undefined) callBack();
+            if (callBack !== undefined) callBack(responseJson);
         },
         error: responseObject => {
             alert(`Error: ${responseObject.status} ${responseObject.statusText}\n${responseObject.responseText}`);
@@ -165,7 +165,7 @@ function searchTweets(str, callBack){
 }
 
 function notifyRank(){
-    searchTweets("UGEN", responseJson => {
+    searchTweets("%23UGEN", responseJson => {
       if(responseJson != undefined) {
         let ranks = calculateRank(responseJson);
         new Notification(`ここ${ranks["all"]}件中あなたは${ranks["me"]}位です！`);
@@ -174,7 +174,7 @@ function notifyRank(){
 }
 
 function calculateRank(responseJson){
-  let re = new RegExp("\d+分かかると見積もった作業を\d+分で終えました!");
+  let re = /\d+分かかると見積もった作業を\d+分で終えました!.*/;
   let tweets = responseJson.statuses.filter(tweet => tweet.lang == "ja" && tweet.text.match(re)).slice(0, 10).map(tweet => tweet.text);
   return {
     me: tweets.filter(text => Number(text.match(re)[1]) > elapsedSeconds / 60).length + 1,
