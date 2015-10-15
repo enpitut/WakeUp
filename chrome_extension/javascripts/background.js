@@ -83,14 +83,6 @@ function stopTimer() {
     clearTimeout(timerId);
 }
 
-if (localStorage.getItem("urlList") === null) {
-    localStorage.setItem("urlList", JSON.stringify(["nicovideo.jp", "youtube.com"]));
-}
-
-if (localStorage.getItem("replyAccount") === null) {
-    localStorage.setItem("replyAccount", "UGEN_teacher");
-}
-
 function isNgSite(url) {
     let urlList = JSON.parse(localStorage.getItem("urlList"));
     for (let str of urlList) {
@@ -133,6 +125,12 @@ function tweet(str, callBack){
 };
 
 $(() => {
+    if (localStorage.getItem("urlList") === null) {
+        localStorage.setItem("urlList", JSON.stringify(["nicovideo.jp", "youtube.com"]));
+    }
+    if (localStorage.getItem("replyAccount") === null) {
+        localStorage.setItem("replyAccount", "UGEN_teacher");
+    }
     if (localStorage.getItem("showRegisterNgSiteButton") === "True") {
         $("#show_register_ngsite_button_checkbox").prop("checked", true);
         createRegisterNgSiteButton();

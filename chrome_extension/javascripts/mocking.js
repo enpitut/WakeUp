@@ -24,11 +24,14 @@ if (location.protocol != "chrome-extension:") {
         tabs: {
             update() {},
             create() {},
-            query: () => ({
-                windowId: 0,
-                url: "http://example.com/",
-                title: "Example",
-            }),
+            query(parameter, callback) {
+                callback([{
+                    id: 0,
+                    windowId: 0,
+                    url: "http://example.com/",
+                    title: "Example",
+                }]);
+            },
         },
     };
     () => {
