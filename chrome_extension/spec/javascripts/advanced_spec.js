@@ -32,6 +32,7 @@ describe("詳細設定から設定できる機能", () => {
         setMock(background, {});
         setMock(popup, {});
         setMock(config, {});
+        expect(background.isNgSite("http://www.pixiv.net/")).toBe(false);
         config.$("#add_url_text").val("pixiv.net");
         config.$("#add_url_button").click();
         expect(background.isNgSite("http://www.pixiv.net/")).toBe(true);
@@ -53,11 +54,9 @@ describe("詳細設定から設定できる機能", () => {
         popup.$("#start_button").click();
     });
     it("サボり通知ツイートにタブの情報を含める", done => {
-        let originalMainLoop = background.mainLoop;
         setMock(background, {
-            mainLoop() {
-                background.stayNgSiteSeconds = 9;
-                originalMainLoop();
+            setTimeout(func, ms) {
+                setTimeout(func, 0);
             },
             chrome: {
                 tabs: {
@@ -86,8 +85,9 @@ describe("詳細設定から設定できる機能", () => {
         setMock(background, {});
         setMock(popup, {});
         setMock(config, {});
+        expect(background.isNgSite("http://www.pixiv.net/")).toBe(false);
         config.$("#show_register_ngsite_button_checkbox").click();
-        config.onRegisterNgSiteButtonClickHandler({
+        config.chrome.contextMenus.onClicked.dispatch({
             menuItemId: "register_ngsite_button",
         }, {
             id: 0,
@@ -96,7 +96,7 @@ describe("詳細設定から設定できる機能", () => {
             title: "[pixiv]",
         });
         expect(background.isNgSite("http://www.pixiv.net/")).toBe(true);
-        config.onRegisterNgSiteButtonClickHandler({
+        config.chrome.contextMenus.onClicked.dispatch({
             menuItemId: "remove_ngsite_button",
         }, {
             id: 0,

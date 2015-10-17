@@ -46,11 +46,9 @@ describe("基本機能", () => {
         popup.$("#start_button").click();
     });
     it("ブロックサイトを一定時間閲覧し続けていると警告を表示する", done => {
-        let originalMainLoop = background.mainLoop;
         setMock(background, {
-            mainLoop() {
-                background.stayNgSiteSeconds = 4;
-                originalMainLoop();
+            setTimeout(func, ms) {
+                setTimeout(func, 0);
             },
             chrome: {
                 tabs: {
@@ -75,15 +73,13 @@ describe("基本機能", () => {
     });
     it("警告を無視してブロックサイトを閲覧し続けているとサボり通知ツイートをして「新しいタブ」ページへ飛ばす", done => {
         let count = 2;
-        function donePartially() {
+        function partiallyDone() {
             count--;
             if (count == 0) done();
         }
-        let originalMainLoop = background.mainLoop;
         setMock(background, {
-            mainLoop() {
-                background.stayNgSiteSeconds = 9;
-                originalMainLoop();
+            setTimeout(func, ms) {
+                setTimeout(func, 0);
             },
             chrome: {
                 tabs: {
@@ -97,13 +93,13 @@ describe("基本機能", () => {
                     },
                     update(id, parameter) {
                         expect(parameter.url).toEqual("chrome://newtab/");
-                        donePartially();
+                        partiallyDone();
                     },
                 },
             },
             tweet(message) {
                 expect(message).toContain("作業をサボっていました");
-                donePartially();
+                partiallyDone();
             },
         });
         setMock(popup, {});
@@ -112,7 +108,7 @@ describe("基本機能", () => {
     });
     it("タスク終了予定時刻まで残り1分超のとき、残り分数をバッジに青地で表示する", done => {
         let count = 2;
-        function donePartially() {
+        function partiallyDone() {
             count--;
             if (count == 0) done();
         }
@@ -121,11 +117,11 @@ describe("基本機能", () => {
                 browserAction: {
                     setBadgeText(parameter) {
                         expect(parameter.text).toEqual("2");
-                        donePartially();
+                        partiallyDone();
                     },
                     setBadgeBackgroundColor(parameter) {
                         expect(parameter.color).toEqual([0, 0, 255, 100]);
-                        donePartially();
+                        partiallyDone();
                     },
                 },
             },
@@ -136,7 +132,7 @@ describe("基本機能", () => {
     });
     it("タスク終了予定時刻まで残り1分以下のとき、残り秒数をバッジに赤地で表示する", done => {
         let count = 2;
-        function donePartially() {
+        function partiallyDone() {
             count--;
             if (count == 0) done();
         }
@@ -145,11 +141,11 @@ describe("基本機能", () => {
                 browserAction: {
                     setBadgeText(parameter) {
                         expect(parameter.text).toEqual("60");
-                        donePartially();
+                        partiallyDone();
                     },
                     setBadgeBackgroundColor(parameter) {
                         expect(parameter.color).toEqual([255, 0, 0, 100]);
-                        donePartially();
+                        partiallyDone();
                     },
                 },
             },
@@ -159,11 +155,9 @@ describe("基本機能", () => {
         popup.$("#start_button").click();
     });
     it("タスク終了予定時刻まで残り1分以下になった瞬間、警告を表示する", done => {
-        let originalMainLoop = background.mainLoop;
         setMock(background, {
-            mainLoop() {
-                background.stayNgSiteSeconds = 9;
-                originalMainLoop();
+            setTimeout(func, ms) {
+                setTimeout(func, 0);
             },
             chrome: {
                 tabs: {

@@ -16,9 +16,19 @@ if (location.protocol != "chrome-extension:") {
         },
         contextMenus: {
             create() {},
-            onClicked: {
-                addListener() {},
-            },
+            onClicked: () => {
+                let listeners = [];
+                return {
+                    addListener(listener) {
+                        listeners.push(listener);
+                    },
+                    dispatch(info, tab) {
+                        for (let listener of listeners) {
+                            listener(info, tab);
+                        }
+                    },
+                };
+            }(),
         },
         extension: {},
         tabs: {
