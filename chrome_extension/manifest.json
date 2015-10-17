@@ -15,10 +15,12 @@
   "permissions": [
     "tabs",
     "alarms",
-    "https://api.twitter.com/*"
+    "https://api.twitter.com/*",
+    "notifications"
   ],
     "browser_action": {
     "default_title": "UGEN",
     "default_popup": "popup.html"
-  }
+  },
+  "options_page": "config.html"
 }

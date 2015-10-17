@@ -5,10 +5,13 @@
 <title>ポップアップページ</title>
 <script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="javascripts/popup.js"></script>
-<link rel="stylesheet" href="style.css" type="text/css">
+<link rel="stylesheet" href="popup.css" type="text/css">
 </head>
 <body>
-    <p>ボタンを押すと監視がはじまるよ！<br><img src="../images/ugenchan.png" alt=""></p>
+    <p id="guide_message"></p>
+    <p>
+        <img src="images/ugenchan.png" alt="">
+    </p>
     <p>
         <input type="text" value="10" id="task_time_text" size="3">分の作業時間と
     </p>
@@ -22,7 +25,7 @@
         <input type="button" value="タスク完了" id="end_button">
     </p>
     <p>
-          <a href="config.html">詳細設定</a>
+        <a href="javascript:;" id="goto_option">詳細設定</a>
     </p>
 </body>
 </html>
