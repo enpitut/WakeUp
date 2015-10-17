@@ -34,18 +34,16 @@ $(() => {
         flushReplyAccount();
     });
 
-    $("#oauth_button").click(() => {
-        co(function* () {
-            try {
-                let queryMap = yield callTwitterApi("POST", "https://api.twitter.com/oauth/request_token", {oauth_callback: "oob"}, {});
-                let currentTab = yield getCurrentTab();
-                queryMap["window_id"] = currentTab.windowId.toString();
-                open(OAuth.addToURL("pin.html", queryMap), "", "width=300, height=100");
-            } catch (e) {
-                alert(e.message);
-            }
-        });
-    });
+    $("#oauth_button").click(co.wrap(function* () {
+        try {
+            let queryMap = yield callTwitterApi("POST", "https://api.twitter.com/oauth/request_token", {oauth_callback: "oob"}, {});
+            let currentTab = yield getCurrentTab();
+            queryMap["window_id"] = currentTab.windowId.toString();
+            open(OAuth.addToURL("pin.html", queryMap), "", "width=300, height=100");
+        } catch (e) {
+            alert(e.message);
+        }
+    }));
 
     $("#tweet_tabinfo_checkbox").change(function () {
         if ($(this).is(":checked")) {

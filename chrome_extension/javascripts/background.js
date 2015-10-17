@@ -9,7 +9,7 @@ let oneMinuteNotified;
 const ALERT_TIME = 5;
 const TWEET_TIME = 10;
 
-function* mainLoop() {
+let mainLoop = co.wrap(function* () {
     while (true) {
         elapsedSeconds++;
         let remainingSeconds = limitSeconds - elapsedSeconds;
@@ -22,7 +22,7 @@ function* mainLoop() {
                     body: "",
                     icon: "../images/ugenchan.png"
                 });
-                sleep(2000).then(() => { notification.close(); })
+                sleep(2).then(() => { notification.close(); })
                 oneMinuteNotified = true;
             }
             chrome.browserAction.setBadgeText({text: Math.round(remainingSeconds).toString()});
@@ -64,12 +64,12 @@ function* mainLoop() {
         }
 
         try {
-            yield sleep(1000, "mainLoop");
+            yield sleep(1, "mainLoop");
         } catch (e) {
             return;
         }
     }
-}
+});
 
 function startTimer(arg) {
     limitSeconds = arg;
@@ -78,7 +78,7 @@ function startTimer(arg) {
     isTimerOn = true;
     oneMinuteNotified = false;
     chrome.browserAction.setIcon({path: "../images/watchicon16.png"});
-    co(mainLoop);
+    mainLoop();
 }
 
 function stopTimer() {
