@@ -1,0 +1,24 @@
+{
+    "name": "UGEN tweet 文言集",
+    "version": "0.0.1",
+    "description": "UGENでツイートするときの文言集",
+    "phrases": {
+        "watched_ngsites": {
+            "include_tabinfo": [
+                "`私は作業をサボって ${currentTab.title.substr(0, 40).replace(/(@|#|＃|＠)/g, '$1\u200c')}(${currentTab.url}) を見ていました ${new Date()}`.substr(0, 135) + ' #UGEN'",
+                "`今作業をさぼってるよ。今のタブはこれ！ ${currentTab.url} ${new Date()}`.substr(0, 135) + ' #UGEN'"
+            ],
+            "not_include_tabinfo": [
+                "`私は作業をサボっていました ${new Date()} #UGEN`"
+            ]
+        },
+        "failed": [
+            "`@${localStorage.getItem('replyAccount')} 突然のリプライ失礼致します。このたび私事ながら作業時間の見積もりに失敗しました。誠に申し訳ありません ${new Date()} #UGEN`"
+        ],
+        "successed": [
+            "`${Math.round(bg.limitSeconds / 60)}分かかると見積もった作業を${Math.round(bg.elapsedSeconds / 60)}分で終えました! #UGEN ${new Date()}`",
+            "`${Math.round(bg.limitSeconds / 60)}分かかると見積もった作業を${Math.round(bg.elapsedSeconds / 60)}分で終えたぽよ #UGEN ${new Date()}`"
+        ]
+    }
+
+}
