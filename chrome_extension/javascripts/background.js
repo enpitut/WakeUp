@@ -136,7 +136,8 @@ function searchTweets(str, callBack){
         method: "GET",
         action: "https://api.twitter.com/1.1/search/tweets.json",
         parameters: {
-            q: str
+            q: str,
+            count: 100
         }
     };
     let originalParameters = $.extend({}, message.parameters);
@@ -165,7 +166,7 @@ function searchTweets(str, callBack){
 }
 
 function notifyRank(){
-    searchTweets("%23UGEN", responseJson => {
+    searchTweets("#UGEN", responseJson => {
       if(responseJson != undefined) {
         let ranks = calculateRank(responseJson);
         new Notification(`ここ${ranks["all"]}件中あなたは${ranks["me"]}位です！`);
@@ -174,8 +175,9 @@ function notifyRank(){
 }
 
 function calculateRank(responseJson){
-  let re = /\d+分かかると見積もった作業を\d+分で終えました!.*/;
-  let tweets = responseJson.statuses.filter(tweet => tweet.lang == "ja" && tweet.text.match(re)).slice(0, 10).map(tweet => tweet.text);
+  let rankRange = 50;
+  let re = /\d+分かかると見積もった作業を(\d+)分で終えました!/;
+  let tweets = responseJson.statuses.filter(tweet => tweet.lang == "ja" && tweet.text.match(re)).slice(0, rankRange).map(tweet => tweet.text);
   return {
     me: tweets.filter(text => Number(text.match(re)[1]) > elapsedSeconds / 60).length + 1,
     all: tweets.length + 1
