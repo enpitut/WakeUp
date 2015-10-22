@@ -10,6 +10,7 @@ const ALERT_TIME = 5;
 const TWEET_TIME = 10;
 
 let timerId;
+
 function mainLoop() {
     function next() {
         timerId = setTimeout(mainLoop, 1000);
@@ -244,3 +245,10 @@ function readTimeline(id){
     });
   });
 }
+
+$(() => {
+    if (localStorage.getItem("showRegisterNgSiteButton") === "True") {
+        $("#show_register_ngsite_button_checkbox").prop("checked", true);
+        createRegisterNgSiteButton();
+    }
+});
