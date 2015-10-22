@@ -41,7 +41,7 @@ describe("詳細設定から設定できる機能", () => {
     });
     it("タスクが見積もり時間内に終わらなかった時にリプライを送る相手を変更する", done => {
         setMock(background, {
-            tweet: message => {
+            tweet(message) {
                 expect(message).toContain("@tos");
                 done();
             },

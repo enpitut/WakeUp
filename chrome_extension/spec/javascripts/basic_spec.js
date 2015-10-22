@@ -24,7 +24,7 @@ describe("基本機能", () => {
     });
     it("タスクを見積もり時間内に終わらせると見積もり時間と実際にかかった時間をツイートする", done => {
         setMock(background, {
-            tweet: message => {
+            tweet(message) {
                 expect(message).toContain("1分かかると見積もった作業を0分で終えました");
                 done();
             },
@@ -36,7 +36,7 @@ describe("基本機能", () => {
     });
     it("タスクが見積もり時間内に終わらないと謝罪ツイートをする", done => {
         setMock(background, {
-            tweet: message => {
+            tweet(message) {
                 expect(message).toContain("申し訳ありません");
                 done();
             },
