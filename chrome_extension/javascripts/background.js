@@ -150,7 +150,7 @@ function searchTweets(str, callBack){
     $.ajax({
         type: message.method,
         url: message.action,
-        timeout: 10000,
+        timeout: 30000,
         headers: {
             "Authorization": OAuth.getAuthorizationHeader("", message.parameters)
         },
@@ -175,11 +175,76 @@ function notifyRank(){
 }
 
 function calculateRank(responseJson){
-  let rankRange = 50;
+  let workTimes = {};
   let re = /\d+分かかると見積もった作業を(\d+)分で終えました!/;
-  let tweets = responseJson.statuses.filter(tweet => tweet.lang == "ja" && tweet.text.match(re)).slice(0, rankRange).map(tweet => tweet.text);
+  let users = responseJson.statuses
+    .filter(tweet => tweet.lang == "ja" && tweet.text.match(re))
+    .map(status => status.user.id)
+    .filter((x, i, self) => self.indexOf(x) === i);
+    
+  for(let user of users){
+    workTimes[user] = 0;
+  }
+  
+  Promise.all(users.map(user => readTimeline(user)))
+  .then((responseJsons) => {
+    for(let responseJson of responseJsons){
+      let timeTweets = responseJson.filter(res => res.text.match(re))
+      .filter(res => {
+        let createdDay = new Date(res.created_at);
+        let today =new Date();
+        return new Date(createdDay.toDateString()).getTime() == new Date(today.toDateString()).getTime();
+      });
+      for(let timeTweet of timeTweets){
+        let id = timeTweet.user.id;
+        workTimes[id] += Number(timeTweet.text.match(re)[1]);
+      }
+    }
+  });
+
+
+
   return {
-    me: tweets.filter(text => Number(text.match(re)[1]) > elapsedSeconds / 60).length + 1,
-    all: tweets.length + 1
+//     me: tweets.filter(text => Number(text.match(re)[1]) > elapsedSeconds / 60).length + 1,
+//     all: tweets.length + 1
+    me:1,
+    all:5
   };
+}
+
+function readTimeline(id){
+  return new Promise(function(resolve, reject) {
+    let message = {
+        method: "GET",
+        action: "https://api.twitter.com/1.1/statuses/user_timeline.json",
+        parameters: {
+            user_id: id,
+            count: 1000
+        }
+    };
+    let originalParameters = $.extend({}, message.parameters);
+    OAuth.completeRequest(message, {
+        consumerKey: CONSUMER_KEY,
+        consumerSecret: CONSUMER_SECRET,
+        token: localStorage.getItem("accessToken"),
+        tokenSecret: localStorage.getItem("accessTokenSecret")
+    });
+    $.ajax({
+        type: message.method,
+        url: message.action,
+        timeout: 30000,
+        headers: {
+            "Authorization": OAuth.getAuthorizationHeader("", message.parameters)
+        },
+        data: OAuth.formEncode(originalParameters),
+        dataType: "json",
+        success: responseJson => {
+            resolve(responseJson);
+        },
+        error: responseObject => {
+            alert(`Error: ${responseObject.status} ${responseObject.statusText}\n${responseObject.responseText}`);
+            reject(null);
+        }
+    });
+  });
 }
