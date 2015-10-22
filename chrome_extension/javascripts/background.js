@@ -3,7 +3,7 @@
 var limitSeconds;
 var elapsedSeconds;
 var stayNgSiteSeconds;
-var isTimerOn = false;
+var timerState = "off";
 var oneMinuteNotified = false;
 
 const ALERT_TIME = 5;
@@ -67,17 +67,33 @@ function mainLoop() {
     });
 }
 function startTimer(arg) {
+    if (timerState != "off") throw new Error("Illegal state.");
     limitSeconds = arg;
     elapsedSeconds = -1;
     stayNgSiteSeconds = -1;
-    isTimerOn = true;
+    timerState = "on";
     chrome.browserAction.setIcon({path: "../images/watchicon16.png"});
     oneMinuteNotified = false;
     mainLoop();
 }
 
+function pauseTimer() {
+    if (timerState != "on") throw new Error("Illegal state.");
+    timerState = "pause";
+    chrome.browserAction.setIcon({path:"../images/icon16.png"});
+    clearTimeout(timerId);
+}
+
+function restartTimer() {
+    if (timerState != "pause") throw new Error("Illegal state.");
+    timerState = "on";
+    chrome.browserAction.setIcon({path: "../images/watchicon16.png"});
+    mainLoop();
+}
+
 function stopTimer() {
-    isTimerOn = false;
+    if (timerState != "on") throw new Error("Illegal state.");
+    timerState = "off";
     chrome.browserAction.setBadgeText({"text": ""});
     chrome.browserAction.setIcon({path:"../images/icon16.png"});
     clearTimeout(timerId);
