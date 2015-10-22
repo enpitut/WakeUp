@@ -201,15 +201,8 @@ function calculateRank(responseJson){
       }
     }
   });
-
-
-
-  return {
-//     me: tweets.filter(text => Number(text.match(re)[1]) > elapsedSeconds / 60).length + 1,
-//     all: tweets.length + 1
-    me:1,
-    all:5
-  };
+  
+  return { me: 1,all: 5 };//test data
 }
 
 function readTimeline(id){
