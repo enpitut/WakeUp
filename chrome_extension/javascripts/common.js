@@ -14,9 +14,7 @@ function createRegisterNgSiteButton(){
   chrome.contextMenus.onClicked.addListener(onRegisterNgSiteButtonClickHandler);
 }
 
-function onRegisterNgSiteButtonClickHandler(info, tab) {
-  chrome.tabs.query({currentWindow: true, active: true}, tabs => {
-    let currentTab = tabs[0];
+function onRegisterNgSiteButtonClickHandler(info, currentTab) {
     let urlList = JSON.parse(localStorage.getItem("urlList"));
     let domain = (currentTab.url.split("/"))[2];
     let index = urlList.findIndex(url => url == domain);
@@ -33,5 +31,4 @@ function onRegisterNgSiteButtonClickHandler(info, tab) {
       var notification = new Notification(domain + "をNGサイトから除外しました");
       setTimeout(notification.close.bind(notification),2000);
     }
-  });
 }
