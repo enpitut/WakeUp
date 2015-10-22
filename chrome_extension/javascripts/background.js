@@ -131,7 +131,8 @@ function tweet(str, callBack){
     });
 };
 
-function searchTweets(str, callBack){
+function searchTweets(str){
+  return new Promise(function(resolve, reject) {
     let message = {
         method: "GET",
         action: "https://api.twitter.com/1.1/search/tweets.json",
@@ -157,52 +158,54 @@ function searchTweets(str, callBack){
         data: OAuth.formEncode(originalParameters),
         dataType: "json",
         success: responseJson => {
-            if (callBack !== undefined) callBack(responseJson);
+            resolve(responseJson);
         },
         error: responseObject => {
             alert(`Error: ${responseObject.status} ${responseObject.statusText}\n${responseObject.responseText}`);
+            reject(null);
         }
     });
+  });
 }
 
 function notifyRank(){
-    searchTweets("#UGEN", responseJson => {
-      if(responseJson != undefined) {
-        let ranks = calculateRank(responseJson);
-        new Notification(`ここ${ranks["all"]}件中あなたは${ranks["me"]}位です！`);
-      }
-    });
-}
+  searchTweets("#UGEN")
+  .then(responseJson => {
+    let workTimes = {};
+    let re = /\d+分かかると見積もった作業を(\d+)分で終えました!/;
+    let users = responseJson.statuses
+      .filter(tweet => tweet.lang == "ja" && tweet.text.match(re))
+      .map(status => status.user.id);
+    users.push(localStorage.getItem("userId"));
+    users = users.filter((x, i, self) => self.indexOf(x) === i);
 
-function calculateRank(responseJson){
-  let workTimes = {};
-  let re = /\d+分かかると見積もった作業を(\d+)分で終えました!/;
-  let users = responseJson.statuses
-    .filter(tweet => tweet.lang == "ja" && tweet.text.match(re))
-    .map(status => status.user.id)
-    .filter((x, i, self) => self.indexOf(x) === i);
-    
-  for(let user of users){
-    workTimes[user] = 0;
-  }
-  
-  Promise.all(users.map(user => readTimeline(user)))
-  .then((responseJsons) => {
-    for(let responseJson of responseJsons){
-      let timeTweets = responseJson.filter(res => res.text.match(re))
-      .filter(res => {
-        let createdDay = new Date(res.created_at);
-        let today =new Date();
-        return new Date(createdDay.toDateString()).getTime() == new Date(today.toDateString()).getTime();
-      });
-      for(let timeTweet of timeTweets){
-        let id = timeTweet.user.id;
-        workTimes[id] += Number(timeTweet.text.match(re)[1]);
-      }
+    for(let user of users){
+      workTimes[user] = 0;
     }
+    
+    Promise.all(users.map(user => readTimeline(user)))
+    .then((responseJsons) => {
+      for(let responseJson of responseJsons){
+        let timeTweets = responseJson.filter(res => res.text.match(re))
+        .filter(res => {
+          let createdDay = new Date(res.created_at);
+          let today =new Date();
+          return new Date(createdDay.toDateString()).getTime() == new Date(today.toDateString()).getTime();
+        });
+        for(let timeTweet of timeTweets){
+          let id = timeTweet.user.id;
+          workTimes[id] += Number(timeTweet.text.match(re)[1]);
+        }
+      }
+      
+      let myRank = 1;
+      let myWorkTime = (elapsedSeconds / 60) + workTimes[localStorage.getItem("userId")];
+      for(let key in workTimes){
+        if(workTimes[key] > myWorkTime)myRank++;
+      }
+      new Notification(`ここ${users.length}件中あなたは${myRank}位です！`);
+    });
   });
-  
-  return { me: 1,all: 5 };//test data
 }
 
 function readTimeline(id){
