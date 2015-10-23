@@ -18,6 +18,21 @@ $(() => {
         }[bg.timerState]);
     }
 
+    let isEmptyDescription;
+    $("#task_description_text").focus(() => {
+        if (isEmptyDescription) {
+            $("#task_description_text").val("");
+            $("#task_description_text").css("color", "#000000");
+        }
+    });
+    $("#task_description_text").blur(() => {
+        isEmptyDescription = ($("#task_description_text").val() == "");
+        if (isEmptyDescription) {
+            $("#task_description_text").val("（空欄でも可）");
+            $("#task_description_text").css("color", "#999999");
+        }
+    });
+    $("#task_description_text").blur();
     $("#start_button").click(() => {
         let time = Number($("#task_time_text").val()) * 60;
         if(isNaN(time) || time < 0) return false;
@@ -33,10 +48,19 @@ $(() => {
         refreshPageContent();
     });
     $("#end_button").click(() => {
-        let message = `${Math.round(bg.limitSeconds / 60)}分かかると見積もった作業を${Math.round(bg.elapsedSeconds / 60)}分で終えました! #UGEN ${new Date()}`;
-        bg.tweet(message, () => { bg.alert("tweetしたよ^_^"); });
+        function getBaseMessage(string) {
+            return `${Math.round(bg.limitSeconds / 60)}分かかると見積もった${string}を${Math.round(bg.elapsedSeconds / 60)}分で終えました! #UGEN ${new Date()}`;
+        }
+        function getMessage(taskDescription) {
+            if (taskDescription == "") return getBaseMessage("作業");
+            if (taskDescription.length <= 140 - getBaseMessage("「」").length) return getBaseMessage(`「${taskDescription}」`);
+            return getBaseMessage(`「${taskDescription.substring(0, 140 - getBaseMessage("「」").length - 3)}...」`);
+        }
+        bg.tweet(getMessage(isEmptyDescription ? "" : $("#task_description_text").val()), () => { bg.alert("tweetしたよ^_^"); });
         bg.stopTimer();
         refreshPageContent();
+        $("#task_description_text").val("");
+        $("#task_description_text").blur();
     });
     $("#goto_option").click(() => {
         let optionsUrl = chrome.extension.getURL("config.html");

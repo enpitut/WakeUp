@@ -182,4 +182,34 @@ describe("基本機能", () => {
         popup.$("#task_time_text").val("1");
         popup.$("#start_button").click();
     });
+    it("作業内容をツイートする", done => {
+        setMock(background, {
+            tweet(message) {
+                expect(message).toContain("動作確認作業");
+                done();
+            },
+        });
+        setMock(popup, {});
+        popup.$("#task_time_text").val("1");
+        popup.$("#task_description_text").focus();
+        popup.$("#task_description_text").val("動作確認作業");
+        popup.$("#task_description_text").blur();
+        popup.$("#start_button").click();
+        popup.$("#end_button").click();
+    });
+    it("長い文字数の作業内容を140文字以内に収めてツイートする", done => {
+        setMock(background, {
+            tweet(message) {
+                expect(message.length).toEqual(140);
+                done();
+            },
+        });
+        setMock(popup, {});
+        popup.$("#task_time_text").val("1");
+        popup.$("#task_description_text").focus();
+        popup.$("#task_description_text").val("超".repeat(100) + "長い文字数の作業");
+        popup.$("#task_description_text").blur();
+        popup.$("#start_button").click();
+        popup.$("#end_button").click();
+    });
 });
