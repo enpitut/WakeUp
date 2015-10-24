@@ -49,7 +49,7 @@ function mainLoop() {
         stayNgSiteSeconds++;
         switch (stayNgSiteSeconds) {
         case ALERT_TIME:
-            alert(`あと ${TWEET_TIME - ALERT_TIME} 秒 ${currentTab.title} に滞在するとTwitterに報告されます`);
+            new Notification(`あと ${TWEET_TIME - ALERT_TIME} 秒 ${currentTab.title} に滞在するとTwitterに報告されます`);
             break;
         case TWEET_TIME:
             if(localStorage.getItem("tweetTabinfo") === "True") {
