@@ -8,8 +8,9 @@ describe("基本機能", () => {
         globalObject.$.fire();
     }
     beforeEach(done => {
+        let prefix = location.protocol == "http:" ? "base/" : "";
         localStorage.clear();
-        jasmine.getFixtures().fixturesPath = "javascripts/fixtures";
+        jasmine.getFixtures().fixturesPath = `${prefix}spec/javascripts/fixtures`;
         loadFixtures("fixture.html");
         $("#background").load(() => {
             background = $("#background").get(0).contentWindow;
@@ -18,9 +19,9 @@ describe("基本機能", () => {
                 popup.chrome.extension.getBackgroundPage = () => background;
                 done();
             });
-            $("#popup").attr("src", "../popup.html");
+            $("#popup").attr("src", `${prefix}popup.html`);
         });
-        $("#background").attr("src", "../background.html");
+        $("#background").attr("src", `${prefix}background.html`);
     });
     it("タスクを見積もり時間内に終わらせると見積もり時間と実際にかかった時間をツイートする", done => {
         setMock(background, {
@@ -47,9 +48,9 @@ describe("基本機能", () => {
     });
     it("ブロックサイトを一定時間閲覧し続けていると警告を表示する", done => {
         setMock(background, {
-            setTimeout(func, ms) {
-                setTimeout(func, 0);
-            },
+            setTimeout: (originalSetTimeout => {
+                return (func, ms) => originalSetTimeout(func, 0);
+            })(background.setTimeout),
             chrome: {
                 tabs: {
                     query(parameter, callback) {
@@ -62,13 +63,14 @@ describe("基本機能", () => {
                     },
                 },
             },
-            alert(message) {
+            Notification: function (message) {
+                this.close = () => {};
                 expect(message).toContain("あと 5 秒 niconico に滞在すると");
                 done();
             },
         });
         setMock(popup, {});
-        popup.$("#task_time_text").val("1");
+        popup.$("#task_time_text").val("2");
         popup.$("#start_button").click();
     });
     it("警告を無視してブロックサイトを閲覧し続けているとサボり通知ツイートをして「新しいタブ」ページへ飛ばす", done => {
@@ -78,9 +80,9 @@ describe("基本機能", () => {
             if (count == 0) done();
         }
         setMock(background, {
-            setTimeout(func, ms) {
-                setTimeout(func, 0);
-            },
+            setTimeout: (originalSetTimeout => {
+                return (func, ms) => originalSetTimeout(func, 0);
+            })(background.setTimeout),
             chrome: {
                 tabs: {
                     query(parameter, callback) {
@@ -156,22 +158,6 @@ describe("基本機能", () => {
     });
     it("タスク終了予定時刻まで残り1分以下になった瞬間、警告を表示する", done => {
         setMock(background, {
-            setTimeout(func, ms) {
-                setTimeout(func, 0);
-            },
-            chrome: {
-                tabs: {
-                    query(parameter, callback) {
-                        callback([{
-                            id: 0,
-                            windowId: 0,
-                            url: "http://www.nicovideo.jp/",
-                            title: "niconico",
-                        }]);
-                    },
-                },
-            },
-            tweet() {},
             Notification: function (message) {
                 this.close = () => {};
                 expect(message).toContain("あと1分でtweetされます");

@@ -19,7 +19,7 @@ function mainLoop() {
     elapsedSeconds++;
     let remainingSeconds = limitSeconds - elapsedSeconds;
     if (remainingSeconds > 60) {
-        chrome.browserAction.setBadgeText({"text": Math.round(remainingSeconds / 60).toString()});
+        chrome.browserAction.setBadgeText({"text": Math.ceil(remainingSeconds / 60).toString()});
         chrome.browserAction.setBadgeBackgroundColor({color:[0, 0, 255, 100]});
     } else {
         if (!oneMinuteNotified){
@@ -49,7 +49,7 @@ function mainLoop() {
         stayNgSiteSeconds++;
         switch (stayNgSiteSeconds) {
         case ALERT_TIME:
-            alert(`あと ${TWEET_TIME - ALERT_TIME} 秒 ${currentTab.title} に滞在するとTwitterに報告されます`);
+            new Notification(`あと ${TWEET_TIME - ALERT_TIME} 秒 ${currentTab.title} に滞在するとTwitterに報告されます`);
             break;
         case TWEET_TIME:
             if(localStorage.getItem("tweetTabinfo") === "True") {
