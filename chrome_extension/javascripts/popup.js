@@ -36,7 +36,7 @@ $(() => {
     $("#start_button").click(() => {
         let time = Number($("#task_time_text").val()) * 60;
         if(isNaN(time) || time < 0) return false;
-        bg.startTimer(time);
+        bg.startTimer(time, isEmptyDescription ? "" : $("#task_description_text").val());
         refreshPageContent();
     });
     $("#pause_button").click(() => {
@@ -48,15 +48,17 @@ $(() => {
         refreshPageContent();
     });
     $("#end_button").click(() => {
-        function getBaseMessage(string) {
-            return `${Math.round(bg.limitSeconds / 60)}分かかると見積もった${string}を${Math.round(bg.elapsedSeconds / 60)}分で終えました! #UGEN ${new Date()}`;
-        }
-        function getMessage(taskDescription) {
-            if (taskDescription == "") return getBaseMessage("作業");
-            if (taskDescription.length <= 140 - getBaseMessage("「」").length) return getBaseMessage(`「${taskDescription}」`);
-            return getBaseMessage(`「${taskDescription.substring(0, 140 - getBaseMessage("「」").length - 3)}...」`);
-        }
-        bg.tweet(getMessage(isEmptyDescription ? "" : $("#task_description_text").val()), () => { bg.alert("tweetしたよ^_^"); });
+        bg.tweet(bg.generateTweet(
+            element => `${Math.round(bg.limitSeconds / 60)}分かかると見積もった${element}を${Math.round(bg.elapsedSeconds / 60)}分で終えました! ${new Date()} #UGEN`,
+            {
+                element: bg.taskDescription,
+                formatter(element, upperLimitLength, getShortenedString) {
+                    if (element == "") return "作業";
+                    if (element.length + 2 <= upperLimitLength) return `「${element}」`;
+                    return `「${getShortenedString(5)}...」`;
+                },
+            }
+        ), () => { bg.alert("tweetしたよ^_^"); });
         bg.stopTimer();
         refreshPageContent();
         $("#task_description_text").val("");

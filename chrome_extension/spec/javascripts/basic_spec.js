@@ -108,6 +108,122 @@ describe("基本機能", () => {
         popup.$("#task_time_text").val("1");
         popup.$("#start_button").click();
     });
+    it("作業内容を入力してタスクが見積もり時間内に終わったとき作業内容をツイートする", done => {
+        setMock(background, {
+            tweet(message) {
+                expect(message).toContain("動作確認作業");
+                done();
+            },
+        });
+        setMock(popup, {});
+        popup.$("#task_time_text").val("1");
+        popup.$("#task_description_text").focus();
+        popup.$("#task_description_text").val("動作確認作業");
+        popup.$("#task_description_text").blur();
+        popup.$("#start_button").click();
+        popup.$("#end_button").click();
+    });
+    it("作業内容を入力してタスクが見積もり時間内に終わらなかったとき作業内容をツイートする", done => {
+        setMock(background, {
+            tweet(message) {
+                expect(message).toContain("動作確認作業");
+                done();
+            },
+        });
+        setMock(popup, {});
+        popup.$("#task_time_text").val("0");
+        popup.$("#task_description_text").focus();
+        popup.$("#task_description_text").val("動作確認作業");
+        popup.$("#task_description_text").blur();
+        popup.$("#start_button").click();
+    });
+    it("作業内容を入力してブロックサイトを閲覧し続けていたとき作業内容をツイートする", done => {
+        setMock(background, {
+            setTimeout: (originalSetTimeout => {
+                return (func, ms) => originalSetTimeout(func, 0);
+            })(background.setTimeout),
+            chrome: {
+                tabs: {
+                    query(parameter, callback) {
+                        callback([{
+                            id: 0,
+                            windowId: 0,
+                            url: "http://www.nicovideo.jp/",
+                            title: "niconico",
+                        }]);
+                    },
+                },
+            },
+            tweet(message) {
+                expect(message).toContain("動作確認作業");
+                done();
+            },
+        });
+        setMock(popup, {});
+        popup.$("#task_time_text").val("1");
+        popup.$("#task_description_text").focus();
+        popup.$("#task_description_text").val("動作確認作業");
+        popup.$("#task_description_text").blur();
+        popup.$("#start_button").click();
+    });
+    it("長い文字数の作業内容を入力してタスクが見積もり時間内に終わったとき140文字以内に収めてツイートする", done => {
+        setMock(background, {
+            tweet(message) {
+                expect(message.length).toBeLessThan(141);
+                done();
+            },
+        });
+        setMock(popup, {});
+        popup.$("#task_time_text").val("1");
+        popup.$("#task_description_text").focus();
+        popup.$("#task_description_text").val("超".repeat(100) + "長い文字数の作業");
+        popup.$("#task_description_text").blur();
+        popup.$("#start_button").click();
+        popup.$("#end_button").click();
+    });
+    it("長い文字数の作業内容を入力してタスクが見積もり時間内に終わらなかったとき140文字以内に収めてツイートする", done => {
+        setMock(background, {
+            tweet(message) {
+                expect(message.length).toBeLessThan(141);
+                done();
+            },
+        });
+        setMock(popup, {});
+        popup.$("#task_time_text").val("0");
+        popup.$("#task_description_text").focus();
+        popup.$("#task_description_text").val("超".repeat(100) + "長い文字数の作業");
+        popup.$("#task_description_text").blur();
+        popup.$("#start_button").click();
+    });
+    it("長い文字数の作業内容を入力してブロックサイトを閲覧し続けていたとき140文字以内に収めてツイートする", done => {
+        setMock(background, {
+            setTimeout: (originalSetTimeout => {
+                return (func, ms) => originalSetTimeout(func, 0);
+            })(background.setTimeout),
+            chrome: {
+                tabs: {
+                    query(parameter, callback) {
+                        callback([{
+                            id: 0,
+                            windowId: 0,
+                            url: "http://www.nicovideo.jp/",
+                            title: "niconico",
+                        }]);
+                    },
+                },
+            },
+            tweet(message) {
+                expect(message.length).toBeLessThan(141);
+                done();
+            },
+        });
+        setMock(popup, {});
+        popup.$("#task_time_text").val("1");
+        popup.$("#task_description_text").focus();
+        popup.$("#task_description_text").val("超".repeat(100) + "長い文字数の作業");
+        popup.$("#task_description_text").blur();
+        popup.$("#start_button").click();
+    });
     it("タスク終了予定時刻まで残り1分超のとき、残り分数をバッジに青地で表示する", done => {
         let count = 2;
         function partiallyDone() {
@@ -167,35 +283,5 @@ describe("基本機能", () => {
         setMock(popup, {});
         popup.$("#task_time_text").val("1");
         popup.$("#start_button").click();
-    });
-    it("作業内容をツイートする", done => {
-        setMock(background, {
-            tweet(message) {
-                expect(message).toContain("動作確認作業");
-                done();
-            },
-        });
-        setMock(popup, {});
-        popup.$("#task_time_text").val("1");
-        popup.$("#task_description_text").focus();
-        popup.$("#task_description_text").val("動作確認作業");
-        popup.$("#task_description_text").blur();
-        popup.$("#start_button").click();
-        popup.$("#end_button").click();
-    });
-    it("長い文字数の作業内容を140文字以内に収めてツイートする", done => {
-        setMock(background, {
-            tweet(message) {
-                expect(message.length).toEqual(140);
-                done();
-            },
-        });
-        setMock(popup, {});
-        popup.$("#task_time_text").val("1");
-        popup.$("#task_description_text").focus();
-        popup.$("#task_description_text").val("超".repeat(100) + "長い文字数の作業");
-        popup.$("#task_description_text").blur();
-        popup.$("#start_button").click();
-        popup.$("#end_button").click();
     });
 });
