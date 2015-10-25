@@ -163,13 +163,9 @@ function generateTweet(baseMessageGenerator) {
         return elementHolder.formatter(
             element,
             upperLimitLengths[i],
-            // elementを末尾cutLength文字切った文字列を返す関数
+            // elementの先頭を、使える文字数の上限だけ切り取り、さらに末尾cutLength文字切った文字列を返す関数
             // 末尾を切った結果、末尾が@#になってしまうと、リプライ誤爆やハッシュタグ誤爆を起こしかねないので、その際は末尾の@#も切る
-            cutLength => {
-                let result = element.substring(0, upperLimitLengths[i] - cutLength);
-                if (result.match(/[@#＠＃]$/)) return result.substring(0, result.length - 1);
-                else return result;
-            }
+            cutLength => element.substring(0, upperLimitLengths[i] - cutLength).replace(/[@#＠＃]$/, "")
         );
     }));
 }
