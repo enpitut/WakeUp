@@ -72,7 +72,7 @@ describe("詳細設定から設定できる機能", () => {
                 },
             },
             tweet(message) {
-                expect(message).toContain("niconico(http://www.nicovideo.jp/)");
+                expect(message).toContain("niconico( http://www.nicovideo.jp/ )");
                 done();
             },
         });
