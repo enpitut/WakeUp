@@ -116,12 +116,16 @@ describe("基本機能", () => {
             },
         });
         setMock(popup, {});
-        popup.$("#task_time_text").val("1");
-        popup.$("#task_description_text").focus();
-        popup.$("#task_description_text").val("動作確認作業");
-        popup.$("#task_description_text").blur();
-        popup.$("#start_button").click();
-        popup.$("#end_button").click();
+        // setTimeoutを使う理由: blur()の直後にfocus()は効かない
+        // http://stackoverflow.com/questions/11380392/the-focus-method-in-jquery-doesnt-work
+        setTimeout(() => {
+            popup.$("#task_time_text").val("1");
+            popup.$("#task_description_text").focus();
+            popup.$("#task_description_text").val("動作確認作業");
+            popup.$("#task_description_text").blur();
+            popup.$("#start_button").click();
+            popup.$("#end_button").click();
+        }, 0);
     });
     it("作業内容を入力してタスクが見積もり時間内に終わらなかったとき作業内容をツイートする", done => {
         setMock(background, {
@@ -131,11 +135,13 @@ describe("基本機能", () => {
             },
         });
         setMock(popup, {});
-        popup.$("#task_time_text").val("0");
-        popup.$("#task_description_text").focus();
-        popup.$("#task_description_text").val("動作確認作業");
-        popup.$("#task_description_text").blur();
-        popup.$("#start_button").click();
+        setTimeout(() => {
+            popup.$("#task_time_text").val("0");
+            popup.$("#task_description_text").focus();
+            popup.$("#task_description_text").val("動作確認作業");
+            popup.$("#task_description_text").blur();
+            popup.$("#start_button").click();
+        }, 0);
     });
     it("作業内容を入力してブロックサイトを閲覧し続けていたとき作業内容をツイートする", done => {
         setMock(background, {
@@ -160,11 +166,13 @@ describe("基本機能", () => {
             },
         });
         setMock(popup, {});
-        popup.$("#task_time_text").val("1");
-        popup.$("#task_description_text").focus();
-        popup.$("#task_description_text").val("動作確認作業");
-        popup.$("#task_description_text").blur();
-        popup.$("#start_button").click();
+        setTimeout(() => {
+            popup.$("#task_time_text").val("1");
+            popup.$("#task_description_text").focus();
+            popup.$("#task_description_text").val("動作確認作業");
+            popup.$("#task_description_text").blur();
+            popup.$("#start_button").click();
+        }, 0);
     });
     it("タスク終了予定時刻まで残り1分超のとき、残り分数をバッジに青地で表示する", done => {
         let count = 2;
