@@ -83,7 +83,7 @@ function mainLoop() {
                 ), () => { alert("tweetしたよ^_^"); });
             } else {
                 tweet(generateTweet(
-                    (taskDescription, pageTitle) => `私は${taskDescription}をサボっていました ${new Date()} #UGEN`,
+                    element => `私は${element}をサボっていました ${new Date()} #UGEN`,
                     {
                         element: taskDescription,
                         formatter(element, upperLimitLength, getShortenedString) {
