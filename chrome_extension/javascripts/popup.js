@@ -18,10 +18,25 @@ $(() => {
         }[bg.timerState]);
     }
 
+    let isEmptyDescription;
+    $("#task_description_text").focus(() => {
+        if (isEmptyDescription) {
+            $("#task_description_text").val("");
+            $("#task_description_text").css("color", "#000000");
+        }
+    });
+    $("#task_description_text").blur(() => {
+        isEmptyDescription = ($("#task_description_text").val() == "");
+        if (isEmptyDescription) {
+            $("#task_description_text").val("（空欄でも可）");
+            $("#task_description_text").css("color", "#999999");
+        }
+    });
+    $("#task_description_text").blur();
     $("#start_button").click(() => {
         let time = Number($("#task_time_text").val()) * 60;
         if(isNaN(time) || time < 0) return false;
-        bg.startTimer(time);
+        bg.startTimer(time, isEmptyDescription ? "" : $("#task_description_text").val());
         refreshPageContent();
     });
     $("#pause_button").click(() => {
@@ -33,10 +48,21 @@ $(() => {
         refreshPageContent();
     });
     $("#end_button").click(() => {
-        let message = `${Math.round(bg.limitSeconds / 60)}分かかると見積もった作業を${Math.round(bg.elapsedSeconds / 60)}分で終えました! #UGEN ${new Date()}`;
-        bg.tweet(message, () => { bg.alert("tweetしたよ^_^"); });
+        bg.tweet(bg.generateTweet(
+            element => `${Math.round(bg.limitSeconds / 60)}分かかると見積もった${element}を${Math.round(bg.elapsedSeconds / 60)}分で終えました! ${new Date()} #UGEN`,
+            {
+                element: bg.taskDescription,
+                formatter(element, upperLimitLength, getShortenedString) {
+                    if (element == "") return "作業";
+                    if (element.length + 2 <= upperLimitLength) return `「${element}」`;
+                    return `「${getShortenedString(5)}...」`;
+                },
+            }
+        ), () => { bg.alert("tweetしたよ^_^"); });
         bg.stopTimer();
         refreshPageContent();
+        $("#task_description_text").val("");
+        $("#task_description_text").blur();
     });
     $("#goto_option").click(() => {
         let optionsUrl = chrome.extension.getURL("config.html");
