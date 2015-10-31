@@ -3,7 +3,7 @@
 var limitSeconds;
 var elapsedSeconds;
 var stayNgSiteSeconds;
-var isTimerOn = false;
+var timerState = "off";
 var oneMinuteNotified = false;
 
 const ALERT_TIME = 5;
@@ -19,7 +19,7 @@ function mainLoop() {
     elapsedSeconds++;
     let remainingSeconds = limitSeconds - elapsedSeconds;
     if (remainingSeconds > 60) {
-        chrome.browserAction.setBadgeText({"text": Math.round(remainingSeconds / 60).toString()});
+        chrome.browserAction.setBadgeText({"text": Math.ceil(remainingSeconds / 60).toString()});
         chrome.browserAction.setBadgeBackgroundColor({color:[0, 0, 255, 100]});
     } else {
         if (!oneMinuteNotified){
@@ -49,7 +49,7 @@ function mainLoop() {
         stayNgSiteSeconds++;
         switch (stayNgSiteSeconds) {
         case ALERT_TIME:
-            alert(`あと ${TWEET_TIME - ALERT_TIME} 秒 ${currentTab.title} に滞在するとTwitterに報告されます`);
+            new Notification(`あと ${TWEET_TIME - ALERT_TIME} 秒 ${currentTab.title} に滞在するとTwitterに報告されます`);
             break;
         case TWEET_TIME:
             if(localStorage.getItem("tweetTabinfo") === "True") {
@@ -67,28 +67,36 @@ function mainLoop() {
     });
 }
 function startTimer(arg) {
+    if (timerState != "off") throw new Error("Illegal state.");
     limitSeconds = arg;
     elapsedSeconds = -1;
     stayNgSiteSeconds = -1;
-    isTimerOn = true;
+    timerState = "on";
     chrome.browserAction.setIcon({path: "../images/watchicon16.png"});
     oneMinuteNotified = false;
     mainLoop();
 }
 
-function stopTimer() {
-    isTimerOn = false;
-    chrome.browserAction.setBadgeText({"text": ""});
+function pauseTimer() {
+    if (timerState != "on") throw new Error("Illegal state.");
+    timerState = "pause";
     chrome.browserAction.setIcon({path:"../images/icon16.png"});
     clearTimeout(timerId);
 }
 
-if (localStorage.getItem("urlList") === null) {
-    localStorage.setItem("urlList", JSON.stringify(["nicovideo.jp", "youtube.com"]));
+function restartTimer() {
+    if (timerState != "pause") throw new Error("Illegal state.");
+    timerState = "on";
+    chrome.browserAction.setIcon({path: "../images/watchicon16.png"});
+    mainLoop();
 }
 
-if (localStorage.getItem("replyAccount") === null) {
-    localStorage.setItem("replyAccount", "UGEN_teacher");
+function stopTimer() {
+    if (timerState != "on") throw new Error("Illegal state.");
+    timerState = "off";
+    chrome.browserAction.setBadgeText({"text": ""});
+    chrome.browserAction.setIcon({path:"../images/icon16.png"});
+    clearTimeout(timerId);
 }
 
 function isNgSite(url) {
@@ -240,6 +248,12 @@ function readTimeline(id){
 }
 
 $(() => {
+    if (localStorage.getItem("urlList") === null) {
+        localStorage.setItem("urlList", JSON.stringify(["nicovideo.jp", "youtube.com"]));
+    }
+    if (localStorage.getItem("replyAccount") === null) {
+        localStorage.setItem("replyAccount", "UGEN_teacher");
+    }
     if (localStorage.getItem("showRegisterNgSiteButton") === "True") {
         $("#show_register_ngsite_button_checkbox").prop("checked", true);
         createRegisterNgSiteButton();
