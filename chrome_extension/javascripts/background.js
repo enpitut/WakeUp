@@ -172,41 +172,34 @@ function searchTweets(str){
 function notifyRank(){
   searchTweets("#UGEN")
   .then(responseJson => {
-    let workTimes = {};
+    let workTimes = [];
     let re = /\d+分かかると見積もった作業を(\d+)分で終えました!/;
-    let users = responseJson.statuses
-      .filter(tweet => tweet.lang == "ja" && tweet.text.match(re))
-      .map(status => status.user.id);
-    users.push(localStorage.getItem("userId"));
-    users = users.filter((x, i, self) => self.indexOf(x) === i);
-
-    for(let user of users){
-      workTimes[user] = 0;
-    }
+    let userIds = [...new Set(
+        responseJson.statuses
+        .filter(status => status.lang == "ja" && status.text.match(re))
+        .map(status => status.user.id)
+        .concat(Number([localStorage.getItem("userId")]))
+      )];
+      console.log([...new Set(
+        responseJson.statuses
+        .filter(status => status.lang == "ja" && status.text.match(re))
+        .map(status => status.user.id)
+        .concat(Number([localStorage.getItem("userId")]))
+      )]);
     
-    Promise.all(users.map(user => readTimeline(user)))
-    .then((responseJsons) => {
-      for(let responseJson of responseJsons){
-        let timeTweets = responseJson.filter(res => res.text.match(re))
-        .filter(res => {
-          let createdDay = new Date(res.created_at);
-          let today =new Date();
-          return new Date(createdDay.toDateString()).getTime() == new Date(today.toDateString()).getTime();
-        });
-        for(let timeTweet of timeTweets){
-          let id = timeTweet.user.id;
-          workTimes[id] += Number(timeTweet.text.match(re)[1]);
-        }
-      }
-      
-      let myRank = 1;
-      let myWorkTime = (elapsedSeconds / 60) + workTimes[localStorage.getItem("userId")];
-      for(let key in workTimes){
-        if(workTimes[key] > myWorkTime)myRank++;
-      }
-      new Notification(`ここ${users.length}件中あなたは${myRank}位です！`);
+    return Promise.all(userIds.map(userId => readTimeline(userId)
+      .then(statuses => [
+        userId,
+        statuses.filter(res => res.text.match(re))
+          .filter(res => new Date(res.created_at).toDateString() == new Date().toDateString()) //toDateString()で日付だけを取得できる
+          .map(res => Number(res.text.match(re)[1]))
+          .reduce((sum, minutes) => sum + minutes, 0)])
+      )).then(pairs => new Map(pairs));
+    }).then(workTimeMap => {
+      let myWorkTime = Math.round((elapsedSeconds / 60) + workTimeMap.get(Number(localStorage.getItem("userId"))));
+      let myRank = [...workTimeMap.values()].filter(workTime => workTime > myWorkTime).length + 1;
+      new Notification(`今日のあなたの作業時間合計は${myWorkTime}分で、${workTimeMap.size}人中${myRank}位です！`);
     });
-  });
 }
 
 function readTimeline(id){
