@@ -65,3 +65,11 @@ function onOAuthButtonClickHandler() {
         }
     });
 }
+
+function getLocalStorageData(key) {
+    if (localStorage !== null) return localStorage.getItem(key);
+    else return null;
+}
+function setLocalStorageData(key, value) {
+    if (localStorage !== null) localStorage.setItem(key, value);
+}
