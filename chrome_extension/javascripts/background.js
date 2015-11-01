@@ -178,66 +178,67 @@ function searchTweets(str){
 }
 
 function notifyRank(){
-  searchTweets("#UGEN")
-  .then(responseJson => {
-    let re = /\d+分かかると見積もった.*を(\d+)分で終えました!/;
-    let userIds = [...new Set(
-        responseJson.statuses
-        .filter(status => status.lang == "ja" && status.text.match(re))
-        .map(status => status.user.id)
-        .concat(Number([localStorage.getItem("userId")]))
-      )];
+    searchTweets("#UGEN")
+    .then(responseJson => {
+        let re = /\d+分かかると見積もった.*を(\d+)分で終えました!/;
+        let userIds = [...new Set(
+            responseJson.statuses
+            .filter(status => status.lang == "ja" && status.text.match(re))
+            .filter(status => new Date(status.created_at).toDateString() == new Date().toDateString()) //toDateString()で日付だけを取得できる
+            .map(status => status.user.id)
+            .concat(Number([localStorage.getItem("userId")]))
+        )];
     
     return Promise.all(userIds.map(userId => readTimeline(userId)
-      .then(statuses => [
-        userId,
-        statuses.filter(res => res.text.match(re))
-          .filter(res => new Date(res.created_at).toDateString() == new Date().toDateString()) //toDateString()で日付だけを取得できる
-          .map(res => Number(res.text.match(re)[1]))
-          .reduce((sum, minutes) => sum + minutes, 0)])
-      )).then(pairs => new Map(pairs));
-    }).then(workTimeMap => {
-      let myWorkTime = Math.round((elapsedSeconds / 60) + workTimeMap.get(Number(localStorage.getItem("userId"))));
-      let myRank = [...workTimeMap.values()].filter(workTime => workTime > myWorkTime).length + 1;
-      new Notification(`今日のあなたの作業時間合計は${myWorkTime}分で、${workTimeMap.size}人中${myRank}位です！`);
-    });
+        .then(statuses => [
+            userId,
+            statuses.filter(status => status.text.match(re))
+              .filter(status => new Date(status.created_at).toDateString() == new Date().toDateString()) //toDateString()で日付だけを取得できる
+              .map(status => Number(status.text.match(re)[1]))
+              .reduce((sum, minutes) => sum + minutes, 0)])
+          )).then(pairs => new Map(pairs));
+      }).then(workTimeMap => {
+          let myWorkTime = Math.round((elapsedSeconds / 60) + workTimeMap.get(Number(localStorage.getItem("userId"))));
+          let myRank = [...workTimeMap.values()].filter(workTime => workTime > myWorkTime).length + 1;
+          new Notification(`今日のあなたの作業時間合計は${myWorkTime}分で、${workTimeMap.size}人中${myRank}位です！`);
+      });
 }
 
 function readTimeline(id){
-  return new Promise(function(resolve, reject) {
-    let message = {
-        method: "GET",
-        action: "https://api.twitter.com/1.1/statuses/user_timeline.json",
-        parameters: {
-            user_id: id,
-            count: 1000
-        }
-    };
-    let originalParameters = $.extend({}, message.parameters);
-    OAuth.completeRequest(message, {
-        consumerKey: CONSUMER_KEY,
-        consumerSecret: CONSUMER_SECRET,
-        token: localStorage.getItem("accessToken"),
-        tokenSecret: localStorage.getItem("accessTokenSecret")
+    return new Promise(function(resolve, reject) {
+        let message = {
+            method: "GET",
+            action: "https://api.twitter.com/1.1/statuses/user_timeline.json",
+            parameters: {
+                user_id: id,
+                count: 1000
+            }
+        };
+        let originalParameters = $.extend({}, message.parameters);
+        OAuth.completeRequest(message, {
+            consumerKey: CONSUMER_KEY,
+            consumerSecret: CONSUMER_SECRET,
+            token: localStorage.getItem("accessToken"),
+            tokenSecret: localStorage.getItem("accessTokenSecret")
+        });
+        $.ajax({
+            type: message.method,
+            url: message.action,
+            timeout: 30000,
+            headers: {
+                "Authorization": OAuth.getAuthorizationHeader("", message.parameters)
+            },
+            data: OAuth.formEncode(originalParameters),
+            dataType: "json",
+            success: responseJson => {
+                resolve(responseJson);
+            },
+            error: responseObject => {
+                alert(`Error: ${responseObject.status} ${responseObject.statusText}\n${responseObject.responseText}`);
+                reject(null);
+            }
+        });
     });
-    $.ajax({
-        type: message.method,
-        url: message.action,
-        timeout: 30000,
-        headers: {
-            "Authorization": OAuth.getAuthorizationHeader("", message.parameters)
-        },
-        data: OAuth.formEncode(originalParameters),
-        dataType: "json",
-        success: responseJson => {
-            resolve(responseJson);
-        },
-        error: responseObject => {
-            alert(`Error: ${responseObject.status} ${responseObject.statusText}\n${responseObject.responseText}`);
-            reject(null);
-        }
-    });
-  });
 }
 
 $(() => {
