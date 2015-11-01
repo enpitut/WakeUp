@@ -19,11 +19,11 @@ $(() => {
         
         if(!getLocalStorageData("accessToken") || !getLocalStorageData("accessTokenSecret")) {
             $("#guide_message").text("Twitter連携をしてね！");
-            $("#start_control").hide();
-            $("#oauth_control").show();
+            $("#start_control").css("display", "none");
+            $("#oauth_control").css("display", "block");
         } else {
-            $("#start_control").show();
-            $("#oauth_control").hide();
+            $("#start_control").css("display", "block");
+            $("#oauth_control").css("display", "none");
         }
     }
 
