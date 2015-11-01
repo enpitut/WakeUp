@@ -180,20 +180,13 @@ function searchTweets(str){
 function notifyRank(){
   searchTweets("#UGEN")
   .then(responseJson => {
-    let workTimes = [];
-    let re = /\d+分かかると見積もった作業を(\d+)分で終えました!/;
+    let re = /\d+分かかると見積もった.*を(\d+)分で終えました!/;
     let userIds = [...new Set(
         responseJson.statuses
         .filter(status => status.lang == "ja" && status.text.match(re))
         .map(status => status.user.id)
         .concat(Number([localStorage.getItem("userId")]))
       )];
-      console.log([...new Set(
-        responseJson.statuses
-        .filter(status => status.lang == "ja" && status.text.match(re))
-        .map(status => status.user.id)
-        .concat(Number([localStorage.getItem("userId")]))
-      )]);
     
     return Promise.all(userIds.map(userId => readTimeline(userId)
       .then(statuses => [
