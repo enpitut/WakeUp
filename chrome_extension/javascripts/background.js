@@ -24,12 +24,7 @@ function mainLoop() {
         chrome.browserAction.setBadgeBackgroundColor({color:[0, 0, 255, 100]});
     } else {
         if (!oneMinuteNotified){
-            var options = {
-                body : "",
-                icon : "../images/ugenchan.png"
-            }
-            var notification = new Notification("あと1分でtweetされます",options);
-            setTimeout(notification.close.bind(notification),2000);
+            notificate("あと1分でtweetされます", 2);
             oneMinuteNotified = true;
         }
         chrome.browserAction.setBadgeText({"text": Math.round(remainingSeconds).toString()});
@@ -59,7 +54,7 @@ function mainLoop() {
         stayNgSiteSeconds++;
         switch (stayNgSiteSeconds) {
         case ALERT_TIME:
-            new Notification(`あと ${TWEET_TIME - ALERT_TIME} 秒 ${currentTab.title} に滞在するとTwitterに報告されます`);
+            notificate(`あと ${TWEET_TIME - ALERT_TIME} 秒 ${currentTab.title} に滞在するとTwitterに報告されます`, 2);
             break;
         case TWEET_TIME:
             if(localStorage.getItem("tweetTabinfo") === "True") {
@@ -168,6 +163,20 @@ function generateTweet(baseMessageGenerator) {
             cutLength => element.substring(0, upperLimitLengths[i] - cutLength).replace(/[@#＠＃]$/, "")
         );
     }));
+}
+
+function notificate(message, displaySeconds) {
+    let notification = new Notification(message, {
+        icon: "images/ugenchan.png"
+    });
+    if (displaySeconds > 0) {
+        setTimeout(() => {
+            notification.close();
+        }, displaySeconds * 1000);
+    }
+    let audio = new Audio();
+    audio.autoplay = true;
+    audio.src = "sounds/alert.wav";
 }
 
 function tweet(str, callBack){
