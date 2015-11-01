@@ -17,14 +17,17 @@ $(() => {
             on: "監視中",
         }[bg.timerState]);
         
-        if(!localStorage.getItem("accessToken") || !localStorage.getItem("accessTokenSecret")){
-            $("#guide_message").text("Twitter連携をしてね！");
-            $("#start_control").hide();
-            $("#oauth_control").show();
-        } else {
-            $("#start_control").show();
-            $("#oauth_control").hide();
-        }
+        isLocalStorageNull(
+          ()=> {
+                if(!localStorage.getItem("accessToken") || !localStorage.getItem("accessTokenSecret")){
+                $("#guide_message").text("Twitter連携をしてね！");
+                $("#start_control").hide();
+                $("#oauth_control").show();
+            } else {
+                $("#start_control").show();
+                $("#oauth_control").hide();
+        }},
+          ()=> {$("#guide_message").text = "データ読み込み最中にエラーが発生しています";});
     }
 
     let isEmptyDescription;
@@ -80,3 +83,11 @@ $(() => {
     $("#oauth_button").click(onOAuthButtonClickHandler);
     refreshPageContent();
 });
+
+function isLocalStorageNull(success, error){
+    if(localStorage==null){
+      error();
+    } else {
+      success();
+    }
+}
