@@ -6,6 +6,7 @@ var stayNgSiteSeconds;
 var isTimerOn = false;
 var oneMinuteNotified = false;
 
+
 const ALERT_TIME = 5;
 const TWEET_TIME = 10;
 
@@ -130,3 +131,27 @@ function tweet(str, callBack){
         }
 	});
 };
+
+var previousIsTimerOn = false;
+function loopTimer(taskTime,restTime,loopCount,context){
+	if(loopCount==0)return;
+	function tick(){
+		previousIsTimerOn = isTimerOn;
+        timerId = setTimeout(function(){
+				if(isTimerOn!=true && context){
+					startTime();
+				}
+				loopTimer(taskTime,restTime,loopCount,context);
+			}, 1000);
+	}
+	
+	if(previousIsTimerOn == true && previousIsTimerOn != isTimerOn){
+		context = false;
+		loopCount--;
+	}
+	if(previousIsTimerOn == false && previousIsTimerOn != isTimerOn){
+		context = true;
+	}
+	
+	tick();
+}

@@ -22,7 +22,6 @@ $(() => {
     $("#start_button").click(() => {
         let time = Number($("#task_time_text").val()) * 60;
         if(isNaN(time) || time < 0) return false;
-        bg.roopTimer(time);
         flushButtonArea();
     });
 
@@ -30,12 +29,14 @@ $(() => {
 	    var bg = chrome.extension.getBackgroundPage();
         var taskTime = Number($("#task_time_text").val()) * 60;
         var restTime = Number($("#rest_time_text").val()) * 60 * 1000;
-        var roopCount = Number($("#loop_count_text").val());
+        var loopCount = Number($("#loop_count_text").val());
         if(isNaN(taskTime) || taskTime < 0) return false;
-        var timerID = setInterval(bg.startTimer(taskTime,restTime,roopCount),restTime+restTime);
+		loopTimer(taskTime,restTime,loopCount,true);
         flushButtonArea();
         refreshGuideMessage();
     });
+
+
     $("#end_button").click(() => {
         let message = `${Math.round(bg.limitSeconds / 60)}分かかると見積もった作業を${Math.round(bg.elapsedSeconds / 60)}分で終えました! #UGEN ${new Date()}`;
         bg.tweet(message, () => { bg.alert("tweetしたよ^_^"); });
