@@ -59,6 +59,7 @@ $(() => {
                 },
             }
         ), () => { bg.alert("tweetしたよ^_^"); });
+        bg.notifyRank();
         bg.stopTimer();
         refreshPageContent();
         $("#task_description_text").val("");
