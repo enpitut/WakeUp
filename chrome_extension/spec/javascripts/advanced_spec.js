@@ -9,8 +9,9 @@ describe("詳細設定から設定できる機能", () => {
         globalObject.$.fire();
     }
     beforeEach(done => {
+        let prefix = location.protocol == "http:" ? "base/" : "";
         localStorage.clear();
-        jasmine.getFixtures().fixturesPath = "javascripts/fixtures";
+        jasmine.getFixtures().fixturesPath = `${prefix}spec/javascripts/fixtures`;
         loadFixtures("fixture.html");
         $("#background").load(() => {
             background = $("#background").get(0).contentWindow;
@@ -22,11 +23,11 @@ describe("詳細設定から設定できる機能", () => {
                     config.chrome.extension.getBackgroundPage = () => background;
                     done();
                 });
-                $("#config").attr("src", "../config.html");
+                $("#config").attr("src", `${prefix}config.html`);
             });
-            $("#popup").attr("src", "../popup.html");
+            $("#popup").attr("src", `${prefix}popup.html`);
         });
-        $("#background").attr("src", "../background.html");
+        $("#background").attr("src", `${prefix}background.html`);
     });
     it("詳細設定ページからブロックサイトを追加・削除する", () => {
         setMock(background, {});
@@ -55,9 +56,9 @@ describe("詳細設定から設定できる機能", () => {
     });
     it("サボり通知ツイートにタブの情報を含める", done => {
         setMock(background, {
-            setTimeout(func, ms) {
-                setTimeout(func, 0);
-            },
+            setTimeout: (originalSetTimeout => {
+                return (func, ms) => originalSetTimeout(func, 0);
+            })(background.setTimeout),
             chrome: {
                 tabs: {
                     query(parameter, callback) {
@@ -71,7 +72,7 @@ describe("詳細設定から設定できる機能", () => {
                 },
             },
             tweet(message) {
-                expect(message).toContain("niconico(http://www.nicovideo.jp/)");
+                expect(message).toContain("niconico( http://www.nicovideo.jp/ )");
                 done();
             },
         });

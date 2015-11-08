@@ -3,6 +3,7 @@
 var limitSeconds;
 var elapsedSeconds;
 var stayNgSiteSeconds;
+var taskDescription;
 var timerState = "off";
 var oneMinuteNotified = false;
 
@@ -19,24 +20,28 @@ function mainLoop() {
     elapsedSeconds++;
     let remainingSeconds = limitSeconds - elapsedSeconds;
     if (remainingSeconds > 60) {
-        chrome.browserAction.setBadgeText({"text": Math.round(remainingSeconds / 60).toString()});
+        chrome.browserAction.setBadgeText({"text": Math.ceil(remainingSeconds / 60).toString()});
         chrome.browserAction.setBadgeBackgroundColor({color:[0, 0, 255, 100]});
     } else {
         if (!oneMinuteNotified){
-            var options = {
-                body : "",
-                icon : "../images/ugenchan.png"
-            }
-            var notification = new Notification("あと1分でtweetされます",options);
-            setTimeout(notification.close.bind(notification),2000);
+            notificate("あと1分でtweetされます", 2);
             oneMinuteNotified = true;
         }
         chrome.browserAction.setBadgeText({"text": Math.round(remainingSeconds).toString()});
         chrome.browserAction.setBadgeBackgroundColor({color:[255, 0, 0, 100]});
     }
     if (elapsedSeconds >= limitSeconds) {
-        tweet(`@${localStorage.getItem("replyAccount")} 突然のリプライ失礼致します。このたび私事ながら作業時間の見積もりに失敗しました。誠に申し訳ありません ${new Date()} #UGEN`,
-                () => { alert("tweetしたよ^_^"); });
+        tweet(generateTweet(
+            element => `@${localStorage.getItem("replyAccount")} 突然のリプライ失礼致します。このたび私事ながら${element}作業時間の見積もりに失敗しました。誠に申し訳ありません ${new Date()} #UGEN`,
+            {
+                element: taskDescription,
+                formatter(element, upperLimitLength, getShortenedString) {
+                    if (element == "") return "";
+                    if (element.length + 3 <= upperLimitLength) return `「${element}」の`;
+                    return `「${getShortenedString(6)}...」の`;
+                },
+            }
+        ), () => { alert("tweetしたよ^_^"); });
         stopTimer();
         return;
     }
@@ -49,15 +54,40 @@ function mainLoop() {
         stayNgSiteSeconds++;
         switch (stayNgSiteSeconds) {
         case ALERT_TIME:
-            alert(`あと ${TWEET_TIME - ALERT_TIME} 秒 ${currentTab.title} に滞在するとTwitterに報告されます`);
+            notificate(`あと ${TWEET_TIME - ALERT_TIME} 秒 ${currentTab.title} に滞在するとTwitterに報告されます`, 2);
             break;
         case TWEET_TIME:
             if(localStorage.getItem("tweetTabinfo") === "True") {
-                tweet(`私は作業をサボって ${currentTab.title.substr(0, 40).replace(/(@|#|＃|＠)/g, "$1\u200c")}(${currentTab.url}) を見ていました ${new Date()}`.substr(0, 135) + " #UGEN",
-                    () => { alert("tweetしたよ^_^"); });
+                tweet(generateTweet(
+                    (element1, element2) => `私は${element1}をサボって ${element2}( ${currentTab.url} ) を見ていました ${new Date()} #UGEN`,
+                    {
+                        element: taskDescription,
+                        formatter(element, upperLimitLength, getShortenedString) {
+                            if (element == "") return "作業";
+                            if (element.length + 2 <= upperLimitLength) return `「${element}」`;
+                            return `「${getShortenedString(5)}...」`;
+                        },
+                    },
+                    {
+                        element: currentTab.title,
+                        formatter(element, upperLimitLength, getShortenedString) {
+                            if (element.length <= upperLimitLength) return element;
+                            else return `${getShortenedString(3)}...`;
+                        },
+                    }
+                ), () => { alert("tweetしたよ^_^"); });
             } else {
-                tweet(`私は作業をサボっていました ${new Date()} #UGEN`,
-                    () => { alert("tweetしたよ^_^"); });
+                tweet(generateTweet(
+                    element => `私は${element}をサボっていました ${new Date()} #UGEN`,
+                    {
+                        element: taskDescription,
+                        formatter(element, upperLimitLength, getShortenedString) {
+                            if (element == "") return "作業";
+                            if (element.length + 2 <= upperLimitLength) return `「${element}」`;
+                            return `「${getShortenedString(5)}...」`;
+                        },
+                    }
+                ), () => { alert("tweetしたよ^_^"); });
             }
             chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
             stayNgSiteSeconds = 0;
@@ -66,11 +96,12 @@ function mainLoop() {
         next();
     });
 }
-function startTimer(arg) {
+function startTimer(limitSecondsAsParameter, taskDescriptionAsParameter) {
     if (timerState != "off") throw new Error("Illegal state.");
-    limitSeconds = arg;
+    limitSeconds = limitSecondsAsParameter;
     elapsedSeconds = -1;
     stayNgSiteSeconds = -1;
+    taskDescription = taskDescriptionAsParameter;
     timerState = "on";
     chrome.browserAction.setIcon({path: "../images/watchicon16.png"});
     oneMinuteNotified = false;
@@ -106,6 +137,46 @@ function isNgSite(url) {
         if (url.match(re)) return true;
     }
     return false;
+}
+
+// 1個以上の文字数が不明な文字列を用いて140文字以内のツイートを作る、という問題の解決を助ける関数
+function generateTweet(baseMessageGenerator) {
+    let elementHolders = Array.from(arguments).slice(1);
+    // RFC3986定義の厳密なHTTP URIの正規表現
+    // http://sinya8282.sakura.ne.jp/?p=1064
+    let uriPattern = /https?:(\/\/(([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,:;=])*@)?(\[(([0-9a-f]{1,4}:){6}([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|::([0-9a-f]{1,4}:){5}([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|([0-9a-f]{1,4})?::([0-9a-f]{1,4}:){4}([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(([0-9a-f]{1,4}:)?[0-9a-f]{1,4})?::([0-9a-f]{1,4}:){3}([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(([0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::([0-9a-f]{1,4}:){2}([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(([0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(([0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(([0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(([0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::|v[0-9a-f]+\.[!$&-.0-;=_a-z~]+)\]|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])|([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,;=])*)(:\d*)?(\/([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,:;=@])*)*|\/(([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,:;=@])+(\/([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,:;=@])*)*)?|([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,:;=@])+(\/([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,:;=@])*)*)?(\?([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,/:;=?@])*)?(#([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,/:;=?@])*)?/ig;
+    // 自由に使える文字数 = 140 - ベースとなる文字列の文字数
+    // URIはt.coで短縮されて23文字になるので考慮しておく
+    let freeLength = 140 - baseMessageGenerator(...new Array(baseMessageGenerator.length).fill("")).replace(uriPattern, "x".repeat(23)).length;
+    // 各文字数が不明な文字列が使える文字数の上限を割り振る
+    // 自由に使える文字数が74文字で、文字数が不明な文字列が3個ならば、[25文字, 25文字, 24文字]のように割り振る
+    let upperLimitLengths = new Array(elementHolders.length).fill()
+        .map((_, i) => Math.floor(freeLength / elementHolders.length) + (i < freeLength % elementHolders.length ? 1 : 0));
+    return baseMessageGenerator(...elementHolders.map((elementHolder, i) => {
+        // 文字数が不明な文字列中の@#をエスケープしてリプライ誤爆やハッシュタグ誤爆を防ぐ
+        let element = elementHolder.element.replace(/([@#＠＃])/g, "$1\u200c");
+        return elementHolder.formatter(
+            element,
+            upperLimitLengths[i],
+            // elementの先頭を、使える文字数の上限だけ切り取り、さらに末尾cutLength文字切った文字列を返す関数
+            // 末尾を切った結果、末尾が@#になってしまうと、リプライ誤爆やハッシュタグ誤爆を起こしかねないので、その際は末尾の@#も切る
+            cutLength => element.substring(0, upperLimitLengths[i] - cutLength).replace(/[@#＠＃]$/, "")
+        );
+    }));
+}
+
+function notificate(message, displaySeconds) {
+    let notification = new Notification(message, {
+        icon: "images/ugenchan.png"
+    });
+    if (displaySeconds > 0) {
+        setTimeout(() => {
+            notification.close();
+        }, displaySeconds * 1000);
+    }
+    let audio = new Audio();
+    audio.autoplay = true;
+    audio.src = "sounds/alert.wav";
 }
 
 function tweet(str, callBack){

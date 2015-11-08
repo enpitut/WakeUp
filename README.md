@@ -1,3 +1,8 @@
+UGEN
+=====================
+
+[![Build Status](https://travis-ci.org/enpitut/WakeUp.svg)](https://travis-ci.org/enpitut/WakeUp)
+
 このファイルの内容
 ---------------------
   * 開発チームについて
