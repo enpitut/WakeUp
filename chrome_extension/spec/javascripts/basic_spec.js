@@ -234,4 +234,70 @@ describe("基本機能", () => {
         popup.$("#task_time_text").val("1");
         popup.$("#start_button").click();
     });
+    it("監視を停止・再開する", () => {
+        setMock(background, {});
+        setMock(popup, {});
+        expect(background.timerState).toBe("off");
+        popup.$("#task_time_text").val("1");
+        popup.$("#start_button").click();
+        expect(background.timerState).toBe("on");
+        popup.$("#pause_button").click();
+        expect(background.timerState).toBe("pause");
+        popup.$("#restart_button").click();
+        expect(background.timerState).toBe("on");
+    });
+    it("監視停止中はブロックサイトを閲覧してもサボり通知ツイートがされたり「新しいタブ」ページへ飛ばされたりしない", done => {
+        let isDone = false;
+        setMock(background, {
+            setTimeout: (originalSetTimeout => {
+                return (func, ms) => originalSetTimeout(func, 0);
+            })(background.setTimeout),
+            chrome: {
+                tabs: {
+                    query(parameter, callback) {
+                        if (background.timerState == "pause") {
+                            callback([{
+                                id: 0,
+                                windowId: 0,
+                                url: "http://www.nicovideo.jp/",
+                                title: "niconico",
+                            }]);
+                        } else {
+                            callback([{
+                                id: 0,
+                                windowId: 0,
+                                url: "http://example.com/",
+                                title: "Example",
+                            }]);
+                        }
+                    },
+                    update(id, parameter) {
+                        if (!isDone) {
+                            fail("chrome.tabs.update()が呼ばれた");
+                            isDone = true;
+                            done();
+                        }
+                    },
+                },
+            },
+            tweet(message) {
+                if (!isDone) {
+                    fail("tweet()が呼ばれた");
+                    isDone = true;
+                    done();
+                }
+            },
+        });
+        setMock(popup, {});
+        popup.$("#task_time_text").val("100");
+        popup.$("#start_button").click();
+        popup.$("#pause_button").click();
+        setTimeout(() => {
+            if (!isDone) {
+                expect(true).toBe(true);
+                isDone = true;
+                done();
+            }
+        }, 500);
+    });
 });
