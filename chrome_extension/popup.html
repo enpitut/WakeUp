@@ -6,10 +6,6 @@
 <script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="javascripts/mocking.js"></script>
 <script type="text/javascript" src="javascripts/popup.js"></script>
-<script type="text/javascript" src="javascripts/common.js"></script>
-<script type="text/javascript" src="javascripts/sha1.js"></script>
-<script type="text/javascript" src="javascripts/oauth.js"></script>
-<script type="text/javascript" src="javascripts/consumer_key_and_secret.js"></script>
 <link rel="stylesheet" href="popup.css" type="text/css">
 </head>
 <body>
@@ -17,27 +13,20 @@
     <p>
         <img src="images/ugenchan.png" alt="">
     </p>
-    <div id="start_control">
-        <p>
+    <p>
         <input type="text" value="10" id="task_time_text" size="3">分のタスクとして<br>
         <input type="text" id="task_description_text">を<br>
         <input type="button" value="開始" id="start_button">
-        </p>
-        <p>
-            <input type="button" value="再開" id="restart_button">
-        </p>
-        <p>
-            <input type="button" value="タスク完了" id="end_button"><br>
-            <input type="button" value="一時停止" id="pause_button">
-        </p>
-        <p>
-            <a href="javascript:;" id="goto_option">詳細設定</a>
-        </p>
-    </div>
-    <div id="oauth_control">
-        <p>
-            <input type="button" value="連携する" id="oauth_button">
-        </p>
-    </div>
+    </p>
+    <p>
+        <input type="button" value="再開" id="restart_button">
+    </p>
+    <p>
+        <input type="button" value="タスク完了" id="end_button"><br>
+        <input type="button" value="一時停止" id="pause_button">
+    </p>
+    <p>
+        <a href="javascript:;" id="goto_option">詳細設定</a>
+    </p>
 </body>
 </html>

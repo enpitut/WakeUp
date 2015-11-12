@@ -16,15 +16,6 @@ $(() => {
             pause: "ボタンを押すと監視を再開するよ！",
             on: "監視中",
         }[bg.timerState]);
-        
-        if(!getLocalStorageData("accessToken") || !getLocalStorageData("accessTokenSecret")) {
-            $("#guide_message").text("Twitter連携をしてね！");
-            $("#start_control").css("display", "none");
-            $("#oauth_control").css("display", "block");
-        } else {
-            $("#start_control").css("display", "block");
-            $("#oauth_control").css("display", "none");
-        }
     }
 
     let isEmptyDescription;
@@ -78,6 +69,5 @@ $(() => {
         let optionsUrl = chrome.extension.getURL("config.html");
         open(optionsUrl);
     });
-    $("#oauth_button").click(onOAuthButtonClickHandler);
     refreshPageContent();
 });
