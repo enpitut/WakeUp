@@ -71,6 +71,7 @@ $(() => {
         bg.notifyRank();
         bg.stopTimer();
         refreshPageContent();
+        bg.saveTaskLog(true);
         $("#task_description_text").val("");
         $("#task_description_text").blur();
     });

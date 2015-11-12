@@ -6,6 +6,7 @@ var stayNgSiteSeconds;
 var taskDescription;
 var timerState = "off";
 var oneMinuteNotified = false;
+var saboriNum = 0;
 
 const ALERT_TIME = 5;
 const TWEET_TIME = 10;
@@ -43,6 +44,7 @@ function mainLoop() {
             }
         ), () => { alert("tweetしたよ^_^"); });
         stopTimer();
+        saveTaskLog(false);
         return;
     }
 
@@ -57,6 +59,7 @@ function mainLoop() {
             notificate(`あと ${TWEET_TIME - ALERT_TIME} 秒 ${currentTab.title} に滞在するとTwitterに報告されます`, 2);
             break;
         case TWEET_TIME:
+            saboriNum++;
             if(localStorage.getItem("tweetTabinfo") === "True") {
                 tweet(generateTweet(
                     (element1, element2) => `私は${element1}をサボって ${element2}( ${currentTab.url} ) を見ていました ${new Date()} #UGEN`,
@@ -105,6 +108,7 @@ function startTimer(limitSecondsAsParameter, taskDescriptionAsParameter) {
     timerState = "on";
     chrome.browserAction.setIcon({path: "../images/watchicon16.png"});
     oneMinuteNotified = false;
+    saboriNum = 0;
     mainLoop();
 }
 
@@ -323,4 +327,28 @@ $(() => {
         $("#show_register_ngsite_button_checkbox").prop("checked", true);
         createRegisterNgSiteButton();
     }
+    if (getLocalStorageData("taskLog") === null) {
+        setLocalStorageData("taskLog", JSON.stringify([{ date: new Date().toDateString() , workMinutes: 0, taskNum: 0, saboriNum: 0, successNum: 0}]));
+    }
 });
+
+function saveTaskLog(isSuccess) {;
+    let taskLog = JSON.parse(getLocalStorageData("taskLog"));
+    let lastLog = taskLog[taskLog.length-1];
+    
+    let today = new Date().toDateString();
+    let workMinutes = Math.floor(elapsedSeconds / 60);
+    let taskNum = 1;
+    let successNum = (isSuccess == true) ? 1 : 0;
+    
+    if(lastLog.date == new Date().toDateString()){
+        workMinutes += lastLog.workMinutes;
+        taskNum += lastLog.taskNum;
+        saboriNum += lastLog.saboriNum;
+        if(isSuccess == true)successNum += lastLog.successNum;
+        taskLog[taskLog.length-1] = { date: today, workMinutes: workMinutes, taskNum: taskNum, saboriNum: saboriNum, successNum: successNum};
+    } else {
+        taskLog.push({ date: today, workMinutes: workMinutes, taskNum: taskNum, saboriNum: saboriNum, successNum: successNum});
+    }
+    setLocalStorageData("taskLog", JSON.stringify(taskLog));
+}
