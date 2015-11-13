@@ -327,28 +327,28 @@ $(() => {
         $("#show_register_ngsite_button_checkbox").prop("checked", true);
         createRegisterNgSiteButton();
     }
-    if (getLocalStorageData("taskLog") === null) {
-        setLocalStorageData("taskLog", JSON.stringify([{ date: new Date().toDateString() , workMinutes: 0, taskNum: 0, saboriNum: 0, successNum: 0}]));
+    if (localStorage.getItem("taskLog") === null) {
+        localStorage.setItem("taskLog", JSON.stringify([{ date: new Date().toDateString() , workMinutes: 0, taskNum: 0, saboriNum: 0, successNum: 0}]));
     }
 });
 
 function saveTaskLog(isSuccess) {
-    let taskLog = JSON.parse(getLocalStorageData("taskLog"));
+    let taskLog = JSON.parse(localStorage.getItem("taskLog"));
     let lastLog = taskLog[taskLog.length-1];
     
-    let today = new Date().toDateString();
+    let today = new Date();
     let workMinutes = Math.floor(elapsedSeconds / 60);
     let taskNum = 1;
     let successNum = (isSuccess == true) ? 1 : 0;
     
-    if(lastLog.date == new Date().toDateString()){
+    if(new Date(lastLog.date).toDateString() == today.toDateString()){
         workMinutes += lastLog.workMinutes;
         taskNum += lastLog.taskNum;
         saboriNum += lastLog.saboriNum;
         if(isSuccess == true)successNum += lastLog.successNum;
-        taskLog[taskLog.length-1] = { date: today, workMinutes: workMinutes, taskNum: taskNum, saboriNum: saboriNum, successNum: successNum};
+        taskLog[taskLog.length-1] = { date: today.toString(), workMinutes: workMinutes, taskNum: taskNum, saboriNum: saboriNum, successNum: successNum};
     } else {
-        taskLog.push({ date: today, workMinutes: workMinutes, taskNum: taskNum, saboriNum: saboriNum, successNum: successNum});
+        taskLog.push({ date: today.toString(), workMinutes: workMinutes, taskNum: taskNum, saboriNum: saboriNum, successNum: successNum});
     }
-    setLocalStorageData("taskLog", JSON.stringify(taskLog));
+    localStorage.setItem("taskLog", JSON.stringify(taskLog));
 }
