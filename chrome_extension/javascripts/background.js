@@ -32,7 +32,7 @@ function mainLoop() {
     }
     if (elapsedSeconds >= limitSeconds) {
         tweet(generateTweet(
-            element => `@${localStorage.getItem("replyAccount")} 突然のリプライ失礼致します。このたび私事ながら${element}作業時間の見積もりに失敗しました。誠に申し訳ありません ${new Date()} #UGEN`,
+            element => eval(tweet_phrases.phrases.failed[Math.floor(Math.random() * tweet_phrases.phrases.failed.length)]),
             {
                 element: taskDescription,
                 formatter(element, upperLimitLength, getShortenedString) {
@@ -59,7 +59,7 @@ function mainLoop() {
         case TWEET_TIME:
             if(localStorage.getItem("tweetTabinfo") === "True") {
                 tweet(generateTweet(
-                    (element1, element2) => `私は${element1}をサボって ${element2}( ${currentTab.url} ) を見ていました ${new Date()} #UGEN`,
+                    (element1, element2) => eval(tweet_phrases.phrases.watched_ngsites.include_tabinfo[Math.floor(Math.random() * tweet_phrases.phrases.watched_ngsites.include_tabinfo.length)]),
                     {
                         element: taskDescription,
                         formatter(element, upperLimitLength, getShortenedString) {
@@ -78,7 +78,7 @@ function mainLoop() {
                 ), () => { alert("tweetしたよ^_^"); });
             } else {
                 tweet(generateTweet(
-                    element => `私は${element}をサボっていました ${new Date()} #UGEN`,
+                    element => eval(tweet_phrases.phrases.watched_ngsites.not_include_tabinfo[Math.floor(Math.random() * tweet_phrases.phrases.watched_ngsites.not_include_tabinfo.length)]),
                     {
                         element: taskDescription,
                         formatter(element, upperLimitLength, getShortenedString) {
@@ -259,7 +259,7 @@ function notifyRank(){
             .map(status => status.user.id)
             .concat(Number([localStorage.getItem("userId")]))
         )];
-    
+
     return Promise.all(userIds.map(userId => readTimeline(userId)
         .then(statuses => [
             userId,

@@ -16,7 +16,7 @@ $(() => {
             pause: "ボタンを押すと監視を再開するよ！",
             on: "監視中",
         }[bg.timerState]);
-        
+
         if(!getLocalStorageData("accessToken") || !getLocalStorageData("accessTokenSecret")) {
             $("#guide_message").text("Twitter連携をしてね！");
             $("#start_control").css("display", "none");
@@ -58,7 +58,7 @@ $(() => {
     });
     $("#end_button").click(() => {
         bg.tweet(bg.generateTweet(
-            element => `${Math.round(bg.limitSeconds / 60)}分かかると見積もった${element}を${Math.round(bg.elapsedSeconds / 60)}分で終えました! ${new Date()} #UGEN`,
+            element => eval(tweet_phrases.phrases.successed[Math.floor(Math.random() * tweet_phrases.phrases.successed.length)]),
             {
                 element: bg.taskDescription,
                 formatter(element, upperLimitLength, getShortenedString) {

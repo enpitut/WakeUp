@@ -5,19 +5,18 @@ const tweet_phrases = {
     "phrases": {
         "watched_ngsites": {
             "include_tabinfo": [
-                "`今作業をさぼってるよ。今のタブはこれ！ ${element2}( ${currentTab.url} ) ${new Date()} #UGEN`",
+                "`私は${element1}をさぼってるよ。今のタブはこれ！ ${element2}( ${currentTab.url} ) ${new Date()} #UGEN`",
                 "`私は${element1}をサボって ${element2}( ${currentTab.url} ) を見ていました ${new Date()} #UGEN`"
             ],
             "not_include_tabinfo": [
-                "`私は作業をサボっていました ${new Date()} #UGEN`"
+                "`私は${element}をサボっていました ${new Date()} #UGEN`"
             ]
         },
         "failed": [
-            "`@${localStorage.getItem('replyAccount')} 突然のリプライ失礼致します。このたび私事ながら作業時間の見積もりに失敗しました。誠に申し訳ありません ${new Date()} #UGEN`"
+            "`@${localStorage.getItem('replyAccount')} 突然のリプライ失礼致します。このたび私事ながら${element}作業時間の見積もりに失敗しました。誠に申し訳ありません ${new Date()} #UGEN`"
         ],
         "successed": [
-            "`${Math.round(bg.limitSeconds / 60)}分かかると見積もった作業を${Math.round(bg.elapsedSeconds / 60)}分で終えました! #UGEN ${new Date()}`",
-            "`${Math.round(bg.limitSeconds / 60)}分かかると見積もった作業を${Math.round(bg.elapsedSeconds / 60)}分で終えたぽよ #UGEN ${new Date()}`"
+            "`${Math.round(bg.limitSeconds / 60)}分かかると見積もった${element}を${Math.round(bg.elapsedSeconds / 60)}分で終えました! #UGEN ${new Date()}`"
         ]
     }
 
