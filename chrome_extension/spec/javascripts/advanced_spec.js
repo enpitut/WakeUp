@@ -44,7 +44,7 @@ describe("詳細設定から設定できる機能", () => {
         setMock(background, {
             tweet(message) {
                 expect(message).toContain("@tos");
-                done();
+                setTimeout(done, 0);
             },
         });
         setMock(popup, {});
@@ -73,7 +73,7 @@ describe("詳細設定から設定できる機能", () => {
             },
             tweet(message) {
                 expect(message).toContain("niconico( http://www.nicovideo.jp/ )");
-                done();
+                setTimeout(done, 0);
             },
         });
         setMock(popup, {});

@@ -332,7 +332,7 @@ $(() => {
     }
 });
 
-function saveTaskLog(isSuccess) {;
+function saveTaskLog(isSuccess) {
     let taskLog = JSON.parse(getLocalStorageData("taskLog"));
     let lastLog = taskLog[taskLog.length-1];
     
