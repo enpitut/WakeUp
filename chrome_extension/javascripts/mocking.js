@@ -16,19 +16,32 @@ if (location.protocol != "chrome-extension:") {
         },
         contextMenus: {
             create() {},
-            onClicked: {
-                addListener() {},
-            },
+            onClicked: () => {
+                let listeners = [];
+                return {
+                    addListener(listener) {
+                        listeners.push(listener);
+                    },
+                    dispatch(info, tab) {
+                        for (let listener of listeners) {
+                            listener(info, tab);
+                        }
+                    },
+                };
+            }(),
         },
         extension: {},
         tabs: {
             update() {},
             create() {},
-            query: () => ({
-                windowId: 0,
-                url: "http://example.com/",
-                title: "Example",
-            }),
+            query(parameter, callback) {
+                callback([{
+                    id: 0,
+                    windowId: 0,
+                    url: "http://example.com/",
+                    title: "Example",
+                }]);
+            },
         },
     };
     () => {

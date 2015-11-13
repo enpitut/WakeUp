@@ -34,6 +34,7 @@ $(() => {
                 let accessTokenMap = OAuth.getParameterMap(responseText);
                 localStorage.setItem("accessToken", accessTokenMap["oauth_token"]);
                 localStorage.setItem("accessTokenSecret", accessTokenMap["oauth_token_secret"]);
+                localStorage.setItem("userId", accessTokenMap["user_id"]);
                 $("body > p").text("Twitter連携の設定が完了しました。");
                 setTimeout(close, 2000);
             },
