@@ -328,7 +328,7 @@ $(() => {
         createRegisterNgSiteButton();
     }
     if (localStorage.getItem("taskLog") === null) {
-        localStorage.setItem("taskLog", JSON.stringify([{ date: new Date().toDateString() , workMinutes: 0, taskNum: 0, saboriNum: 0, successNum: 0}]));
+        localStorage.setItem("taskLog", JSON.stringify([{ date: new Date().toString(), task_descriptions: [], workMinutes: 0, taskNum: 0, saboriNum: 0, successNum: 0}]));
     }
 });
 
@@ -339,16 +339,15 @@ function saveTaskLog(isSuccess) {
     let today = new Date();
     let workMinutes = Math.floor(elapsedSeconds / 60);
     let taskNum = 1;
-    let successNum = (isSuccess == true) ? 1 : 0;
     
     if(new Date(lastLog.date).toDateString() == today.toDateString()){
-        workMinutes += lastLog.workMinutes;
-        taskNum += lastLog.taskNum;
-        saboriNum += lastLog.saboriNum;
-        if(isSuccess == true)successNum += lastLog.successNum;
-        taskLog[taskLog.length-1] = { date: today.toString(), workMinutes: workMinutes, taskNum: taskNum, saboriNum: saboriNum, successNum: successNum};
+        lastLog.workMinutes += workMinutes;
+        lastLog.task_descriptions.push((taskDescription=="") ? "-" : taskDescription);
+        lastLog.saboriNum += saboriNum;
+        if(isSuccess == true)lastLog.successNum++;
+        taskLog[taskLog.length-1] = lastLog;
     } else {
-        taskLog.push({ date: today.toString(), workMinutes: workMinutes, taskNum: taskNum, saboriNum: saboriNum, successNum: successNum});
+        taskLog.push({ date: today.toString(), task_descriptions:[(taskDescription=="") ? "-" : taskDescription], workMinutes: workMinutes, saboriNum: saboriNum, successNum: (isSuccess) ? 1 : 0});
     }
     localStorage.setItem("taskLog", JSON.stringify(taskLog));
 }

@@ -59,8 +59,4 @@ $(() => {
     if (localStorage.getItem("showRegisterNgSiteButton") === "True") {
         $("#show_register_ngsite_button_checkbox").prop("checked", true);
     }
-    for (let log of JSON.parse(getLocalStorageData("taskLog"))) {
-        let today = new Date(log.date);
-        $("#task_log").append($(`<p>${today.getFullYear()}/${today.getMonth()+1}/${today.getDate()}のデータ　　　作業時間：${log.workMinutes}分　タスク数：${log.taskNum}（うち${log.successNum}回成功、${log.taskNum - log.successNum}回失敗）　サボり数：${log.saboriNum}</p>`));
-    }
 });

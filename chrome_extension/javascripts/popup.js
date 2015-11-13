@@ -79,6 +79,10 @@ $(() => {
         let optionsUrl = chrome.extension.getURL("config.html");
         open(optionsUrl);
     });
+    $("#goto_tasklog").click(() => {
+        let tasklogUrl = chrome.extension.getURL("task_log.html");
+        open(tasklogUrl);
+    });
     $("#oauth_button").click(onOAuthButtonClickHandler);
     refreshPageContent();
 });
