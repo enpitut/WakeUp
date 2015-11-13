@@ -27,7 +27,7 @@ describe("基本機能", () => {
         setMock(background, {
             tweet(message) {
                 expect(message).toContain("1分かかると見積もった作業を0分で終えました");
-                done();
+                setTimeout(done, 0);
             },
         });
         setMock(popup, {});
@@ -39,7 +39,7 @@ describe("基本機能", () => {
         setMock(background, {
             tweet(message) {
                 expect(message).toContain("申し訳ありません");
-                done();
+                setTimeout(done, 0);
             },
         });
         setMock(popup, {});
@@ -66,7 +66,7 @@ describe("基本機能", () => {
             Notification: function (message) {
                 this.close = () => {};
                 expect(message).toContain("あと 5 秒 niconico に滞在すると");
-                done();
+                setTimeout(done, 0);
             },
         });
         setMock(popup, {});
@@ -77,7 +77,7 @@ describe("基本機能", () => {
         let count = 2;
         function partiallyDone() {
             count--;
-            if (count == 0) done();
+            if (count == 0) setTimeout(done, 0);
         }
         setMock(background, {
             setTimeout: (originalSetTimeout => {
@@ -112,7 +112,7 @@ describe("基本機能", () => {
         setMock(background, {
             tweet(message) {
                 expect(message).toContain("動作確認作業");
-                done();
+                setTimeout(done, 0);
             },
         });
         setMock(popup, {});
@@ -131,7 +131,7 @@ describe("基本機能", () => {
         setMock(background, {
             tweet(message) {
                 expect(message).toContain("動作確認作業");
-                done();
+                setTimeout(done, 0);
             },
         });
         setMock(popup, {});
@@ -162,7 +162,7 @@ describe("基本機能", () => {
             },
             tweet(message) {
                 expect(message).toContain("動作確認作業");
-                done();
+                setTimeout(done, 0);
             },
         });
         setMock(popup, {});
@@ -178,7 +178,7 @@ describe("基本機能", () => {
         let count = 2;
         function partiallyDone() {
             count--;
-            if (count == 0) done();
+            if (count == 0) setTimeout(done, 0);
         }
         setMock(background, {
             chrome: {
@@ -202,7 +202,7 @@ describe("基本機能", () => {
         let count = 2;
         function partiallyDone() {
             count--;
-            if (count == 0) done();
+            if (count == 0) setTimeout(done, 0);
         }
         setMock(background, {
             chrome: {
@@ -227,7 +227,7 @@ describe("基本機能", () => {
             Notification: function (message) {
                 this.close = () => {};
                 expect(message).toContain("あと1分でtweetされます");
-                done();
+                setTimeout(done, 0);
             },
         });
         setMock(popup, {});
@@ -275,7 +275,7 @@ describe("基本機能", () => {
                         if (!isDone) {
                             fail("chrome.tabs.update()が呼ばれた");
                             isDone = true;
-                            done();
+                            setTimeout(done, 0);
                         }
                     },
                 },
@@ -284,7 +284,7 @@ describe("基本機能", () => {
                 if (!isDone) {
                     fail("tweet()が呼ばれた");
                     isDone = true;
-                    done();
+                    setTimeout(done, 0);
                 }
             },
         });
@@ -296,7 +296,7 @@ describe("基本機能", () => {
             if (!isDone) {
                 expect(true).toBe(true);
                 isDone = true;
-                done();
+                setTimeout(done, 0);
             }
         }, 500);
     });
