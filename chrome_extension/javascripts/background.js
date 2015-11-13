@@ -46,11 +46,11 @@ function mainLoop() {
         stopTimer();
         return;
     }
-
+	
     chrome.tabs.query({currentWindow: true, active: true}, tabs => {
-        if (tabs.length == 0) return next();
-        let currentTab = tabs[0];
-        if (!isNgSite(currentTab.url)) return next();
+		if (tabs.length == 0) return next();
+		let currentTab = tabs[0];
+		if (!isNgSite(currentTab.url)) return next();
 
         stayNgSiteSeconds++;
         switch (stayNgSiteSeconds) {
@@ -213,24 +213,24 @@ function tweet(str, callBack){
 };
 
 
-var previousIsTimerOn = false;
-function loopTimer(taskTime,restTime,loopCount,context){
+var previousIsTimerOn = "off";
+function loopTimer(taskTime,restTime,loopCount,context,taskDescription){
 	if(loopCount==0)return;
 	function tick(){
-		previousIsTimerOn = isTimerOn;
+		previousIsTimerOn = timerState;
         timerId = setTimeout(function(){
-				if(isTimerOn!=true && context){
-					startTime();
+				if(timerState == "on" && context == true){
+					startTime(taskTime,taskDescription);
 				}
-				loopTimer(taskTime,restTime,loopCount,context);
+				loopTimer(taskTime,restTime,loopCount,context,taskDescription);
 			}, 1000);
 	}
 	
-	if(previousIsTimerOn == true && previousIsTimerOn != isTimerOn){
+	if(previousIsTimerOn == true && previousIsTimerOn != timerState){
 		context = false;
 		loopCount--;
 	}
-	if(previousIsTimerOn == false && previousIsTimerOn != isTimerOn){
+	if(previousIsTimerOn == false && previousIsTimerOn != timerState){
 		context = true;
 	}
 	
