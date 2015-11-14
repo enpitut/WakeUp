@@ -48,6 +48,20 @@ $(() => {
         bg.startTimer(time, isEmptyDescription ? "" : $("#task_description_text").val());
         refreshPageContent();
     });
+    $("#start_button").click(() => {
+        let time = Number($("#task_time_text").val()) * 60;
+        if(isNaN(time) || time < 0) return false;
+        bg.startTimer(time, isEmptyDescription ? "" : $("#task_description_text").val());
+        refreshPageContent();
+    });
+    $("#loop_button").click(() => {
+	    let taskTime = Number($("#rest_time_text").val()) * 60;
+		let restTime = Number($("#task_time_text").val()) * 60;
+		let loopCount = Number($("#loop_time_text").val());	  
+        if(isNaN(taskTime) || taskTime < 0) return false;
+		bg.loopTimer(taskTime,restTime,loopCount,true,isEmptyDescription ? "" : $("#task_description_text").val());
+        refreshPageContent();
+		});
     $("#pause_button").click(() => {
         bg.pauseTimer();
         refreshPageContent();

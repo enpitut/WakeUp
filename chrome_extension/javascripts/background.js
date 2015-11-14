@@ -135,11 +135,13 @@ function isNgSite(url) {
     let urlList = JSON.parse(localStorage.getItem("urlList"));
     for (let str of urlList) {
         let re = new RegExp(str.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1"));
-        if (url.match(re)) return true;
-    }
-    return false;
+        if (url.match(re)) return true; 						   
+		else{
+			return false;
+		}
 	}
-};
+}
+
 
 // 1個以上の文字数が不明な文字列を用いて140文字以内のツイートを作る、という問題の解決を助ける関数
 function generateTweet(baseMessageGenerator) {
@@ -216,27 +218,28 @@ function tweet(str, callBack){
 
 var previousIsTimerOn = "off";
 function loopTimer(taskTime,restTime,loopCount,context,taskDescription){
+	console.log("pre"+previousIsTimerOn);
+	console.log("now"+timerState);
 	if(loopCount==0)return;
 	function tick(){
 		previousIsTimerOn = timerState;
-        timerId = setTimeout(function(){
-				if(timerState == "on" && context == true){
-					startTime(taskTime,taskDescription);
-				}
+		timerId = setTimeout(function(){
+				if(timerState == "off" && context == true){
+					startTimer(taskTime,taskDescription);
+				}				
 				loopTimer(taskTime,restTime,loopCount,context,taskDescription);
-			}, 1000);
+				}, 1000);
 	}
-	
-	if(previousIsTimerOn == true && previousIsTimerOn != timerState){
+	if(previousIsTimerOn == "on" && previousIsTimerOn != timerState){
 		context = false;
 		loopCount--;
-	}
-	if(previousIsTimerOn == false && previousIsTimerOn != timerState){
+ 	}
+	if(previousIsTimerOn == "off" && previousIsTimerOn != timerState){
 		context = true;
 	}
-	
 	tick();
 }
+
 
 function searchTweets(str){
   return new Promise(function(resolve, reject) {
@@ -337,7 +340,7 @@ function readTimeline(id){
             }
         });
     });
-}
+};
 
 
 $(() => {
