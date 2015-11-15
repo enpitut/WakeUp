@@ -6,8 +6,8 @@ $(() => {
 });
 
 function drawTaskMinutes(){
-    let width = 500;
-	let height = 200;
+    let width = 600;
+	let height = 300;
     let drawWidth = width - 100;
     let drawHeight = height - 50;
 	let taskLogs = JSON.parse(localStorage.getItem("taskLog"));
