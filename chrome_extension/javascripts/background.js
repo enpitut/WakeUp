@@ -32,6 +32,7 @@ function mainLoop() {
         chrome.browserAction.setBadgeBackgroundColor({color:[255, 0, 0, 100]});
     }
     if (elapsedSeconds >= limitSeconds) {
+        saveTaskLog(false);
         tweet(generateTweet(
             element => `@${localStorage.getItem("replyAccount")} 突然のリプライ失礼致します。このたび私事ながら${element}作業時間の見積もりに失敗しました。誠に申し訳ありません ${new Date()} #UGEN`,
             {
@@ -44,7 +45,6 @@ function mainLoop() {
             }
         ), () => { alert("tweetしたよ^_^"); });
         stopTimer();
-        saveTaskLog(false);
         return;
     }
 
