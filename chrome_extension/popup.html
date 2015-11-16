@@ -16,31 +16,26 @@
 <link rel="stylesheet" href="bootstrap-theme.min.css" type="text/css">
 </head>
 <body>
+<div class="container">
 <div class="row">
     <p id="guide_message"></p>
     <p>
         <img src="images/ugenchan_alpha.png" alt="">
     </p>
     <div id="start_control">
-        <p>
         <div class="col-xs-12">
-            <form class="form-horizontal">
+            <form class="form">
             <div class="form-group">
-                <label for="task_time_text" class="col-xs-4 control-label">時間(分)</label>
-                <div class="col-xs-8">
-                    <input type="text" value="10" id="task_time_text" class="form-control">
-                </div>
+                <label for="task_time_text" class="control-label">時間(分)</label>
+                <input type="text" value="10" id="task_time_text" class="form-control input-sm">
             </div>
             <div class="form-group">
-                <label for="task_description_text" class="col-xs-4 control-label">作業名</label>
-                <div class="col-xs-8">
-                    <input type="text" id="task_description_text" class="form-control">
-                </div>
+                <label for="task_description_text" class="control-label">作業名</label>
+                <input type="text" id="task_description_text" class="form-control input-sm">
             </div>
             <input type="button" value="開始" id="start_button" class="btn btn-success btn-block">
             </form>
         </div>
-        </p>
         <div class="col-xs-12">
             <input type="button" value="再開" id="restart_button" class="btn btn-primary btn-block">
         </div>
@@ -50,7 +45,7 @@
         </div>
         <div class="footer">
         <p>
-            <a href="javascript:;" id="goto_option" class="col-xs-5 col-xs-offset-7">オプション</a>
+            <a href="javascript:;" id="goto_option" class="pull-right">オプション</a>
         </p>
         </div>
     </div>
@@ -59,6 +54,7 @@
             <input type="button" value="連携する" id="oauth_button">
         </p>
     </div>
+</div>
 </div>
 </body>
 </html>
