@@ -58,7 +58,7 @@ $(() => {
     });
     $("#end_button").click(() => {
         bg.tweet(bg.generateTweet(
-            element => eval(tweet_phrases.phrases.successed[Math.floor(Math.random() * tweet_phrases.phrases.successed.length)]),
+            element => sprintf(tweet_phrases.phrases.successed[Math.floor(Math.random() * tweet_phrases.phrases.successed.length)], Math.round(bg.limitSeconds / 60), element, Math.round(bg.elapsedSeconds / 60), new Date()),
             {
                 element: bg.taskDescription,
                 formatter(element, upperLimitLength, getShortenedString) {

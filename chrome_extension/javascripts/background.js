@@ -32,7 +32,7 @@ function mainLoop() {
     }
     if (elapsedSeconds >= limitSeconds) {
         tweet(generateTweet(
-            element => eval(tweet_phrases.phrases.failed[Math.floor(Math.random() * tweet_phrases.phrases.failed.length)]),
+            element => sprintf(tweet_phrases.phrases.failed[Math.floor(Math.random() * tweet_phrases.phrases.failed.length)], localStorage.getItem("replyAccount"), element, new Date()),
             {
                 element: taskDescription,
                 formatter(element, upperLimitLength, getShortenedString) {
@@ -59,7 +59,7 @@ function mainLoop() {
         case TWEET_TIME:
             if(localStorage.getItem("tweetTabinfo") === "True") {
                 tweet(generateTweet(
-                    (element1, element2) => eval(tweet_phrases.phrases.watched_ngsites.include_tabinfo[Math.floor(Math.random() * tweet_phrases.phrases.watched_ngsites.include_tabinfo.length)]),
+                    (element1, element2) => sprintf(tweet_phrases.phrases.watched_ngsites.include_tabinfo[Math.floor(Math.random() * tweet_phrases.phrases.watched_ngsites.include_tabinfo.length)], element1, element2, currentTab.url, new Date()),
                     {
                         element: taskDescription,
                         formatter(element, upperLimitLength, getShortenedString) {
@@ -78,7 +78,7 @@ function mainLoop() {
                 ), () => { alert("tweetしたよ^_^"); });
             } else {
                 tweet(generateTweet(
-                    element => eval(tweet_phrases.phrases.watched_ngsites.not_include_tabinfo[Math.floor(Math.random() * tweet_phrases.phrases.watched_ngsites.not_include_tabinfo.length)]),
+                    element => sprintf(tweet_phrases.phrases.watched_ngsites.not_include_tabinfo[Math.floor(Math.random() * tweet_phrases.phrases.watched_ngsites.not_include_tabinfo.length)], element, new Date()),
                     {
                         element: taskDescription,
                         formatter(element, upperLimitLength, getShortenedString) {
