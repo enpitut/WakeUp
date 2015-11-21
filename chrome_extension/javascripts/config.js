@@ -6,7 +6,7 @@ function flushReplyAccount() {
 
 $(() => {
     function addRow(targetUrl) {
-        let tr = $('<tr><td></td><td><input type="button" value="×"></td></tr>');
+        let tr = $('<tr><td class="col-lg-4"></td><td><input type="button" value="×" class="btn btn-danger"></td></tr>');
         tr.children(":first").text(targetUrl);
         tr.find("input").click(() => {
             tr.remove();

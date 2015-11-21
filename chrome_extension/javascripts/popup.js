@@ -31,7 +31,7 @@ $(() => {
     $("#task_description_text").focus(() => {
         if (isEmptyDescription) {
             $("#task_description_text").val("");
-            $("#task_description_text").css("color", "#000000");
+            $("#task_description_text").css("color", "#555555");
         }
     });
     $("#task_description_text").blur(() => {
