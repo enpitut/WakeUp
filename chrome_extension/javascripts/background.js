@@ -167,7 +167,7 @@ function generateTweet(baseMessageGenerator) {
 
 function notificate(message, displaySeconds) {
     let notification = new Notification(message, {
-        icon: "images/ugenchan.png"
+        icon: "images/ugenchan200.png"
     });
     if (displaySeconds > 0) {
         setTimeout(() => {
