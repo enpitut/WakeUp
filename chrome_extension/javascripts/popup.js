@@ -16,7 +16,15 @@ $(() => {
             pause: "ボタンを押すと監視を再開するよ！",
             on: "監視中",
         }[bg.timerState]);
-        
+
+        $("#idling_image").css("display", "none");
+        $("#running_image").css("display", "none");
+        $({
+            off: "#idling_image",
+            pause: "#idling_image",
+            on: "#running_image",
+        }[bg.timerState]).css("display", "block");
+       
         if(!getLocalStorageData("accessToken") || !getLocalStorageData("accessTokenSecret")) {
             $("#guide_message").text("Twitter連携をしてね！");
             $("#start_control").css("display", "none");
