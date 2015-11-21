@@ -246,6 +246,23 @@ describe("基本機能", () => {
         popup.$("#restart_button").click();
         expect(background.timerState).toBe("on");
     });
+    it("監視を停止・再開するのに合わせてポップアップの画像が切り替わる", () => {
+        setMock(background, {});
+        setMock(popup, {});
+        expect(background.timerState).toBe("off");
+        popup.$("#task_time_text").val("1");
+        expect(popup.$("#idling_image").css("display")).toBe("block");
+        expect(popup.$("#running_image").css("display")).toBe("none");
+        popup.$("#start_button").click();
+        expect(popup.$("#idling_image").css("display")).toBe("none");
+        expect(popup.$("#running_image").css("display")).toBe("block");
+        popup.$("#pause_button").click();
+        expect(popup.$("#idling_image").css("display")).toBe("block");
+        expect(popup.$("#running_image").css("display")).toBe("none");
+        popup.$("#restart_button").click();
+        expect(popup.$("#idling_image").css("display")).toBe("none");
+        expect(popup.$("#running_image").css("display")).toBe("block");
+    });
     it("監視停止中はブロックサイトを閲覧してもサボり通知ツイートがされたり「新しいタブ」ページへ飛ばされたりしない", done => {
         let isDone = false;
         setMock(background, {
