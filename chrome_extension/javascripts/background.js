@@ -226,17 +226,15 @@ function loopTimer(taskTime,restTime,loopCount,context,taskDescription){
 				loopTimer(taskTime,restTime,loopCount,context,taskDescription);
 				}, 1000);
 	}
-	if(loopCount==0)return;//end state
-	if(previousIsTimerOn == "on" && timerState == "off"){     //rest start
-		console.log("立ち下がり");
+	if(loopCount==0)return;
+	if(previousIsTimerOn == "on" && timerState == "off"){    
 		context = "rest";
+		notificate("休憩‼!!作業お疲れ様!!",2);
  	}
-	if(previousIsTimerOn == "on" && timerState == "pause"){    //pause start
-		console.log("立ち下がり");
+	if(previousIsTimerOn == "on" && timerState == "pause"){    
 		context="pause";
 	}
-	if(context == "task"){    //loopcount down
-		console.log("立ち上がり");
+	if(context == "task"){    
 		startTimer(taskTime,taskDescription);		
 		context="concentrate";
 		loopCount--;
