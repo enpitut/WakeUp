@@ -217,26 +217,39 @@ function tweet(str, callBack){
 
 
 var previousIsTimerOn = "off";
+var defaultRestTime;
 function loopTimer(taskTime,restTime,loopCount,context,taskDescription){
-	console.log("pre"+previousIsTimerOn);
-	console.log("now"+timerState);
-	if(loopCount==0)return;
+	console.log("restTime:"+restTime);
+	console.log("defaultRestTime:"+defaultRestTime);
 	function tick(){
-		previousIsTimerOn = timerState;
-		timerId = setTimeout(function(){
-				if(timerState == "off" && context == true){
-					startTimer(taskTime,taskDescription);
-				}				
+		setTimeout(function(){
 				loopTimer(taskTime,restTime,loopCount,context,taskDescription);
 				}, 1000);
 	}
-	if(previousIsTimerOn == "on" && previousIsTimerOn != timerState){
-		context = false;
-		loopCount--;
+	if(loopCount==0)return;//end state
+	if(previousIsTimerOn == "on" && timerState == "off"){     //rest start
+		console.log("立ち下がり");
+		context = "rest";
  	}
-	if(previousIsTimerOn == "off" && previousIsTimerOn != timerState){
-		context = true;
+	if(previousIsTimerOn == "on" && timerState == "pause"){    //pause start
+		console.log("立ち下がり");
+		context="pause";
 	}
+	if(context == "task"){    //loopcount down
+		console.log("立ち上がり");
+		startTimer(taskTime,taskDescription);		
+		context="concentrate";
+		loopCount--;
+		restTime = defaultRestTime;
+	}
+	if(context == "rest"){
+		restTime--;
+		if(restTime==0){
+			context = "task";
+			
+		}
+	}
+	previousIsTimerOn = timerState;
 	tick();
 }
 
