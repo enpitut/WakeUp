@@ -216,40 +216,28 @@ function tweet(str, callBack){
 };
 
 
-var previousIsTimerOn = "off";
-var defaultRestTime;
-function loopTimer(taskTime,restTime,loopCount,context,taskDescription){
-	console.log("restTime:"+restTime);
-	console.log("defaultRestTime:"+defaultRestTime);
-	function tick(){
-		setTimeout(function(){
-				loopTimer(taskTime,restTime,loopCount,context,taskDescription);
-				}, 1000);
-	}
-	if(loopCount==0)return;
-	if(previousIsTimerOn == "on" && timerState == "off"){    
-		context = "rest";
-		notificate("休憩‼!!作業お疲れ様!!",2);
- 	}
-	if(previousIsTimerOn == "on" && timerState == "pause"){    
-		context="pause";
-	}
-	if(context == "task"){    
-		startTimer(taskTime,taskDescription);		
-		context="concentrate";
-		loopCount--;
-		restTime = defaultRestTime;
-	}
-	if(context == "rest"){
-		restTime--;
-		if(restTime==0){
-			context = "task";
-			
+function loopTimer(taskTime, restTime, loopCount, taskDescription) {
+	let leftRestTime = 0;
+	let leftLoopCount = loopCount;
+	let previousTimerState = "off";
+	(function tick() {
+		if (previousTimerState == "on" && timerState == "off") {
+			notificate("休憩‼!!作業お疲れ様!!", 2);
+			leftRestTime = restTime;
 		}
-	}
-	previousIsTimerOn = timerState;
-	tick();
+		if (timerState == "off") {
+			if (leftRestTime == 0) {
+				if (leftLoopCount == 0) return;
+				startTimer(taskTime, taskDescription);
+				leftLoopCount--;
+				}
+			leftRestTime--;
+		}
+		previousTimerState = timerState;
+		setTimeout(tick, 1000);
+	})();
 }
+
 
 
 function searchTweets(str){
