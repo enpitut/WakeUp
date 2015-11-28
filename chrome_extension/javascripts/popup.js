@@ -50,13 +50,13 @@ $(() => {
     });
 
     $("#loop_button").click(() => {
-	    let taskTime = Number($("#rest_time_text").val()) * 60;
-		let restTime = Number($("#task_time_text").val()) * 60;
-		let loopCount = Number($("#loop_time_text").val());	  
+        let taskTime = Number($("#rest_time_text").val()) * 60;
+        let restTime = Number($("#task_time_text").val()) * 60;
+        let loopCount = Number($("#loop_time_text").val());   
         if(isNaN(taskTime) || taskTime < 0) return false;
-		bg.loopTimer(taskTime,restTime,loopCount,isEmptyDescription ? "" : $("#task_description_text").val());
+        bg.loopTimer(taskTime,restTime,loopCount,isEmptyDescription ? "" : $("#task_description_text").val());
         refreshPageContent();
-		});
+        });
     $("#pause_button").click(() => {
         bg.pauseTimer();
         refreshPageContent();

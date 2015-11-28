@@ -46,11 +46,11 @@ function mainLoop() {
         stopTimer();
         return;
     }
-	
+    
     chrome.tabs.query({currentWindow: true, active: true}, tabs => {
-		if (tabs.length == 0) return next();
-		let currentTab = tabs[0];
-		if (!isNgSite(currentTab.url)) return next();
+        if (tabs.length == 0) return next();
+        let currentTab = tabs[0];
+        if (!isNgSite(currentTab.url)) return next();
 
         stayNgSiteSeconds++;
         switch (stayNgSiteSeconds) {
@@ -92,7 +92,7 @@ function mainLoop() {
             }
             chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
             stayNgSiteSeconds = 0;
-			break;
+            break;
         }
         next();
     });
@@ -135,11 +135,10 @@ function isNgSite(url) {
     let urlList = JSON.parse(localStorage.getItem("urlList"));
     for (let str of urlList) {
         let re = new RegExp(str.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1"));
-        if (url.match(re)) return true; 						   
-		else{
-			return false;
-		}
-	}
+        if (url.match(re)) return true;                            
+        }
+    }
+    return false;
 }
 
 
@@ -212,30 +211,30 @@ function tweet(str, callBack){
         error: responseObject => {
             alert(`Error: ${responseObject.status} ${responseObject.statusText}\n${responseObject.responseText}`);
         }
-	});
+    });
 };
 
 
 function loopTimer(taskTime, restTime, loopCount, taskDescription) {
-	let leftRestTime = 0;
-	let leftLoopCount = loopCount;
-	let previousTimerState = "off";
-	(function tick() {
-		if (previousTimerState == "on" && timerState == "off") {
-			notificate("休憩‼!!作業お疲れ様!!", 2);
-			leftRestTime = restTime;
-		}
-		if (timerState == "off") {
-			if (leftRestTime == 0) {
-				if (leftLoopCount == 0) return;
-				startTimer(taskTime, taskDescription);
-				leftLoopCount--;
-				}
-			leftRestTime--;
-		}
-		previousTimerState = timerState;
-		setTimeout(tick, 1000);
-	})();
+    let leftRestTime = 0;
+    let leftLoopCount = loopCount;
+    let previousTimerState = "off";
+    (function tick() {
+        if (previousTimerState == "on" && timerState == "off") {
+            notificate("休憩‼!!作業お疲れ様!!", 2);
+            leftRestTime = restTime;
+        }
+        if (timerState == "off") {
+            if (leftRestTime == 0) {
+                if (leftLoopCount == 0) return;
+                startTimer(taskTime, taskDescription);
+                leftLoopCount--;
+                }
+            leftRestTime--;
+        }
+        previousTimerState = timerState;
+        setTimeout(tick, 1000);
+    })();
 }
 
 
@@ -353,7 +352,7 @@ $(() => {
         $("#show_register_ngsite_button_checkbox").prop("checked", true);
         createRegisterNgSiteButton();
     }
-	
-	});
+    
+    });
 
 
