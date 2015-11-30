@@ -18,10 +18,11 @@ $(() => {
         }[bg.timerState]);
 
         $("#idling_image").css("display", "none");
+        $("#resting_image").css("display", "none");
         $("#running_image").css("display", "none");
         $({
             off: "#idling_image",
-            pause: "#idling_image",
+            pause: "#resting_image",
             on: "#running_image",
         }[bg.timerState]).css("display", "block");
        
