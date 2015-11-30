@@ -252,15 +252,19 @@ describe("基本機能", () => {
         expect(background.timerState).toBe("off");
         popup.$("#task_time_text").val("1");
         expect(popup.$("#idling_image")).toHaveCss({display: "block"});
+        expect(popup.$("#resting_image")).toHaveCss({display: "none"});
         expect(popup.$("#running_image")).toHaveCss({display: "none"});
         popup.$("#start_button").click();
         expect(popup.$("#idling_image")).toHaveCss({display: "none"});
+        expect(popup.$("#resting_image")).toHaveCss({display: "none"});
         expect(popup.$("#running_image")).toHaveCss({display: "block"});
         popup.$("#pause_button").click();
-        expect(popup.$("#idling_image")).toHaveCss({display: "block"});
+        expect(popup.$("#idling_image")).toHaveCss({display: "none"});
+        expect(popup.$("#resting_image")).toHaveCss({display: "block"});
         expect(popup.$("#running_image")).toHaveCss({display: "none"});
         popup.$("#restart_button").click();
         expect(popup.$("#idling_image")).toHaveCss({display: "none"});
+        expect(popup.$("#resting_image")).toHaveCss({display: "none"});
         expect(popup.$("#running_image")).toHaveCss({display: "block"});
     });
     it("監視停止中はブロックサイトを閲覧してもサボり通知ツイートがされたり「新しいタブ」ページへ飛ばされたりしない", done => {
