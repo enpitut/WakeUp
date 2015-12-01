@@ -96,13 +96,17 @@ $(() => {
         $("#new_account_text").val("");
         $("#new_account_text").trigger("keydown");
         getUserId(screenName).then(userId => {
-            return tweet(`@${screenName} ツールによる自動メッセージです。作業が見積もり時間内に終わらなかった時にリプライを自動で送るツールを使うことで作業の強制力を上げようとしています。リプライを送られることを許可する場合はこのリプライに返信してください。`).then(status => {
-                let replySetting = JSON.parse(localStorage.getItem("replySetting"));
-                replySetting[localStorage.getItem("userId")].replyIdForPermissionMap[userId] = status["id"];
-                localStorage.setItem("replySetting", JSON.stringify(replySetting));
-                flushReplyAccounts();
-                notificate(`@${screenName}にリプライを送りました`, 2);
-            });
+            if (JSON.parse(localStorage.getItem("replySetting"))[localStorage.getItem("userId")].replyAccountIds.indexOf(userId) > -1) {
+                notificate(`@${screenName}からは既に許可を得ています`, 2);
+            } else {
+                return tweet(`@${screenName} ツールによる自動メッセージです。作業が見積もり時間内に終わらなかった時にリプライを自動で送るツールを使うことで作業の強制力を上げようとしています。リプライを送られることを許可する場合はこのリプライに返信してください。`).then(status => {
+                    let replySetting = JSON.parse(localStorage.getItem("replySetting"));
+                    replySetting[localStorage.getItem("userId")].replyIdForPermissionMap[userId] = status["id"];
+                    localStorage.setItem("replySetting", JSON.stringify(replySetting));
+                    flushReplyAccounts();
+                    notificate(`@${screenName}にリプライを送りました`, 2);
+                });
+            }
         }).catch(e => { alert(e.message); });
     });
 
