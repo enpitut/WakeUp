@@ -17,7 +17,7 @@ $(() => {
             on: "監視中",
         }[bg.timerState]);
         
-        if(!getLocalStorageData("accessToken") || !getLocalStorageData("accessTokenSecret")) {
+        if(getLocalStorageData("userId") === null) {
             $("#guide_message").text("Twitter連携をしてね！");
             $("#start_control").css("display", "none");
             $("#oauth_control").css("display", "block");
@@ -57,7 +57,7 @@ $(() => {
         refreshPageContent();
     });
     $("#end_button").click(() => {
-        bg.tweet(bg.generateTweet(
+        bg.tweet(generateTweet(
             element => `${Math.round(bg.limitSeconds / 60)}分かかると見積もった${element}を${Math.round(bg.elapsedSeconds / 60)}分で終えました! ${new Date()} #UGEN`,
             {
                 element: bg.taskDescription,
@@ -65,9 +65,9 @@ $(() => {
                     if (element == "") return "作業";
                     if (element.length + 2 <= upperLimitLength) return `「${element}」`;
                     return `「${getShortenedString(5)}...」`;
-                },
+                }
             }
-        ), () => { bg.alert("tweetしたよ^_^"); });
+        )).then(() => { bg.alert("tweetしたよ^_^"); }).catch(e => { bg.alert(e.message); });
         bg.notifyRank();
         bg.stopTimer();
         refreshPageContent();

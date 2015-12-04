@@ -25,7 +25,7 @@ describe("関数の入出力", () => {
                     element: "x".repeat(140),
                     formatter(element, upperLimitLength, getShortenedString) {
                         return `${getShortenedString(5)}.....`;
-                    },
+                    }
                 }
             );
             expect(tweet).toEqual(`${"x".repeat(130)}.....yyyyy`);
@@ -37,13 +37,13 @@ describe("関数の入出力", () => {
                     element: "x".repeat(140),
                     formatter(element, upperLimitLength, getShortenedString) {
                         return `${getShortenedString(5)}.....`;
-                    },
+                    }
                 },
                 {
                     element: "z".repeat(140),
                     formatter(element, upperLimitLength, getShortenedString) {
                         return `${getShortenedString(5)}.....`;
-                    },
+                    }
                 }
             );
             expect(tweet).toEqual(`${"x".repeat(63)}.....yyyyy${"z".repeat(62)}.....`);
@@ -55,7 +55,7 @@ describe("関数の入出力", () => {
                     element: "x".repeat(140),
                     formatter(element, upperLimitLength, getShortenedString) {
                         return getShortenedString(0);
-                    },
+                    }
                 }
             );
             expect(tweet.split("|")[0]).toEqual("x".repeat(140 - 23 * 2 - 2));
@@ -67,7 +67,7 @@ describe("関数の入出力", () => {
                     element: "@tos",
                     formatter(element, upperLimitLength, getShortenedString) {
                         return element;
-                    },
+                    }
                 }
             );
             expect(tweet).toEqual("@\u200ctos");
@@ -79,7 +79,7 @@ describe("関数の入出力", () => {
                     element: `${"x".repeat(130)}@tos`,
                     formatter(element, upperLimitLength, getShortenedString) {
                         return getShortenedString(0);
-                    },
+                    }
                 }
             );
             expect(tweet).toEqual(`${"x".repeat(130)}TwitterJP`);
