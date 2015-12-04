@@ -6,6 +6,7 @@ var stayNgSiteSeconds;
 var taskDescription;
 var timerState = "off";
 var oneMinuteNotified = false;
+var wait = 1000;
 
 const ALERT_TIME = 5;
 const TWEET_TIME = 10;
@@ -14,41 +15,56 @@ let timerId;
 
 function mainLoop() {
     function next() {
-        timerId = setTimeout(mainLoop, 1000);
+        if (timerState == "on") timerId = setTimeout(mainLoop, wait);
     }
 
     elapsedSeconds++;
     let remainingSeconds = limitSeconds - elapsedSeconds;
     if (remainingSeconds > 60) {
-        chrome.browserAction.setBadgeText({"text": Math.ceil(remainingSeconds / 60).toString()});
+        chrome.browserAction.setBadgeText({text: Math.ceil(remainingSeconds / 60).toString()});
         chrome.browserAction.setBadgeBackgroundColor({color:[0, 0, 255, 100]});
     } else {
         if (!oneMinuteNotified){
             notificate("あと1分でtweetされます", 2);
             oneMinuteNotified = true;
         }
-        chrome.browserAction.setBadgeText({"text": Math.round(remainingSeconds).toString()});
+        chrome.browserAction.setBadgeText({text: Math.round(remainingSeconds).toString()});
         chrome.browserAction.setBadgeBackgroundColor({color:[255, 0, 0, 100]});
     }
     if (elapsedSeconds >= limitSeconds) {
-        tweet(generateTweet(
-            element => `@${localStorage.getItem("replyAccount")} 突然のリプライ失礼致します。このたび私事ながら${element}作業時間の見積もりに失敗しました。誠に申し訳ありません ${new Date()} #UGEN`,
-            {
-                element: taskDescription,
-                formatter(element, upperLimitLength, getShortenedString) {
-                    if (element == "") return "";
-                    if (element.length + 3 <= upperLimitLength) return `「${element}」の`;
-                    return `「${getShortenedString(6)}...」の`;
-                },
-            }
-        ), () => { alert("tweetしたよ^_^"); });
+        let replyAccountId = JSON.parse(localStorage.getItem("replySetting"))[localStorage.getItem("userId")].replyAccountId;
+        if (replyAccountId == -1) {
+            tweet(generateTweet(
+                element => `私は${element}作業時間の見積もりに失敗しました ${new Date()} #UGEN`,
+                {
+                    element: taskDescription,
+                    formatter(element, upperLimitLength, getShortenedString) {
+                        if (element == "") return "";
+                        if (element.length + 3 <= upperLimitLength) return `「${element}」の`;
+                        return `「${getShortenedString(6)}...」の`;
+                    }
+                }
+            )).then(() => { alert("tweetしたよ^_^"); }).catch(e => { alert(e.message); });
+        } else {
+            getScreenName(replyAccountId).then(screenName => {
+                tweet(generateTweet(
+                    element => `@${screenName} 突然のリプライ失礼致します。このたび私事ながら${element}作業時間の見積もりに失敗しました。誠に申し訳ありません ${new Date()} #UGEN`,
+                    {
+                        element: taskDescription,
+                        formatter(element, upperLimitLength, getShortenedString) {
+                            if (element == "") return "";
+                            if (element.length + 3 <= upperLimitLength) return `「${element}」の`;
+                            return `「${getShortenedString(6)}...」の`;
+                        }
+                    }
+                )).then(() => { alert("tweetしたよ^_^"); }).catch(e => { alert(e.message); });
+            });
+        }
         stopTimer();
         return;
     }
 
-    chrome.tabs.query({currentWindow: true, active: true}, tabs => {
-        if (tabs.length == 0) return next();
-        let currentTab = tabs[0];
+    getCurrentTab().then(currentTab => {
         if (!isNgSite(currentTab.url)) return next();
 
         stayNgSiteSeconds++;
@@ -66,16 +82,16 @@ function mainLoop() {
                             if (element == "") return "作業";
                             if (element.length + 2 <= upperLimitLength) return `「${element}」`;
                             return `「${getShortenedString(5)}...」`;
-                        },
+                        }
                     },
                     {
                         element: currentTab.title,
                         formatter(element, upperLimitLength, getShortenedString) {
                             if (element.length <= upperLimitLength) return element;
                             else return `${getShortenedString(3)}...`;
-                        },
+                        }
                     }
-                ), () => { alert("tweetしたよ^_^"); });
+                )).then(() => { alert("tweetしたよ^_^"); }).catch(e => { alert(e.message); });;
             } else {
                 tweet(generateTweet(
                     element => `私は${element}をサボっていました ${new Date()} #UGEN`,
@@ -85,17 +101,18 @@ function mainLoop() {
                             if (element == "") return "作業";
                             if (element.length + 2 <= upperLimitLength) return `「${element}」`;
                             return `「${getShortenedString(5)}...」`;
-                        },
+                        }
                     }
-                ), () => { alert("tweetしたよ^_^"); });
+                )).then(() => { alert("tweetしたよ^_^"); }).catch(e => { alert(e.message); });;
             }
             chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
             stayNgSiteSeconds = 0;
             break;
         }
         next();
-    });
+    }).catch(e => { alert(e.message); });
 }
+
 function startTimer(limitSecondsAsParameter, taskDescriptionAsParameter) {
     if (timerState != "off") throw new Error("Illegal state.");
     limitSeconds = limitSecondsAsParameter;
@@ -103,7 +120,7 @@ function startTimer(limitSecondsAsParameter, taskDescriptionAsParameter) {
     stayNgSiteSeconds = -1;
     taskDescription = taskDescriptionAsParameter;
     timerState = "on";
-    chrome.browserAction.setIcon({path: "../images/watchicon16.png"});
+    chrome.browserAction.setIcon({path: "images/watchicon16.png"});
     oneMinuteNotified = false;
     mainLoop();
 }
@@ -111,14 +128,14 @@ function startTimer(limitSecondsAsParameter, taskDescriptionAsParameter) {
 function pauseTimer() {
     if (timerState != "on") throw new Error("Illegal state.");
     timerState = "pause";
-    chrome.browserAction.setIcon({path:"../images/icon16.png"});
+    chrome.browserAction.setIcon({path: "images/icon16.png"});
     clearTimeout(timerId);
 }
 
 function restartTimer() {
     if (timerState != "pause") throw new Error("Illegal state.");
     timerState = "on";
-    chrome.browserAction.setIcon({path: "../images/watchicon16.png"});
+    chrome.browserAction.setIcon({path: "images/watchicon16.png"});
     mainLoop();
 }
 
@@ -126,7 +143,7 @@ function stopTimer() {
     if (timerState != "on") throw new Error("Illegal state.");
     timerState = "off";
     chrome.browserAction.setBadgeText({"text": ""});
-    chrome.browserAction.setIcon({path:"../images/icon16.png"});
+    chrome.browserAction.setIcon({path: "images/icon16.png"});
     clearTimeout(timerId);
 }
 
@@ -137,115 +154,6 @@ function isNgSite(url) {
         if (url.match(re)) return true;
     }
     return false;
-}
-
-// 1個以上の文字数が不明な文字列を用いて140文字以内のツイートを作る、という問題の解決を助ける関数
-function generateTweet(baseMessageGenerator) {
-    let elementHolders = Array.from(arguments).slice(1);
-    // RFC3986定義の厳密なHTTP URIの正規表現
-    // http://sinya8282.sakura.ne.jp/?p=1064
-    let uriPattern = /https?:(\/\/(([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,:;=])*@)?(\[(([0-9a-f]{1,4}:){6}([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|::([0-9a-f]{1,4}:){5}([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|([0-9a-f]{1,4})?::([0-9a-f]{1,4}:){4}([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(([0-9a-f]{1,4}:)?[0-9a-f]{1,4})?::([0-9a-f]{1,4}:){3}([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(([0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::([0-9a-f]{1,4}:){2}([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(([0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(([0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(([0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(([0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::|v[0-9a-f]+\.[!$&-.0-;=_a-z~]+)\]|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])|([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,;=])*)(:\d*)?(\/([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,:;=@])*)*|\/(([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,:;=@])+(\/([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,:;=@])*)*)?|([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,:;=@])+(\/([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,:;=@])*)*)?(\?([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,/:;=?@])*)?(#([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,/:;=?@])*)?/ig;
-    // 自由に使える文字数 = 140 - ベースとなる文字列の文字数
-    // URIはt.coで短縮されて23文字になるので考慮しておく
-    let freeLength = 140 - baseMessageGenerator(...new Array(baseMessageGenerator.length).fill("")).replace(uriPattern, "x".repeat(23)).length;
-    // 各文字数が不明な文字列が使える文字数の上限を割り振る
-    // 自由に使える文字数が74文字で、文字数が不明な文字列が3個ならば、[25文字, 25文字, 24文字]のように割り振る
-    let upperLimitLengths = new Array(elementHolders.length).fill()
-        .map((_, i) => Math.floor(freeLength / elementHolders.length) + (i < freeLength % elementHolders.length ? 1 : 0));
-    return baseMessageGenerator(...elementHolders.map((elementHolder, i) => {
-        // 文字数が不明な文字列中の@#をエスケープしてリプライ誤爆やハッシュタグ誤爆を防ぐ
-        let element = elementHolder.element.replace(/([@#＠＃])/g, "$1\u200c");
-        return elementHolder.formatter(
-            element,
-            upperLimitLengths[i],
-            // elementの先頭を、使える文字数の上限だけ切り取り、さらに末尾cutLength文字切った文字列を返す関数
-            // 末尾を切った結果、末尾が@#になってしまうと、リプライ誤爆やハッシュタグ誤爆を起こしかねないので、その際は末尾の@#も切る
-            cutLength => element.substring(0, upperLimitLengths[i] - cutLength).replace(/[@#＠＃]$/, "")
-        );
-    }));
-}
-
-function notificate(message, displaySeconds) {
-    let notification = new Notification(message, {
-        icon: "images/ugenchan200.png"
-    });
-    if (displaySeconds > 0) {
-        setTimeout(() => {
-            notification.close();
-        }, displaySeconds * 1000);
-    }
-    let audio = new Audio();
-    audio.autoplay = true;
-    audio.src = "sounds/alert.wav";
-}
-
-function tweet(str, callBack){
-    let message = {
-        method: "POST",
-        action: "https://api.twitter.com/1.1/statuses/update.json",
-        parameters: {
-            status: str
-        }
-    };
-    let originalParameters = $.extend({}, message.parameters);
-    OAuth.completeRequest(message, {
-        consumerKey: CONSUMER_KEY,
-        consumerSecret: CONSUMER_SECRET,
-        token: localStorage.getItem("accessToken"),
-        tokenSecret: localStorage.getItem("accessTokenSecret")
-    });
-    $.ajax({
-        type: message.method,
-        url: message.action,
-        headers: {
-            "Authorization": OAuth.getAuthorizationHeader("", message.parameters)
-        },
-        data: OAuth.formEncode(originalParameters),
-        dataType: "json",
-        success: responseJson => {
-            if (callBack !== undefined) callBack();
-        },
-        error: responseObject => {
-            alert(`Error: ${responseObject.status} ${responseObject.statusText}\n${responseObject.responseText}`);
-        }
-    });
-};
-
-function searchTweets(str){
-  return new Promise(function(resolve, reject) {
-    let message = {
-        method: "GET",
-        action: "https://api.twitter.com/1.1/search/tweets.json",
-        parameters: {
-            q: str,
-            count: 100
-        }
-    };
-    let originalParameters = $.extend({}, message.parameters);
-    OAuth.completeRequest(message, {
-        consumerKey: CONSUMER_KEY,
-        consumerSecret: CONSUMER_SECRET,
-        token: localStorage.getItem("accessToken"),
-        tokenSecret: localStorage.getItem("accessTokenSecret")
-    });
-    $.ajax({
-        type: message.method,
-        url: message.action,
-        timeout: 30000,
-        headers: {
-            "Authorization": OAuth.getAuthorizationHeader("", message.parameters)
-        },
-        data: OAuth.formEncode(originalParameters),
-        dataType: "json",
-        success: responseJson => {
-            resolve(responseJson);
-        },
-        error: responseObject => {
-            alert(`Error: ${responseObject.status} ${responseObject.statusText}\n${responseObject.responseText}`);
-            reject(null);
-        }
-    });
-  });
 }
 
 function notifyRank(){
@@ -271,53 +179,19 @@ function notifyRank(){
       }).then(workTimeMap => {
           let myWorkTime = Math.round((elapsedSeconds / 60) + workTimeMap.get(Number(localStorage.getItem("userId"))));
           let myRank = [...workTimeMap.values()].filter(workTime => workTime > myWorkTime).length + 1;
-          new Notification(`今日のあなたの作業時間合計は${myWorkTime}分で、${workTimeMap.size}人中${myRank}位です！`);
+          notificate(`今日のあなたの作業時間合計は${myWorkTime}分で、${workTimeMap.size}人中${myRank}位です！`, 0);
       });
-}
-
-function readTimeline(id){
-    return new Promise(function(resolve, reject) {
-        let message = {
-            method: "GET",
-            action: "https://api.twitter.com/1.1/statuses/user_timeline.json",
-            parameters: {
-                user_id: id,
-                count: 1000
-            }
-        };
-        let originalParameters = $.extend({}, message.parameters);
-        OAuth.completeRequest(message, {
-            consumerKey: CONSUMER_KEY,
-            consumerSecret: CONSUMER_SECRET,
-            token: localStorage.getItem("accessToken"),
-            tokenSecret: localStorage.getItem("accessTokenSecret")
-        });
-        $.ajax({
-            type: message.method,
-            url: message.action,
-            timeout: 30000,
-            headers: {
-                "Authorization": OAuth.getAuthorizationHeader("", message.parameters)
-            },
-            data: OAuth.formEncode(originalParameters),
-            dataType: "json",
-            success: responseJson => {
-                resolve(responseJson);
-            },
-            error: responseObject => {
-                alert(`Error: ${responseObject.status} ${responseObject.statusText}\n${responseObject.responseText}`);
-                reject(null);
-            }
-        });
-    });
 }
 
 $(() => {
     if (localStorage.getItem("urlList") === null) {
         localStorage.setItem("urlList", JSON.stringify(["nicovideo.jp", "youtube.com"]));
     }
-    if (localStorage.getItem("replyAccount") === null) {
-        localStorage.setItem("replyAccount", "UGEN_teacher");
+    if (localStorage.getItem("replySetting") === null) {
+        localStorage.setItem("replySetting", JSON.stringify({}));
+    }
+    if (localStorage.getItem("screenNameMap") === null) {
+        localStorage.setItem("screenNameMap", JSON.stringify({}))
     }
     if (localStorage.getItem("showRegisterNgSiteButton") === "True") {
         $("#show_register_ngsite_button_checkbox").prop("checked", true);
