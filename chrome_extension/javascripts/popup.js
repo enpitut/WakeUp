@@ -66,8 +66,8 @@ $(() => {
         refreshPageContent();
     });
     $("#end_button").click(() => {
-        bg.tweet(generateTweet(
-            element => `${Math.round(bg.limitSeconds / 60)}分かかると見積もった${element}を${Math.round(bg.elapsedSeconds / 60)}分で終えました! ${new Date()} #UGEN`,
+        bg.tweet(bg.generateTweet(
+            element => sprintf(TWEET_PHRASES.SUCCESSED, Math.round(bg.limitSeconds / 60), element, Math.round(bg.elapsedSeconds / 60), new Date()),
             {
                 element: bg.taskDescription,
                 formatter(element, upperLimitLength, getShortenedString) {

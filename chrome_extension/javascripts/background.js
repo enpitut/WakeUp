@@ -32,6 +32,7 @@ function mainLoop() {
         chrome.browserAction.setBadgeBackgroundColor({color:[255, 0, 0, 100]});
     }
     if (elapsedSeconds >= limitSeconds) {
+
         let replyAccountId = JSON.parse(localStorage.getItem("replySetting"))[localStorage.getItem("userId")].replyAccountId;
         if (replyAccountId == -1) {
             tweet(generateTweet(
@@ -48,7 +49,7 @@ function mainLoop() {
         } else {
             getScreenName(replyAccountId).then(screenName => {
                 tweet(generateTweet(
-                    element => `@${screenName} 突然のリプライ失礼致します。このたび私事ながら${element}作業時間の見積もりに失敗しました。誠に申し訳ありません ${new Date()} #UGEN`,
+                    element => sprintf(TWEET_PHRASES.FAILED, screenName, element, new Date()),
                     {
                         element: taskDescription,
                         formatter(element, upperLimitLength, getShortenedString) {
@@ -75,7 +76,7 @@ function mainLoop() {
         case TWEET_TIME:
             if(localStorage.getItem("tweetTabinfo") === "True") {
                 tweet(generateTweet(
-                    (element1, element2) => `私は${element1}をサボって ${element2}( ${currentTab.url} ) を見ていました ${new Date()} #UGEN`,
+                    (element1, element2) => sprintf(TWEET_PHRASES.WATCHED_NGSITES.WITH_TABINFO, element1, element2, currentTab.url, new Date()),
                     {
                         element: taskDescription,
                         formatter(element, upperLimitLength, getShortenedString) {
@@ -94,7 +95,7 @@ function mainLoop() {
                 )).then(() => { alert("tweetしたよ^_^"); }).catch(e => { alert(e.message); });;
             } else {
                 tweet(generateTweet(
-                    element => `私は${element}をサボっていました ${new Date()} #UGEN`,
+                    element => sprintf(TWEET_PHRASES.WATCHED_NGSITES.WITHOUT_TABINFO, element, new Date()),
                     {
                         element: taskDescription,
                         formatter(element, upperLimitLength, getShortenedString) {
@@ -167,7 +168,7 @@ function notifyRank(){
             .map(status => status.user.id)
             .concat(Number([localStorage.getItem("userId")]))
         )];
-    
+
     return Promise.all(userIds.map(userId => readTimeline(userId)
         .then(statuses => [
             userId,
