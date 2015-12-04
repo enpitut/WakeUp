@@ -14,7 +14,7 @@ if (location.protocol != "chrome-extension:") {
         },
         contextMenus: {
             create() {},
-            onClicked: () => {
+            onClicked: (() => {
                 let listeners = [];
                 return {
                     addListener(listener) {
@@ -26,7 +26,7 @@ if (location.protocol != "chrome-extension:") {
                         }
                     }
                 };
-            }()
+            })()
         },
         extension: {},
         tabs: {
@@ -50,7 +50,7 @@ if (location.protocol != "chrome-extension:") {
         url: "http://example.com/",
         title: "Example"
     });
-    () => {
+    (() => {
         let original$ = window.$;
         let onloadFuncs = [];
         window.$ = onloadFunc => {
@@ -62,5 +62,5 @@ if (location.protocol != "chrome-extension:") {
                 onloadFunc();
             }
         };
-    }();
+    })();
 }

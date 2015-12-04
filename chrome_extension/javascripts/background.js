@@ -49,7 +49,7 @@ function mainLoop() {
         } else {
             getScreenName(replyAccountId).then(screenName => {
                 tweet(generateTweet(
-                    element => sprintf(TWEET_PHRASES.FAILED, localStorage.getItem("replyAccount"), element, new Date()),
+                    element => sprintf(TWEET_PHRASES.FAILED, screenName, element, new Date()),
                     {
                         element: taskDescription,
                         formatter(element, upperLimitLength, getShortenedString) {
