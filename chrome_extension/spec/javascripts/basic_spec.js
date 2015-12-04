@@ -238,6 +238,27 @@ describe("基本機能", () => {
         popup.$("#restart_button").click();
         expect(background.timerState).toBe("on");
     });
+    it("監視を停止・再開するのに合わせてポップアップの画像が切り替わる", () => {
+        setMock(background, {});
+        setMock(popup, {});
+        expect(background.timerState).toBe("off");
+        popup.$("#task_time_text").val("1");
+        expect(popup.$("#idling_image")).toHaveCss({display: "block"});
+        expect(popup.$("#resting_image")).toHaveCss({display: "none"});
+        expect(popup.$("#running_image")).toHaveCss({display: "none"});
+        popup.$("#start_button").click();
+        expect(popup.$("#idling_image")).toHaveCss({display: "none"});
+        expect(popup.$("#resting_image")).toHaveCss({display: "none"});
+        expect(popup.$("#running_image")).toHaveCss({display: "block"});
+        popup.$("#pause_button").click();
+        expect(popup.$("#idling_image")).toHaveCss({display: "none"});
+        expect(popup.$("#resting_image")).toHaveCss({display: "block"});
+        expect(popup.$("#running_image")).toHaveCss({display: "none"});
+        popup.$("#restart_button").click();
+        expect(popup.$("#idling_image")).toHaveCss({display: "none"});
+        expect(popup.$("#resting_image")).toHaveCss({display: "none"});
+        expect(popup.$("#running_image")).toHaveCss({display: "block"});
+    });
     it("監視停止中はブロックサイトを閲覧してもサボり通知ツイートがされたり「新しいタブ」ページへ飛ばされたりしない", done => {
         let isDone = false;
         setMock(background, {
