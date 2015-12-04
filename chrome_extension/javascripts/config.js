@@ -1,9 +1,5 @@
 "use strict";
 
-function flushReplyAccount() {
-    $("#account").text(`現在の宛先: ${localStorage.getItem("replyAccount")}`);
-}
-
 $(() => {
     function addRow(targetUrl) {
         let tr = $('<tr><td class="col-lg-4"></td><td><input type="button" value="×" class="btn btn-danger"></td></tr>');
@@ -27,11 +23,91 @@ $(() => {
         $("#add_url_text").val("http://");
     });
 
-    $("#modify_account_text").val(localStorage.getItem("replyAccount"));
+    function flushReplyAccount() {
+        let replyAccountId = JSON.parse(localStorage.getItem("replySetting"))[localStorage.getItem("userId")].replyAccountId;
+        (replyAccountId == -1 ? Promise.resolve("無し") : getScreenName(replyAccountId)).then(screenName => {
+            $("#account").text(`現在の宛先: ${screenName}`);
+        });
+    }
+    function flushReplyAccounts() {
+        let myReplySetting = JSON.parse(localStorage.getItem("replySetting"))[localStorage.getItem("userId")];
+        $("#modify_account_select").empty();
+        $("#modify_account_select").append($('<option value="-1">無し</option>'));
+        Promise.all([].concat(
+            myReplySetting.replyAccountIds.map(replyAccountId =>
+                getScreenName(replyAccountId).then(screenName =>
+                    Promise.resolve($(document.createElement("option")).attr("value", replyAccountId).text(screenName))
+                )
+            ),
+            Object.keys(myReplySetting.replyIdForPermissionMap).map(replyAccountId =>
+                getScreenName(replyAccountId).then(screenName =>
+                    Promise.resolve($(document.createElement("option")).attr("value", replyAccountId).prop("disabled", true).text(`${screenName}（許可待ち）`))
+                )
+            )
+        )).then(options => {
+            options.sort((x, y) => x.text() < y.text() ? 1 : -1);
+            for (let option of options) {
+                $("#modify_account_select").append(option);
+            }
+            $("#modify_account_select").val(myReplySetting.replyAccountId);
+        });
+    }
     flushReplyAccount();
+    getMentions().then(statuses => {
+        let replySetting = JSON.parse(localStorage.getItem("replySetting"));
+        let myReplySetting = replySetting[localStorage.getItem("userId")];
+
+        let replyIdToUserId = {};
+        for (let userId of Object.keys(myReplySetting.replyIdForPermissionMap).map(str => parseInt(str, 10))) {
+            let replyId = myReplySetting.replyIdForPermissionMap[userId];
+            replyIdToUserId[replyId] = userId;
+        }
+
+        for (let status of statuses) {
+            if (replyIdToUserId.hasOwnProperty(status["in_reply_to_status_id"]) && replyIdToUserId[status["in_reply_to_status_id"]] == status["user"]["id"]) {
+                let userId = replyIdToUserId[status["in_reply_to_status_id"]];
+                delete myReplySetting.replyIdForPermissionMap[userId];
+                myReplySetting.replyAccountIds.push(userId);
+                getScreenName(userId).then(screenName => {
+                    notificate(`@${screenName}からリプライの許可が下りました`, 2);
+                });
+            }
+        }
+
+        localStorage.setItem("replySetting", JSON.stringify(replySetting));
+    }).catch(() => Promise.resolve()).then(flushReplyAccounts);
     $("#modify_account_button").click(() => {
-        localStorage.setItem("replyAccount", $("#modify_account_text").val());
+        let replySetting = JSON.parse(localStorage.getItem("replySetting"));
+        replySetting[localStorage.getItem("userId")].replyAccountId = parseInt($("#modify_account_select").val(), 10);
+        localStorage.setItem("replySetting", JSON.stringify(replySetting));
         flushReplyAccount();
+    });
+
+    $("#new_account_text").on("keydown", () => {
+        setTimeout(() => {
+            $("#new_account_button").prop("disabled", $("#new_account_text").val() == "");
+            $("#permission_message_destination").text($("#new_account_text").val());
+            $("#permission_message").text(`@${$("#new_account_text").val()} ツールによる自動メッセージです。作業が見積もり時間内に終わらなかった時にリプライを自動で送るツールを使うことで作業の強制力を上げようとしています。リプライを送られることを許可する場合はこのリプライに返信してください。`);
+        }, 0);
+    });
+    $("#new_account_text").trigger("keydown");
+    $("#new_account_button").click(() => {
+        let screenName = $("#new_account_text").val();
+        $("#new_account_text").val("");
+        $("#new_account_text").trigger("keydown");
+        getUserId(screenName).then(userId => {
+            if (JSON.parse(localStorage.getItem("replySetting"))[localStorage.getItem("userId")].replyAccountIds.indexOf(userId) > -1) {
+                notificate(`@${screenName}からは既に許可を得ています`, 2);
+            } else {
+                return tweet(`@${screenName} ツールによる自動メッセージです。作業が見積もり時間内に終わらなかった時にリプライを自動で送るツールを使うことで作業の強制力を上げようとしています。リプライを送られることを許可する場合はこのリプライに返信してください。`).then(status => {
+                    let replySetting = JSON.parse(localStorage.getItem("replySetting"));
+                    replySetting[localStorage.getItem("userId")].replyIdForPermissionMap[userId] = status["id"];
+                    localStorage.setItem("replySetting", JSON.stringify(replySetting));
+                    flushReplyAccounts();
+                    notificate(`@${screenName}にリプライを送りました`, 2);
+                });
+            }
+        }).catch(e => { alert(e.message); });
     });
 
     $("#oauth_button").click(onOAuthButtonClickHandler);

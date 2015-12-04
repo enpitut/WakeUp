@@ -7,9 +7,8 @@
 <script type="text/javascript" src="lib/bootstrap/bootstrap.min.js"></script>
 <script type="text/javascript" src="lib/sha1.js"></script>
 <script type="text/javascript" src="lib/oauth.js"></script>
-<script type="text/javascript" src="javascripts/mocking.js"></script>
-<script type="text/javascript" src="javascripts/consumer_key_and_secret.js"></script>
 <script type="text/javascript" src="javascripts/common.js"></script>
+<script type="text/javascript" src="javascripts/mocking.js"></script>
 <script type="text/javascript" src="javascripts/config.js"></script>
 <link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css" type="text/css">
 </head>
@@ -32,10 +31,22 @@
             <form class="form-inline">
                 <div class="input-group">
                     <span class="input-group-addon">@</span>
-                    <input type="text" size="15" id="modify_account_text" class="form-control">
+                    <select id="modify_account_select" class="form-control">
+                    </select>
                 </div>
                 <input type="button" value="更新" id="modify_account_button" class="btn btn-primary">
             </form>
+        </div>
+        <div class="well">
+            <form class="form-inline">
+                <div class="input-group">
+                    <span class="input-group-addon">@</span>
+                    <input type="text" size="15" id="new_account_text" class="form-control">
+                </div>
+                <input type="button" value="新規追加" id="new_account_button" class="btn btn-primary">
+            </form>
+            新規追加ボタンを押すと @<span id="permission_message_destination"></span> に以下のリプライを送り許可待ち状態になります。
+            <blockquote id="permission_message"></blockquote>
         </div>
         <h2 class="sub-header">Twitter連携</h2>
         <p>
