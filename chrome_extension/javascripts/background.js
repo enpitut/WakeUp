@@ -35,27 +35,29 @@ function mainLoop() {
 
         let replyAccountId = JSON.parse(localStorage.getItem("replySetting"))[localStorage.getItem("userId")].replyAccountId;
         if (replyAccountId == -1) {
+            let now = new Date();
             tweet(generateTweet(
-                element => `私は${element}作業時間の見積もりに失敗しました ${new Date()} #UGEN`,
+                element => sprintf(TWEET_PHRASES.FAILED.WITHOUT_RECIPIENT, {taskDescription: element, date: now}),
                 {
                     element: taskDescription,
                     formatter(element, upperLimitLength, getShortenedString) {
-                        if (element == "") return "";
-                        if (element.length + 3 <= upperLimitLength) return `「${element}」の`;
-                        return `「${getShortenedString(6)}...」の`;
+                        if (element == "") return "作業";
+                        if (element.length + 5 <= upperLimitLength) return `「${element}」の作業`;
+                        return `「${getShortenedString(8)}...」の作業`;
                     }
                 }
             )).then(() => { alert("tweetしたよ^_^"); }).catch(e => { alert(e.message); });
         } else {
             getScreenName(replyAccountId).then(screenName => {
+                let now = new Date();
                 tweet(generateTweet(
-                    element => sprintf(TWEET_PHRASES.FAILED, screenName, element, new Date()),
+                    element => sprintf(TWEET_PHRASES.FAILED.WITH_RECIPIENT, {recipient: screenName, taskDescription: element, date: now}),
                     {
                         element: taskDescription,
                         formatter(element, upperLimitLength, getShortenedString) {
-                            if (element == "") return "";
-                            if (element.length + 3 <= upperLimitLength) return `「${element}」の`;
-                            return `「${getShortenedString(6)}...」の`;
+                            if (element == "") return "作業";
+                            if (element.length + 5 <= upperLimitLength) return `「${element}」の作業`;
+                            return `「${getShortenedString(8)}...」の作業`;
                         }
                     }
                 )).then(() => { alert("tweetしたよ^_^"); }).catch(e => { alert(e.message); });
@@ -74,9 +76,10 @@ function mainLoop() {
             notificate(`あと ${TWEET_TIME - ALERT_TIME} 秒 ${currentTab.title} に滞在するとTwitterに報告されます`, 2);
             break;
         case TWEET_TIME:
-            if(localStorage.getItem("tweetTabinfo") === "True") {
+            if(localStorage.getItem("tweetTabInfo") === "True") {
+                let now = new Date();
                 tweet(generateTweet(
-                    (element1, element2) => sprintf(TWEET_PHRASES.WATCHED_NGSITES.WITH_TABINFO, element1, element2, currentTab.url, new Date()),
+                    (element1, element2) => sprintf(TWEET_PHRASES.WATCHED_NG_SITES.WITH_TAB_INFO, {taskDescription: element1, siteName: element2, siteUrl: currentTab.url, date: now}),
                     {
                         element: taskDescription,
                         formatter(element, upperLimitLength, getShortenedString) {
@@ -94,8 +97,9 @@ function mainLoop() {
                     }
                 )).then(() => { alert("tweetしたよ^_^"); }).catch(e => { alert(e.message); });;
             } else {
+                let now = new Date();
                 tweet(generateTweet(
-                    element => sprintf(TWEET_PHRASES.WATCHED_NGSITES.WITHOUT_TABINFO, element, new Date()),
+                    element => sprintf(TWEET_PHRASES.WATCHED_NG_SITES.WITHOUT_TAB_INFO, {taskDescription: element, date: now}),
                     {
                         element: taskDescription,
                         formatter(element, upperLimitLength, getShortenedString) {

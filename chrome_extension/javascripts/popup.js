@@ -66,8 +66,9 @@ $(() => {
         refreshPageContent();
     });
     $("#end_button").click(() => {
+        let now = new Date();
         bg.tweet(bg.generateTweet(
-            element => sprintf(TWEET_PHRASES.SUCCESSED, Math.round(bg.limitSeconds / 60), element, Math.round(bg.elapsedSeconds / 60), new Date()),
+            element => sprintf(TWEET_PHRASES.SUCCESSED, {taskDescription: element, estimatedMinutes: Math.round(bg.limitSeconds / 60), actualMinutes: Math.round(bg.elapsedSeconds / 60), date: now}),
             {
                 element: bg.taskDescription,
                 formatter(element, upperLimitLength, getShortenedString) {
