@@ -142,12 +142,12 @@ function createRegisterNgSiteButton(){
         if (info.menuItemId == "register_ngsite_button" && index == -1) {
             urlList.push(domain);
             localStorage.setItem("urlList", JSON.stringify(urlList));
-            notificate(`${domain}をNGサイトに登録しました`, 2);
+            notificate(`${domain}をNGサイトに登録しました`, 5);
         }
         if (info.menuItemId == "remove_ngsite_button" && index != -1) {
             urlList.splice(index, 1);
             localStorage.setItem("urlList", JSON.stringify(urlList));
-            notificate(`${domain}をNGサイトから除外しました`);
+            notificate(`${domain}をNGサイトから除外しました`, 5);
         }
     });
 }
