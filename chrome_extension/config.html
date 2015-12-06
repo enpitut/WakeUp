@@ -13,6 +13,7 @@
 <script type="text/javascript" src="javascripts/common.js"></script>
 <script type="text/javascript" src="javascripts/config.js"></script>
 <link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css" type="text/css">
+<link rel="stylesheet" href="config.css" type="text/css">
 </head>
 <body>
 <div class="container">
@@ -55,12 +56,23 @@
         <input type="button" value="連携" id="oauth_button" class="btn btn-primary">
         </p>
         <h2 class="sub-header">追加機能</h2>
-        <div class="well">
-            <p>
-            <input type="checkbox" id="tweet_tab_info_checkbox">サボり通知ツイートにタブの情報を含める
-            </p>
-            <input type="checkbox" id="show_register_ngsite_button_checkbox">コンテキストメニューにNGサイト登録機能を表示する
-        </div>
+        <ul class="list-group">
+            <li id="post_automatically_checkbox_group" class="list-group-item">
+                以下のとき確認ダイアログを出さずにツイートする<br>
+                <input type="checkbox" data-property="watchedNgSites.withTabInfo">ブロックサイトについてツイートする設定をしていてブロックサイトを閲覧したとき（<span class="show_tweet_example">送信されるツイートの例</span>）<br>
+                <input type="checkbox" data-property="watchedNgSites.withoutTabInfo">ブロックサイトについてツイートしない設定をしていてブロックサイトを閲覧したとき（<span class="show_tweet_example">送信されるツイートの例</span>）<br>
+                <input type="checkbox" data-property="failed.withRecipient">リプライ相手を設定済みで作業が見積もり時間内に完了しなかったとき（<span class="show_tweet_example">送信されるツイートの例</span>）<br>
+                <input type="checkbox" data-property="failed.withoutRecipient">リプライ相手を未設定で作業が見積もり時間内に完了しなかったとき（<span class="show_tweet_example">送信されるツイートの例</span>）<br>
+                <input type="checkbox" data-property="successed">作業を見積もり時間内に完了したとき（<span class="show_tweet_example">送信されるツイートの例</span>）
+            </li>
+            <li class="list-group-item">
+                <input type="checkbox" id="tweet_tab_info_checkbox">ブロックサイトを閲覧したとき、何のサイトを閲覧していたかについてもツイートする
+            </li>
+            <li class="list-group-item">
+                <input type="checkbox" id="show_register_ngsite_button_checkbox">コンテキストメニューにNGサイト登録機能を表示する
+            </li>
+        </ul>
+        <blockquote id="tweet_example"></blockquote>
     </div>
 </div>
 </body>

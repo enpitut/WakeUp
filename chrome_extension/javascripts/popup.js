@@ -67,7 +67,7 @@ $(() => {
     });
     $("#end_button").click(() => {
         let now = new Date();
-        bg.tweet(bg.generateTweet(
+        let message = generateTweet(
             element => sprintf(TWEET_PHRASES.SUCCESSED, {taskDescription: element, estimatedMinutes: Math.round(bg.limitSeconds / 60), actualMinutes: Math.round(bg.elapsedSeconds / 60), date: now}),
             {
                 element: bg.taskDescription,
@@ -77,7 +77,10 @@ $(() => {
                     return `「${getShortenedString(5)}...」`;
                 }
             }
-        )).then(() => { bg.notificate("tweetしたよ^_^", 5); }).catch(e => { bg.alert(e.message); });
+        );
+        if (loadConfig().postAutomatically.successed || confirmTweet(message, true)) {
+            bg.tweet(message).then(() => { bg.notificate("tweetしたよ^_^", 5); }).catch(e => { bg.alert(e.message); });
+        }
         bg.notifyRank();
         bg.stopTimer();
         refreshPageContent();

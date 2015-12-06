@@ -98,13 +98,15 @@ $(() => {
         getUserId(screenName).then(recipientId => {
             if (loadConfig().replySetting[loadConfig().authInfo.userId].recipientIds.indexOf(recipientId) == -1) {
                 let message = sprintf(TWEET_PHRASES.GET_PERMISSION, {recipient: screenName});
-                return tweet(message).then(status => {
-                    modifyConfig(config => {
-                        config.replySetting[config.authInfo.userId].replyIdForPermissionMap[recipientId] = status["id"];
+                if (confirmTweet(message, false)) {
+                    return tweet(message).then(status => {
+                        modifyConfig(config => {
+                            config.replySetting[config.authInfo.userId].replyIdForPermissionMap[recipientId] = status["id"];
+                        });
+                        flushRecipients();
+                        notificate(`@${screenName}にリプライを送りました`, 5);
                     });
-                    flushRecipients();
-                    notificate(`@${screenName}にリプライを送りました`, 5);
-                });
+                }
             } else {
                 notificate(`@${screenName}からは既に許可を得ています`, 5);
             }
@@ -112,6 +114,35 @@ $(() => {
     });
 
     $("#oauth_button").click(onOAuthButtonClickHandler);
+
+    $("#post_automatically_checkbox_group input").each(function () {
+        let joinedPropertyNames = $(this).data("property");
+        let propertyNames = joinedPropertyNames.split(/\./);
+        $(this).prop("checked", getValue(loadConfig().postAutomatically, ...propertyNames));
+        $(this).change(() => {
+            let newValue = $(this).is(":checked");
+            modifyConfig(config => {
+                setValue(config.postAutomatically, ...propertyNames, newValue);
+            });
+        });
+        $(this).next(".show_tweet_example").on("mouseover", () => {
+            $("#tweet_example").css("display", "block");
+            $("#tweet_example").text({
+                "watchedNgSites.withTabInfo": sprintf(TWEET_PHRASES.WATCHED_NG_SITES.WITH_TAB_INFO, {taskDescription: "「打ち合わせ資料作成」", siteName: "niconico", siteUrl: "http://www.nicovideo.jp/", date: new Date()}),
+                "watchedNgSites.withoutTabInfo": sprintf(TWEET_PHRASES.WATCHED_NG_SITES.WITHOUT_TAB_INFO, {taskDescription: "「打ち合わせ資料作成」", date: new Date()}),
+                "failed.withRecipient": sprintf(TWEET_PHRASES.FAILED.WITH_RECIPIENT, {recipient: "UGEN_teacher", taskDescription: "「打ち合わせ資料作成」の作業", date: new Date()}),
+                "failed.withoutRecipient": sprintf(TWEET_PHRASES.FAILED.WITHOUT_RECIPIENT, {taskDescription: "「打ち合わせ資料作成」の作業", date: new Date()}),
+                "successed": sprintf(TWEET_PHRASES.SUCCESSED, {taskDescription: "「打ち合わせ資料作成」", estimatedMinutes: 60, actualMinutes: 45, date: new Date()})
+            }[joinedPropertyNames]);
+        });
+        $(this).next(".show_tweet_example").on("mousemove", e => {
+            $("#tweet_example").css("left", `${e.pageX + 10}px`);
+            $("#tweet_example").css("top", `${e.pageY - 20}px`);
+        });
+        $(this).next(".show_tweet_example").on("mouseout", () => {
+            $("#tweet_example").css("display", "none");
+        });
+    });
 
     $("#tweet_tab_info_checkbox").prop("checked", loadConfig().tweetTabInfo);
     $("#tweet_tab_info_checkbox").change(function () {

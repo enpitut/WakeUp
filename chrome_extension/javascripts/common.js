@@ -101,6 +101,10 @@ function generateTweet(baseMessageGenerator, ...elementHolders) {
     }));
 }
 
+function confirmTweet(message, isSkippable) {
+    return confirm(`以下の内容でツイートします。よろしければOKを押してください。${isSkippable ? "（この確認ダイアログは詳細設定で消せます）" : ""}\n${message}`);
+}
+
 function notificate(message, displaySeconds) {
     let notification = new Notification(message, {
         icon: "images/ugenchan.png"
@@ -173,4 +177,20 @@ function modifyConfig(modify) {
     let config = loadConfig();
     modify(config);
     saveConfig(config);
+}
+
+function getValue(object, ...propertyNames) {
+    if (propertyNames.length == 0) return object;
+    if (typeof(object) == "undefined" || object === null) return void(0);
+    return getValue(object[propertyNames[0]], ...propertyNames.slice(1));
+}
+function setValue(object) {
+    let propertyNames = Array.from(arguments).slice(1, -1);
+    let newValue = arguments[arguments.length - 1];
+    if (propertyNames.length == 1) {
+        object[propertyNames[0]] = newValue;
+    } else {
+        if (typeof(object[propertyNames[0]]) == "undefined") object[propertyNames[0]] = {};
+        setValue(object[propertyNames[0]], ...propertyNames.slice(1), newValue);
+    }
 }
