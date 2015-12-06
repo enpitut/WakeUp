@@ -3,8 +3,8 @@
 function callTwitterApi(method, action, parameters, tokens) {
     if (typeof(tokens) == "undefined") {
         tokens = {
-            token: localStorage.getItem("accessToken"),
-            tokenSecret: localStorage.getItem("accessTokenSecret")
+            token: loadConfig().authInfo.accessToken,
+            tokenSecret: loadConfig().authInfo.accessTokenSecret
         };
     }
     return new Promise((resolve, reject) => {
@@ -33,7 +33,9 @@ function callTwitterApi(method, action, parameters, tokens) {
                 resolve(getsToken ? OAuth.getParameterMap(response) : response);
             },
             error: response => {
-                reject(new Error(`Could not call Twitter API (${response.status} ${response.statusText}): ${response.responseText}`));
+                let error = new Error(`Could not call Twitter API (${response.status} ${response.statusText}): ${response.responseText}`);
+                error.response = response;
+                reject(error);
             }
         });
     });
@@ -52,17 +54,17 @@ function getMentions(tokens) {
 }
 function getScreenName(id, tokens) {
     return new Promise((resolve, reject) => {
-        let screenNameMap = JSON.parse(localStorage.getItem("screenNameMap"));
+        let screenNameMap = loadConfig().screenNameMap;
         if (screenNameMap.hasOwnProperty(id) && new Date().getTime() - screenNameMap[id].lastModified < 3600000) {
             resolve(screenNameMap[id].screenName);
         } else {
             callTwitterApi("GET", "https://api.twitter.com/1.1/users/show.json", {user_id: id}, tokens).then(user => {
-                screenNameMap = JSON.parse(localStorage.getItem("screenNameMap"));
-                screenNameMap[id] = {
-                    screenName: user["screen_name"],
-                    lastModified: new Date().getTime()
-                };
-                localStorage.setItem("screenNameMap", JSON.stringify(screenNameMap));
+                modifyConfig(config => {
+                    config.screenNameMap[id] = {
+                        screenName: user["screen_name"],
+                        lastModified: new Date().getTime()
+                    };
+                });
                 resolve(user["screen_name"]);
             }).catch(() => {
                 resolve(screenNameMap.hasOwnProperty(id) ? screenNameMap[id].screenName : "???");
@@ -75,8 +77,7 @@ function getUserId(screenName, tokens) {
 }
 
 // 1個以上の文字数が不明な文字列を用いて140文字以内のツイートを作る、という問題の解決を助ける関数
-function generateTweet(baseMessageGenerator) {
-    let elementHolders = Array.from(arguments).slice(1);
+function generateTweet(baseMessageGenerator, ...elementHolders) {
     // RFC3986定義の厳密なHTTP URIの正規表現
     // http://sinya8282.sakura.ne.jp/?p=1064
     let uriPattern = /https?:(\/\/(([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,:;=])*@)?(\[(([0-9a-f]{1,4}:){6}([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|::([0-9a-f]{1,4}:){5}([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|([0-9a-f]{1,4})?::([0-9a-f]{1,4}:){4}([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(([0-9a-f]{1,4}:)?[0-9a-f]{1,4})?::([0-9a-f]{1,4}:){3}([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(([0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::([0-9a-f]{1,4}:){2}([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(([0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(([0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::([0-9a-f]{1,4}:[0-9a-f]{1,4}|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))|(([0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(([0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::|v[0-9a-f]+\.[!$&-.0-;=_a-z~]+)\]|(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])|([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,;=])*)(:\d*)?(\/([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,:;=@])*)*|\/(([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,:;=@])+(\/([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,:;=@])*)*)?|([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,:;=@])+(\/([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,:;=@])*)*)?(\?([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,/:;=?@])*)?(#([-.0-9_a-z~]|%[0-9a-f][0-9a-f]|[!$&-,/:;=?@])*)?/ig;
@@ -135,18 +136,19 @@ function createRegisterNgSiteButton(){
         id: "remove_ngsite_button"
     });
     chrome.contextMenus.onClicked.addListener((info, currentTab) => {
-        let urlList = JSON.parse(localStorage.getItem("urlList"));
         let domain = currentTab.url.split("/")[2];
-        let index = urlList.findIndex(url => url == domain);
+        let index = loadConfig().urlList.findIndex(url => url == domain);
 
         if (info.menuItemId == "register_ngsite_button" && index == -1) {
-            urlList.push(domain);
-            localStorage.setItem("urlList", JSON.stringify(urlList));
+            modifyConfig(config => {
+                config.urlList.push(domain);
+            });
             notificate(`${domain}をNGサイトに登録しました`, 5);
         }
         if (info.menuItemId == "remove_ngsite_button" && index != -1) {
-            urlList.splice(index, 1);
-            localStorage.setItem("urlList", JSON.stringify(urlList));
+            modifyConfig(config => {
+                config.urlList.splice(index, 1);
+            });
             notificate(`${domain}をNGサイトから除外しました`, 5);
         }
     });
@@ -161,10 +163,14 @@ function onOAuthButtonClickHandler() {
     ).catch(e => { alert(e.message); })
 }
 
-function getLocalStorageData(key) {
-    if (localStorage !== null) return localStorage.getItem(key);
-    else return null;
+function loadConfig() {
+    return JSON.parse(localStorage.getItem("config"));
 }
-function setLocalStorageData(key, value) {
-    if (localStorage !== null) localStorage.setItem(key, value);
+function saveConfig(config) {
+    localStorage.setItem("config", JSON.stringify(config));
+}
+function modifyConfig(modify) {
+    let config = loadConfig();
+    modify(config);
+    saveConfig(config);
 }

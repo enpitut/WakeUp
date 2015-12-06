@@ -26,7 +26,7 @@ $(() => {
             on: "#running_image",
         }[bg.timerState]).css("display", "block");
        
-        if(getLocalStorageData("userId") === null) {
+        if (loadConfig().authInfo === null) {
             $("#guide_message").text("Twitter連携をしてね！");
             $("#start_control").css("display", "none");
             $("#oauth_control").css("display", "block");

@@ -4,24 +4,31 @@ describe("基本機能", () => {
     let background;
     let popup;
     function setMock(globalObject, mock) {
+        globalObject.$.setUp();
         $.extend(true, globalObject, mock);
         globalObject.$.fire();
     }
     beforeEach(done => {
         let prefix = location.protocol == "http:" ? "base/" : "";
         localStorage.clear();
-        localStorage.setItem("userId", "3315564288");
-        localStorage.setItem("replySetting", JSON.stringify({
-            "3315564288": {
-                replyAccountId: -1,
-                replyAccountIds: [],
-                replyIdForPermissionMap: {}
-            }
-        }));
         jasmine.getFixtures().fixturesPath = `${prefix}spec/javascripts/fixtures`;
         loadFixtures("fixture.html");
         $("#background").load(() => {
             background = $("#background").get(0).contentWindow;
+            background.$(() => {
+                background.modifyConfig(config => {
+                    config.authInfo = {
+                        userId: 3315564288,
+                        accessToken: null,
+                        accessTokenSecret: null
+                    };
+                    config.replySetting["3315564288"] = {
+                        recipientId: null,
+                        recipientIds: [],
+                        replyIdForPermissionMap: {}
+                    };
+                });
+            });
             $("#popup").load(() => {
                 popup = $("#popup").get(0).contentWindow;
                 popup.chrome.extension.getBackgroundPage = () => background;

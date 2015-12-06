@@ -16,18 +16,20 @@ $(() => {
             token: queryMap["oauth_token"],
             tokenSecret: queryMap["oauth_token_secret"]
         }).then(accessTokenMap => {
-            localStorage.setItem("accessToken", accessTokenMap["oauth_token"]);
-            localStorage.setItem("accessTokenSecret", accessTokenMap["oauth_token_secret"]);
-            localStorage.setItem("userId", accessTokenMap["user_id"]);
-            let replySetting = JSON.parse(localStorage.getItem("replySetting"));
-            if (!replySetting.hasOwnProperty(accessTokenMap["user_id"])) {
-                replySetting[accessTokenMap["user_id"]] = {
-                    replyAccountId: -1,
-                    replyAccountIds: [],
-                    replyIdForPermissionMap: {}
+            modifyConfig(config => {
+                config.authInfo = {
+                    userId: parseInt(accessTokenMap["user_id"], 10),
+                    accessToken: accessTokenMap["oauth_token"],
+                    accessTokenSecret: accessTokenMap["oauth_token_secret"]
                 };
-                localStorage.setItem("replySetting", JSON.stringify(replySetting));
-            }
+                if (!config.replySetting.hasOwnProperty(config.authInfo.userId)) {
+                    config.replySetting[config.authInfo.userId] = {
+                        recipientId: null,
+                        recipientIds: [],
+                        replyIdForPermissionMap: {}
+                    };
+                }
+            });
             $("body > p").text("Twitter連携の設定が完了しました。");
             setTimeout(close, 2000);
         }).catch(e => {
