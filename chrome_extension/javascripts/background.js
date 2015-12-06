@@ -25,7 +25,7 @@ function mainLoop() {
         chrome.browserAction.setBadgeBackgroundColor({color:[0, 0, 255, 100]});
     } else {
         if (!oneMinuteNotified){
-            notificate("あと1分でtweetされます", 2);
+            notificate("あと1分でtweetされます", 5);
             oneMinuteNotified = true;
         }
         chrome.browserAction.setBadgeText({text: Math.round(remainingSeconds).toString()});
@@ -46,7 +46,7 @@ function mainLoop() {
                         return `「${getShortenedString(8)}...」の作業`;
                     }
                 }
-            )).then(() => { alert("tweetしたよ^_^"); }).catch(e => { alert(e.message); });
+            )).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });
         } else {
             getScreenName(replyAccountId).then(screenName => {
                 let now = new Date();
@@ -60,7 +60,7 @@ function mainLoop() {
                             return `「${getShortenedString(8)}...」の作業`;
                         }
                     }
-                )).then(() => { alert("tweetしたよ^_^"); }).catch(e => { alert(e.message); });
+                )).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });
             });
         }
         stopTimer();
@@ -73,7 +73,7 @@ function mainLoop() {
         stayNgSiteSeconds++;
         switch (stayNgSiteSeconds) {
         case ALERT_TIME:
-            notificate(`あと ${TWEET_TIME - ALERT_TIME} 秒 ${currentTab.title} に滞在するとTwitterに報告されます`, 2);
+            notificate(`あと ${TWEET_TIME - ALERT_TIME} 秒 ${currentTab.title} に滞在するとTwitterに報告されます`, 5);
             break;
         case TWEET_TIME:
             if(localStorage.getItem("tweetTabInfo") === "True") {
@@ -95,7 +95,7 @@ function mainLoop() {
                             else return `${getShortenedString(3)}...`;
                         }
                     }
-                )).then(() => { alert("tweetしたよ^_^"); }).catch(e => { alert(e.message); });;
+                )).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });;
             } else {
                 let now = new Date();
                 tweet(generateTweet(
@@ -108,7 +108,7 @@ function mainLoop() {
                             return `「${getShortenedString(5)}...」`;
                         }
                     }
-                )).then(() => { alert("tweetしたよ^_^"); }).catch(e => { alert(e.message); });;
+                )).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });;
             }
             chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
             stayNgSiteSeconds = 0;
@@ -184,7 +184,7 @@ function notifyRank(){
       }).then(workTimeMap => {
           let myWorkTime = Math.round((elapsedSeconds / 60) + workTimeMap.get(Number(localStorage.getItem("userId"))));
           let myRank = [...workTimeMap.values()].filter(workTime => workTime > myWorkTime).length + 1;
-          notificate(`今日のあなたの作業時間合計は${myWorkTime}分で、${workTimeMap.size}人中${myRank}位です！`, 0);
+          notificate(`今日のあなたの作業時間合計は${myWorkTime}分で、${workTimeMap.size}人中${myRank}位です！`, 5);
       });
 }
 

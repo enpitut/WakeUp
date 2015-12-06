@@ -69,7 +69,7 @@ $(() => {
                 delete myReplySetting.replyIdForPermissionMap[userId];
                 myReplySetting.replyAccountIds.push(userId);
                 getScreenName(userId).then(screenName => {
-                    notificate(`@${screenName}からリプライの許可が下りました`, 2);
+                    notificate(`@${screenName}からリプライの許可が下りました`, 5);
                 });
             }
         }
@@ -97,14 +97,14 @@ $(() => {
         $("#new_account_text").trigger("keydown");
         getUserId(screenName).then(userId => {
             if (JSON.parse(localStorage.getItem("replySetting"))[localStorage.getItem("userId")].replyAccountIds.indexOf(userId) > -1) {
-                notificate(`@${screenName}からは既に許可を得ています`, 2);
+                notificate(`@${screenName}からは既に許可を得ています`, 5);
             } else {
                 return tweet(sprintf(TWEET_PHRASES.GET_PERMISSION, {recipient: screenName})).then(status => {
                     let replySetting = JSON.parse(localStorage.getItem("replySetting"));
                     replySetting[localStorage.getItem("userId")].replyIdForPermissionMap[userId] = status["id"];
                     localStorage.setItem("replySetting", JSON.stringify(replySetting));
                     flushReplyAccounts();
-                    notificate(`@${screenName}にリプライを送りました`, 2);
+                    notificate(`@${screenName}にリプライを送りました`, 5);
                 });
             }
         }).catch(e => { alert(e.message); });
