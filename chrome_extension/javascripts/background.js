@@ -45,7 +45,7 @@ function mainLoop() {
                         return `「${getShortenedString(6)}...」の`;
                     }
                 }
-            )).then(() => { alert("tweetしたよ^_^"); }).catch(e => { alert(e.message); });
+            )).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });
         } else {
             getScreenName(replyAccountId).then(screenName => {
                 tweet(generateTweet(
@@ -58,7 +58,7 @@ function mainLoop() {
                             return `「${getShortenedString(6)}...」の`;
                         }
                     }
-                )).then(() => { alert("tweetしたよ^_^"); }).catch(e => { alert(e.message); });
+                )).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });
             });
         }
         stopTimer();
@@ -92,7 +92,7 @@ function mainLoop() {
                             else return `${getShortenedString(3)}...`;
                         }
                     }
-                )).then(() => { alert("tweetしたよ^_^"); }).catch(e => { alert(e.message); });;
+                )).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });;
             } else {
                 tweet(generateTweet(
                     element => sprintf(TWEET_PHRASES.WATCHED_NGSITES.WITHOUT_TABINFO, element, new Date()),
@@ -104,7 +104,7 @@ function mainLoop() {
                             return `「${getShortenedString(5)}...」`;
                         }
                     }
-                )).then(() => { alert("tweetしたよ^_^"); }).catch(e => { alert(e.message); });;
+                )).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });;
             }
             chrome.tabs.update(currentTab.id, {url: "chrome://newtab/"});
             stayNgSiteSeconds = 0;
