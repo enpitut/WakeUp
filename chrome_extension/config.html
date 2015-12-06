@@ -2,40 +2,68 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>UGEN 詳細設定</title>
-<script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
-<script type="text/javascript" src="javascripts/sha1.js"></script>
-<script type="text/javascript" src="javascripts/oauth.js"></script>
-<script type="text/javascript" src="javascripts/consumer_key_and_secret.js"></script>
+<title>UGEN 環境設定</title>
+<script type="text/javascript" src="lib/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="lib/bootstrap/bootstrap.min.js"></script>
+<script type="text/javascript" src="lib/sha1.js"></script>
+<script type="text/javascript" src="lib/oauth.js"></script>
+<script type="text/javascript" src="lib/sprintf.min.js"></script>
+<script type="text/javascript" src="javascripts/tweet_phrases.js"></script>
 <script type="text/javascript" src="javascripts/mocking.js"></script>
-<script type="text/javascript" src="javascripts/config.js"></script>
 <script type="text/javascript" src="javascripts/common.js"></script>
-<link rel="stylesheet" href="config.css" type="text/css">
+<script type="text/javascript" src="javascripts/config.js"></script>
+<link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css" type="text/css">
 </head>
 <body>
-    <h1>UGEN 詳細設定</h1>
-    <h2>ブロックサイト一覧</h2>
-    <table id="url_list"><tbody></tbody></table>
-    <p>
-        <input type="text" value="example.com" id="add_url_text"><input type="button" value="追加" id="add_url_button">
-    </p>
-    <h2>タスク失敗時にリプライを送る相手</h2>
-    <span id="account"></span>
-    <p>
-        @<input type="text" size="15" id="modify_account_text">に<input type="button" value="修正" id="modify_account_button">
-    </p>
-    <h2>Twitter連携</h2>
-    <p>
-        <input type="button" value="連携する" id="oauth_button">
-    </p>
-    <h2>追加機能</h2>
-    <div>
-        <input type="checkbox" id="tweet_tabinfo_checkbox">サボり通知ツイートにタブの情報を含める(非推奨)
+<div class="container">
+    <div class="row">
+        <h1 class="page-header">UGEN 環境設定</h1>
+        <h2 class="sub-header">ブロックサイト一覧</h2>
+        <div class="well">
+            <table id="url_list" class="table table-condensed"><tbody></tbody></table>
+            <form class="form-inline">
+                <input type="text" value="example.com" id="add_url_text" class="form-control">
+                <input type="button" value="追加" id="add_url_button" class="btn btn-primary">
+            </form>
+        </div>
+        <h2 class="sub-header">タスク失敗時にリプライを送る相手</h2>
+        <div class="well">
+            <p id="current_recipient">
+            </p>
+            <form class="form-inline">
+                <div class="input-group">
+                    <span class="input-group-addon">@</span>
+                    <select id="modify_recipient_select" class="form-control">
+                    </select>
+                </div>
+                <input type="button" value="設定" id="modify_recipient_button" class="btn btn-primary">
+            </form>
+        </div>
+        <div class="well">
+            <form class="form-inline">
+                <div class="input-group">
+                    <span class="input-group-addon">@</span>
+                    <input type="text" size="15" id="new_recipient_text" class="form-control">
+                </div>
+                <input type="button" value="新規追加" id="new_recipient_button" class="btn btn-primary">
+            </form>
+            新規追加ボタンを押すと @<span id="new_recipient"></span> に以下のリプライを送り許可待ち状態になります。
+            <blockquote id="permission_message"></blockquote>
+        </div>
+        <h2 class="sub-header">Twitter連携</h2>
+        <p>
+        <input type="button" value="連携" id="oauth_button" class="btn btn-primary">
+        </p>
+        <h2 class="sub-header">追加機能</h2>
+        <div class="well">
+            <p>
+            <input type="checkbox" id="tweet_tab_info_checkbox">サボり通知ツイートにタブの情報を含める
+            </p>
+            <input type="checkbox" id="show_register_ngsite_button_checkbox">コンテキストメニューにNGサイト登録機能を表示する
+        </div>
+        <h2>今までの作業記録</h2>
+        <div id="task_log"></div>
     </div>
-    <div>
-        <input type="checkbox" id="show_register_ngsite_button_checkbox">コンテキストメニューにNGサイト登録機能を表示する
-    </div>
-    <h2>今までの作業記録</h2>
-    <div id="task_log"></div>
+</div>
 </body>
 </html>

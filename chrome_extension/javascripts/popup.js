@@ -16,8 +16,17 @@ $(() => {
             pause: "ボタンを押すと監視を再開するよ！",
             on: "監視中",
         }[bg.timerState]);
-        
-        if(!getLocalStorageData("accessToken") || !getLocalStorageData("accessTokenSecret")) {
+
+        $("#idling_image").css("display", "none");
+        $("#resting_image").css("display", "none");
+        $("#running_image").css("display", "none");
+        $({
+            off: "#idling_image",
+            pause: "#resting_image",
+            on: "#running_image",
+        }[bg.timerState]).css("display", "block");
+       
+        if (loadConfig().authInfo === null) {
             $("#guide_message").text("Twitter連携をしてね！");
             $("#start_control").css("display", "none");
             $("#oauth_control").css("display", "block");
@@ -31,7 +40,7 @@ $(() => {
     $("#task_description_text").focus(() => {
         if (isEmptyDescription) {
             $("#task_description_text").val("");
-            $("#task_description_text").css("color", "#000000");
+            $("#task_description_text").css("color", "#555555");
         }
     });
     $("#task_description_text").blur(() => {
@@ -57,17 +66,18 @@ $(() => {
         refreshPageContent();
     });
     $("#end_button").click(() => {
+        let now = new Date();
         bg.tweet(bg.generateTweet(
-            element => `${Math.round(bg.limitSeconds / 60)}分かかると見積もった${element}を${Math.round(bg.elapsedSeconds / 60)}分で終えました! ${new Date()} #UGEN`,
+            element => sprintf(TWEET_PHRASES.SUCCESSED, {taskDescription: element, estimatedMinutes: Math.round(bg.limitSeconds / 60), actualMinutes: Math.round(bg.elapsedSeconds / 60), date: now}),
             {
                 element: bg.taskDescription,
                 formatter(element, upperLimitLength, getShortenedString) {
                     if (element == "") return "作業";
                     if (element.length + 2 <= upperLimitLength) return `「${element}」`;
                     return `「${getShortenedString(5)}...」`;
-                },
+                }
             }
-        ), () => { bg.alert("tweetしたよ^_^"); });
+        )).then(() => { bg.notificate("tweetしたよ^_^", 5); }).catch(e => { bg.alert(e.message); });
         bg.notifyRank();
         bg.stopTimer();
         refreshPageContent();

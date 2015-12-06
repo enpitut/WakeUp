@@ -4,6 +4,7 @@ describe("基本機能", () => {
     let background;
     let popup;
     function setMock(globalObject, mock) {
+        globalObject.$.setUp();
         $.extend(true, globalObject, mock);
         globalObject.$.fire();
     }
@@ -14,6 +15,20 @@ describe("基本機能", () => {
         loadFixtures("fixture.html");
         $("#background").load(() => {
             background = $("#background").get(0).contentWindow;
+            background.$(() => {
+                background.modifyConfig(config => {
+                    config.authInfo = {
+                        userId: 3315564288,
+                        accessToken: null,
+                        accessTokenSecret: null
+                    };
+                    config.replySetting["3315564288"] = {
+                        recipientId: null,
+                        recipientIds: [],
+                        replyIdForPermissionMap: {}
+                    };
+                });
+            });
             $("#popup").load(() => {
                 popup = $("#popup").get(0).contentWindow;
                 popup.chrome.extension.getBackgroundPage = () => background;
@@ -23,24 +38,26 @@ describe("基本機能", () => {
         });
         $("#background").attr("src", `${prefix}background.html`);
     });
-    it("タスクを見積もり時間内に終わらせると見積もり時間と実際にかかった時間をツイートする", done => {
+    it("タスクが見積もり時間内に終わったとき見積もり時間と実際にかかった時間をツイートする", done => {
         setMock(background, {
             tweet(message) {
                 expect(message).toContain("1分かかると見積もった作業を0分で終えました");
                 setTimeout(done, 0);
-            },
+                return Promise.resolve();
+            }
         });
         setMock(popup, {});
         popup.$("#task_time_text").val("1");
         popup.$("#start_button").click();
         popup.$("#end_button").click();
     });
-    it("タスクが見積もり時間内に終わらないと謝罪ツイートをする", done => {
+    it("タスクが見積もり時間内に終わらなかったときツイートする", done => {
         setMock(background, {
             tweet(message) {
-                expect(message).toContain("申し訳ありません");
+                expect(message).toContain("私は作業時間の見積もりに失敗しました");
                 setTimeout(done, 0);
-            },
+                return Promise.resolve();
+            }
         });
         setMock(popup, {});
         popup.$("#task_time_text").val("0");
@@ -48,26 +65,17 @@ describe("基本機能", () => {
     });
     it("ブロックサイトを一定時間閲覧し続けていると警告を表示する", done => {
         setMock(background, {
-            setTimeout: (originalSetTimeout => {
-                return (func, ms) => originalSetTimeout(func, 0);
-            })(background.setTimeout),
-            chrome: {
-                tabs: {
-                    query(parameter, callback) {
-                        callback([{
-                            id: 0,
-                            windowId: 0,
-                            url: "http://www.nicovideo.jp/",
-                            title: "niconico",
-                        }]);
-                    },
-                },
-            },
-            Notification: function (message) {
-                this.close = () => {};
+            wait: 10,
+            getCurrentTab: () => Promise.resolve({
+                id: 0,
+                windowId: 0,
+                url: "http://www.nicovideo.jp/",
+                title: "niconico"
+            }),
+            notificate(message) {
                 expect(message).toContain("あと 5 秒 niconico に滞在すると");
                 setTimeout(done, 0);
-            },
+            }
         });
         setMock(popup, {});
         popup.$("#task_time_text").val("2");
@@ -80,32 +88,29 @@ describe("基本機能", () => {
             if (count == 0) setTimeout(done, 0);
         }
         setMock(background, {
-            setTimeout: (originalSetTimeout => {
-                return (func, ms) => originalSetTimeout(func, 0);
-            })(background.setTimeout),
+            wait: 10,
+            getCurrentTab: () => Promise.resolve({
+                id: 0,
+                windowId: 0,
+                url: "http://www.nicovideo.jp/",
+                title: "niconico"
+            }),
             chrome: {
                 tabs: {
-                    query(parameter, callback) {
-                        callback([{
-                            id: 0,
-                            windowId: 0,
-                            url: "http://www.nicovideo.jp/",
-                            title: "niconico",
-                        }]);
-                    },
                     update(id, parameter) {
                         expect(parameter.url).toEqual("chrome://newtab/");
                         partiallyDone();
-                    },
-                },
+                    }
+                }
             },
             tweet(message) {
                 expect(message).toContain("作業をサボっていました");
                 partiallyDone();
-            },
+                return Promise.resolve();
+            }
         });
         setMock(popup, {});
-        popup.$("#task_time_text").val("1");
+        popup.$("#task_time_text").val("2");
         popup.$("#start_button").click();
     });
     it("作業内容を入力してタスクが見積もり時間内に終わったとき作業内容をツイートする", done => {
@@ -113,7 +118,8 @@ describe("基本機能", () => {
             tweet(message) {
                 expect(message).toContain("動作確認作業");
                 setTimeout(done, 0);
-            },
+                return Promise.resolve();
+            }
         });
         setMock(popup, {});
         // setTimeoutを使う理由: blur()の直後にfocus()は効かない
@@ -132,7 +138,8 @@ describe("基本機能", () => {
             tweet(message) {
                 expect(message).toContain("動作確認作業");
                 setTimeout(done, 0);
-            },
+                return Promise.resolve();
+            }
         });
         setMock(popup, {});
         setTimeout(() => {
@@ -145,29 +152,22 @@ describe("基本機能", () => {
     });
     it("作業内容を入力してブロックサイトを閲覧し続けていたとき作業内容をツイートする", done => {
         setMock(background, {
-            setTimeout: (originalSetTimeout => {
-                return (func, ms) => originalSetTimeout(func, 0);
-            })(background.setTimeout),
-            chrome: {
-                tabs: {
-                    query(parameter, callback) {
-                        callback([{
-                            id: 0,
-                            windowId: 0,
-                            url: "http://www.nicovideo.jp/",
-                            title: "niconico",
-                        }]);
-                    },
-                },
-            },
+            wait: 10,
+            getCurrentTab: () => Promise.resolve({
+                id: 0,
+                windowId: 0,
+                url: "http://www.nicovideo.jp/",
+                title: "niconico"
+            }),
             tweet(message) {
                 expect(message).toContain("動作確認作業");
                 setTimeout(done, 0);
-            },
+                return Promise.resolve();
+            }
         });
         setMock(popup, {});
         setTimeout(() => {
-            popup.$("#task_time_text").val("1");
+            popup.$("#task_time_text").val("2");
             popup.$("#task_description_text").focus();
             popup.$("#task_description_text").val("動作確認作業");
             popup.$("#task_description_text").blur();
@@ -190,9 +190,9 @@ describe("基本機能", () => {
                     setBadgeBackgroundColor(parameter) {
                         expect(parameter.color).toEqual([0, 0, 255, 100]);
                         partiallyDone();
-                    },
-                },
-            },
+                    }
+                }
+            }
         });
         setMock(popup, {});
         popup.$("#task_time_text").val("2");
@@ -214,9 +214,9 @@ describe("基本機能", () => {
                     setBadgeBackgroundColor(parameter) {
                         expect(parameter.color).toEqual([255, 0, 0, 100]);
                         partiallyDone();
-                    },
-                },
-            },
+                    }
+                }
+            }
         });
         setMock(popup, {});
         popup.$("#task_time_text").val("1");
@@ -224,11 +224,10 @@ describe("基本機能", () => {
     });
     it("タスク終了予定時刻まで残り1分以下になった瞬間、警告を表示する", done => {
         setMock(background, {
-            Notification: function (message) {
-                this.close = () => {};
+            notificate(message) {
                 expect(message).toContain("あと1分でtweetされます");
                 setTimeout(done, 0);
-            },
+            }
         });
         setMock(popup, {});
         popup.$("#task_time_text").val("1");
@@ -246,39 +245,54 @@ describe("基本機能", () => {
         popup.$("#restart_button").click();
         expect(background.timerState).toBe("on");
     });
+    it("監視を停止・再開するのに合わせてポップアップの画像が切り替わる", () => {
+        setMock(background, {});
+        setMock(popup, {});
+        expect(background.timerState).toBe("off");
+        popup.$("#task_time_text").val("1");
+        expect(popup.$("#idling_image")).toHaveCss({display: "block"});
+        expect(popup.$("#resting_image")).toHaveCss({display: "none"});
+        expect(popup.$("#running_image")).toHaveCss({display: "none"});
+        popup.$("#start_button").click();
+        expect(popup.$("#idling_image")).toHaveCss({display: "none"});
+        expect(popup.$("#resting_image")).toHaveCss({display: "none"});
+        expect(popup.$("#running_image")).toHaveCss({display: "block"});
+        popup.$("#pause_button").click();
+        expect(popup.$("#idling_image")).toHaveCss({display: "none"});
+        expect(popup.$("#resting_image")).toHaveCss({display: "block"});
+        expect(popup.$("#running_image")).toHaveCss({display: "none"});
+        popup.$("#restart_button").click();
+        expect(popup.$("#idling_image")).toHaveCss({display: "none"});
+        expect(popup.$("#resting_image")).toHaveCss({display: "none"});
+        expect(popup.$("#running_image")).toHaveCss({display: "block"});
+    });
     it("監視停止中はブロックサイトを閲覧してもサボり通知ツイートがされたり「新しいタブ」ページへ飛ばされたりしない", done => {
         let isDone = false;
         setMock(background, {
-            setTimeout: (originalSetTimeout => {
-                return (func, ms) => originalSetTimeout(func, 0);
-            })(background.setTimeout),
+            wait: 10,
+            getCurrentTab: () => background.timerState == "pause"
+                ? Promise.resolve({
+                    id: 0,
+                    windowId: 0,
+                    url: "http://www.nicovideo.jp/",
+                    title: "niconico"
+                })
+                : Promise.resolve({
+                    id: 0,
+                    windowId: 0,
+                    url: "http://example.com/",
+                    title: "Example"
+                }),
             chrome: {
                 tabs: {
-                    query(parameter, callback) {
-                        if (background.timerState == "pause") {
-                            callback([{
-                                id: 0,
-                                windowId: 0,
-                                url: "http://www.nicovideo.jp/",
-                                title: "niconico",
-                            }]);
-                        } else {
-                            callback([{
-                                id: 0,
-                                windowId: 0,
-                                url: "http://example.com/",
-                                title: "Example",
-                            }]);
-                        }
-                    },
                     update(id, parameter) {
                         if (!isDone) {
                             fail("chrome.tabs.update()が呼ばれた");
                             isDone = true;
                             setTimeout(done, 0);
                         }
-                    },
-                },
+                    }
+                }
             },
             tweet(message) {
                 if (!isDone) {
@@ -286,7 +300,8 @@ describe("基本機能", () => {
                     isDone = true;
                     setTimeout(done, 0);
                 }
-            },
+                return Promise.resolve();
+            }
         });
         setMock(popup, {});
         popup.$("#task_time_text").val("100");

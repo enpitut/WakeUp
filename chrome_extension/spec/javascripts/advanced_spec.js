@@ -5,6 +5,7 @@ describe("詳細設定から設定できる機能", () => {
     let popup;
     let config;
     function setMock(globalObject, mock) {
+        globalObject.$.setUp();
         $.extend(true, globalObject, mock);
         globalObject.$.fire();
     }
@@ -15,6 +16,20 @@ describe("詳細設定から設定できる機能", () => {
         loadFixtures("fixture.html");
         $("#background").load(() => {
             background = $("#background").get(0).contentWindow;
+            background.$(() => {
+                background.modifyConfig(config => {
+                    config.authInfo = {
+                        userId: 3315564288,
+                        accessToken: null,
+                        accessTokenSecret: null
+                    };
+                    config.replySetting["3315564288"] = {
+                        recipientId: null,
+                        recipientIds: [],
+                        replyIdForPermissionMap: {}
+                    };
+                });
+            });
             $("#popup").load(() => {
                 popup = $("#popup").get(0).contentWindow;
                 popup.chrome.extension.getBackgroundPage = () => background;
@@ -40,45 +55,93 @@ describe("詳細設定から設定できる機能", () => {
         config.$("#url_list tr").filter(":contains('pixiv.net')").find("input").click();
         expect(background.isNgSite("http://www.pixiv.net/")).toBe(false);
     });
-    it("タスクが見積もり時間内に終わらなかった時にリプライを送る相手を変更する", done => {
+    it("タスクが見積もり時間内に終わらなかったときにリプライを送る相手を追加する際、リプライを送る相手を表示する", done => {
+        setMock(background, {});
+        setMock(popup, {});
+        setMock(config, {});
+        config.$("#new_recipient_text").val("UGEN_teacher");
+        config.$("#new_recipient_text").trigger("keydown");
+        setTimeout(() => {
+            expect(config.$("#new_recipient").text()).toBe("UGEN_teacher");
+            expect(config.$("#permission_message").text()).toContain("@UGEN_teacher");
+            setTimeout(done, 0);
+        }, 100);
+    });
+    it("タスクが見積もり時間内に終わらなかったときにリプライを送る相手を追加する", done => {
+        setMock(background, {});
+        setMock(popup, {});
+        setMock(config, {
+            tweet(message) {
+                expect(message).toContain("@UGEN_teacher");
+                return Promise.resolve({id: 42});
+            },
+            notificate(message) {
+                let myReplySetting = background.loadConfig().replySetting[background.loadConfig().authInfo.userId];
+                expect(myReplySetting.replyIdForPermissionMap["3356282660"]).toEqual(42);
+                expect(message).toEqual("@UGEN_teacherにリプライを送りました");
+                setTimeout(done, 0);
+            }
+        });
+        config.$("#new_recipient_text").val("UGEN_teacher");
+        config.$("#new_recipient_text").trigger("keydown");
+        config.$("#new_recipient_button").click();
+    });
+    it("タスクが見積もり時間内に終わらなかったときにリプライを送る相手を変更する", done => {
+        setMock(background, {});
+        background.modifyConfig(config => {
+            config.replySetting[config.authInfo.userId].replyIdForPermissionMap["3356282660"] = 42;
+        });
+        setMock(popup, {});
+        setMock(config, {
+            getMentions: () => Promise.resolve([{user: {id: 3356282660}, in_reply_to_status_id: 42}]),
+            notificate(message) {
+                let myReplySetting = background.loadConfig().replySetting[background.loadConfig().authInfo.userId];
+                expect(myReplySetting.replyIdForPermissionMap.hasOwnProperty("3356282660")).toBe(false);
+                expect(myReplySetting.recipientIds).toContain(3356282660);
+                expect(message).toEqual("@UGEN_teacherからリプライの許可が下りました");
+                setTimeout(done, 0);
+            }
+        });
+        config.$("#modify_account_select").val("3356282660");
+        config.$("#modify_account_button").click();
+    });
+    it("リプライ相手を設定していてタスクが見積もり時間内に終わらなかったとき謝罪リプライをする", done => {
         setMock(background, {
             tweet(message) {
-                expect(message).toContain("@tos");
+                expect(message).toContain("@UGEN_teacher");
+                expect(message).toContain("申し訳ありません");
                 setTimeout(done, 0);
-            },
+                return Promise.resolve();
+            }
+        });
+        background.modifyConfig(config => {
+            let myReplySetting = config.replySetting[config.authInfo.userId];
+            myReplySetting.recipientId = 3356282660;
+            myReplySetting.recipientIds.push(3356282660);
         });
         setMock(popup, {});
         setMock(config, {});
-        config.$("#modify_account_text").val("tos");
-        config.$("#modify_account_button").click();
         popup.$("#task_time_text").val("0");
         popup.$("#start_button").click();
     });
     it("サボり通知ツイートにタブの情報を含める", done => {
         setMock(background, {
-            setTimeout: (originalSetTimeout => {
-                return (func, ms) => originalSetTimeout(func, 0);
-            })(background.setTimeout),
-            chrome: {
-                tabs: {
-                    query(parameter, callback) {
-                        callback([{
-                            id: 0,
-                            windowId: 0,
-                            url: "http://www.nicovideo.jp/",
-                            title: "niconico",
-                        }]);
-                    },
-                },
-            },
+            wait: 10,
+            getCurrentTab: () => Promise.resolve({
+                id: 0,
+                windowId: 0,
+                url: "http://www.nicovideo.jp/",
+                title: "niconico"
+            }),
             tweet(message) {
                 expect(message).toContain("niconico( http://www.nicovideo.jp/ )");
                 setTimeout(done, 0);
-            },
+                return Promise.resolve();
+            }
         });
         setMock(popup, {});
         setMock(config, {});
-        config.$("#tweet_tabinfo_checkbox").click();
+        config.$("#tweet_tab_info_checkbox").click();
         popup.$("#task_time_text").val("1");
         popup.$("#start_button").click();
     });
@@ -94,7 +157,7 @@ describe("詳細設定から設定できる機能", () => {
             id: 0,
             windowId: 0,
             url: "http://www.pixiv.net/",
-            title: "[pixiv]",
+            title: "[pixiv]"
         });
         expect(background.isNgSite("http://www.pixiv.net/")).toBe(true);
         config.chrome.contextMenus.onClicked.dispatch({
@@ -103,8 +166,9 @@ describe("詳細設定から設定できる機能", () => {
             id: 0,
             windowId: 0,
             url: "http://www.pixiv.net/",
-            title: "[pixiv]",
+            title: "[pixiv]"
         });
         expect(background.isNgSite("http://www.pixiv.net/")).toBe(false);
     });
 });
+;
