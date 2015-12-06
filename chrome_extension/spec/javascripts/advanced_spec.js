@@ -138,7 +138,7 @@ describe("詳細設定から設定できる機能", () => {
         });
         setMock(popup, {});
         setMock(config, {});
-        config.$("#tweet_tabinfo_checkbox").click();
+        config.$("#tweet_tab_info_checkbox").click();
         popup.$("#task_time_text").val("1");
         popup.$("#start_button").click();
     });

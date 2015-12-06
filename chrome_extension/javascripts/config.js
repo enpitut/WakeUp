@@ -87,7 +87,7 @@ $(() => {
         setTimeout(() => {
             $("#new_account_button").prop("disabled", $("#new_account_text").val() == "");
             $("#permission_message_destination").text($("#new_account_text").val());
-            $("#permission_message").text(`@${$("#new_account_text").val()} ツールによる自動メッセージです。作業が見積もり時間内に終わらなかった時にリプライを自動で送るツールを使うことで作業の強制力を上げようとしています。リプライを送られることを許可する場合はこのリプライに返信してください。`);
+            $("#permission_message").text(sprintf(TWEET_PHRASES.GET_PERMISSION, {recipient: $("#new_account_text").val()}));
         }, 0);
     });
     $("#new_account_text").trigger("keydown");
@@ -99,7 +99,7 @@ $(() => {
             if (JSON.parse(localStorage.getItem("replySetting"))[localStorage.getItem("userId")].replyAccountIds.indexOf(userId) > -1) {
                 notificate(`@${screenName}からは既に許可を得ています`, 5);
             } else {
-                return tweet(`@${screenName} ツールによる自動メッセージです。作業が見積もり時間内に終わらなかった時にリプライを自動で送るツールを使うことで作業の強制力を上げようとしています。リプライを送られることを許可する場合はこのリプライに返信してください。`).then(status => {
+                return tweet(sprintf(TWEET_PHRASES.GET_PERMISSION, {recipient: screenName})).then(status => {
                     let replySetting = JSON.parse(localStorage.getItem("replySetting"));
                     replySetting[localStorage.getItem("userId")].replyIdForPermissionMap[userId] = status["id"];
                     localStorage.setItem("replySetting", JSON.stringify(replySetting));
@@ -112,15 +112,15 @@ $(() => {
 
     $("#oauth_button").click(onOAuthButtonClickHandler);
 
-    $("#tweet_tabinfo_checkbox").change(function () {
+    $("#tweet_tab_info_checkbox").change(function () {
         if ($(this).is(":checked")) {
-            localStorage.setItem("tweetTabinfo", "True");
+            localStorage.setItem("tweetTabInfo", "True");
         } else {
-            localStorage.setItem("tweetTabinfo", "False");
+            localStorage.setItem("tweetTabInfo", "False");
         }
     });
-    if (localStorage.getItem("tweetTabinfo") === "True") {
-        $("#tweet_tabinfo_checkbox").prop("checked", true);
+    if (localStorage.getItem("tweetTabInfo") === "True") {
+        $("#tweet_tab_info_checkbox").prop("checked", true);
     }
     
     $("#show_register_ngsite_button_checkbox").change(function () {
