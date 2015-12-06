@@ -1,16 +1,16 @@
 "use strict";
 
 $(() => {
-    drawTaskMinutes();
-    drawSabori();
+	let taskLogs = JSON.parse(localStorage.getItem("taskLog"));
+    if(taskLogs.length==0) $("#task_log").text("作業するとここにグラフが表示されます");
+    else drawTaskMinutes(taskLogs);
 });
 
-function drawTaskMinutes(){
+function drawTaskMinutes(taskLogs){
     let width = 600;
 	let height = 300;
     let drawWidth = width - 100;
     let drawHeight = height - 50;
-	let taskLogs = JSON.parse(localStorage.getItem("taskLog"));
     
     let tooltip = d3.select("body").select("#tooltip");
 
@@ -49,15 +49,15 @@ function drawTaskMinutes(){
     .tickFormat(d3.time.format("%m/%d"));
 
     svg.append("g")
-    .attr("transform", "translate(0," + (height - 50) + ")")
+    .attr("transform", `translate(0, ${height - 50})`)
     .call(xAxis);
     
     svg.append("g")
-    .attr("transform", "translate(0," + (height - 50) + ")")
+    .attr("transform", `translate(0, ${height - 50})`)
     .call(labelAxis);
     
     svg.append("g")
-    .attr("transform", "translate(50," + 0 + ")")
+    .attr("transform", `translate(50,0`)
     .call(yAxis);
     
     svg.selectAll("barchart")
