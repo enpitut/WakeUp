@@ -76,7 +76,7 @@ $(() => {
                     return `「${getShortenedString(5)}...」`;
                 }
             }
-        )).then(() => { bg.alert("tweetしたよ^_^"); }).catch(e => { bg.alert(e.message); });
+        )).then(() => { bg.notificate("tweetしたよ^_^", 5); }).catch(e => { bg.alert(e.message); });
         bg.notifyRank();
         bg.stopTimer();
         refreshPageContent();
