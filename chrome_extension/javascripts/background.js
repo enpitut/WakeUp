@@ -32,23 +32,9 @@ function mainLoop() {
         chrome.browserAction.setBadgeBackgroundColor({color:[255, 0, 0, 100]});
     }
     if (elapsedSeconds >= limitSeconds) {
-
-        let replyAccountId = JSON.parse(localStorage.getItem("replySetting"))[localStorage.getItem("userId")].replyAccountId;
-        if (replyAccountId == -1) {
-            let now = new Date();
-            tweet(generateTweet(
-                element => sprintf(TWEET_PHRASES.FAILED.WITHOUT_RECIPIENT, {taskDescription: element, date: now}),
-                {
-                    element: taskDescription,
-                    formatter(element, upperLimitLength, getShortenedString) {
-                        if (element == "") return "作業";
-                        if (element.length + 5 <= upperLimitLength) return `「${element}」の作業`;
-                        return `「${getShortenedString(8)}...」の作業`;
-                    }
-                }
-            )).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });
-        } else {
-            getScreenName(replyAccountId).then(screenName => {
+        let recipientId = loadConfig().replySetting[loadConfig().authInfo.userId].recipientId;
+        if (recipientId !== null) {
+            getScreenName(recipientId).then(screenName => {
                 let now = new Date();
                 tweet(generateTweet(
                     element => sprintf(TWEET_PHRASES.FAILED.WITH_RECIPIENT, {recipient: screenName, taskDescription: element, date: now}),
@@ -62,6 +48,19 @@ function mainLoop() {
                     }
                 )).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });
             });
+        } else {
+            let now = new Date();
+            tweet(generateTweet(
+                element => sprintf(TWEET_PHRASES.FAILED.WITHOUT_RECIPIENT, {taskDescription: element, date: now}),
+                {
+                    element: taskDescription,
+                    formatter(element, upperLimitLength, getShortenedString) {
+                        if (element == "") return "作業";
+                        if (element.length + 5 <= upperLimitLength) return `「${element}」の作業`;
+                        return `「${getShortenedString(8)}...」の作業`;
+                    }
+                }
+            )).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });
         }
         stopTimer();
         return;
@@ -76,7 +75,7 @@ function mainLoop() {
             notificate(`あと ${TWEET_TIME - ALERT_TIME} 秒 ${currentTab.title} に滞在するとTwitterに報告されます`, 5);
             break;
         case TWEET_TIME:
-            if(localStorage.getItem("tweetTabInfo") === "True") {
+            if (loadConfig().tweetTabInfo) {
                 let now = new Date();
                 tweet(generateTweet(
                     (element1, element2) => sprintf(TWEET_PHRASES.WATCHED_NG_SITES.WITH_TAB_INFO, {taskDescription: element1, siteName: element2, siteUrl: currentTab.url, date: now}),
@@ -152,13 +151,8 @@ function stopTimer() {
     clearTimeout(timerId);
 }
 
-function isNgSite(url) {
-    let urlList = JSON.parse(localStorage.getItem("urlList"));
-    for (let str of urlList) {
-        let re = new RegExp(str.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1"));
-        if (url.match(re)) return true;
-    }
-    return false;
+function isNgSite(targetUrl) {
+    return loadConfig().urlList.map(url => new RegExp(url.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1"))).some(re => targetUrl.match(re));
 }
 
 function notifyRank(){
@@ -170,7 +164,7 @@ function notifyRank(){
             .filter(status => status.lang == "ja" && status.text.match(re))
             .filter(status => new Date(status.created_at).toDateString() == new Date().toDateString()) //toDateString()で日付だけを取得できる
             .map(status => status.user.id)
-            .concat(Number([localStorage.getItem("userId")]))
+            .concat([loadConfig().authInfo.userId])
         )];
 
     return Promise.all(userIds.map(userId => readTimeline(userId)
@@ -182,24 +176,26 @@ function notifyRank(){
               .reduce((sum, minutes) => sum + minutes, 0)])
           )).then(pairs => new Map(pairs));
       }).then(workTimeMap => {
-          let myWorkTime = Math.round((elapsedSeconds / 60) + workTimeMap.get(Number(localStorage.getItem("userId"))));
+          let myWorkTime = Math.round((elapsedSeconds / 60) + workTimeMap.get(loadConfig().authInfo.userId));
           let myRank = [...workTimeMap.values()].filter(workTime => workTime > myWorkTime).length + 1;
           notificate(`今日のあなたの作業時間合計は${myWorkTime}分で、${workTimeMap.size}人中${myRank}位です！`, 5);
       });
 }
 
 $(() => {
-    if (localStorage.getItem("urlList") === null) {
-        localStorage.setItem("urlList", JSON.stringify(["nicovideo.jp", "youtube.com"]));
+    if (loadConfig() === null) {
+        saveConfig({
+            version: 1,
+            urlList: ["nicovideo.jp", "youtube.com"],
+            authInfo: null,
+            replySetting: {},
+            screenNameMap: {},
+            tweetTabInfo: false,
+            showRegisterNgSiteButton: false
+        });
     }
-    if (localStorage.getItem("replySetting") === null) {
-        localStorage.setItem("replySetting", JSON.stringify({}));
-    }
-    if (localStorage.getItem("screenNameMap") === null) {
-        localStorage.setItem("screenNameMap", JSON.stringify({}))
-    }
-    if (localStorage.getItem("showRegisterNgSiteButton") === "True") {
-        $("#show_register_ngsite_button_checkbox").prop("checked", true);
+
+    if (loadConfig().showRegisterNgSiteButton) {
         createRegisterNgSiteButton();
     }
 });

@@ -5,24 +5,31 @@ describe("詳細設定から設定できる機能", () => {
     let popup;
     let config;
     function setMock(globalObject, mock) {
+        globalObject.$.setUp();
         $.extend(true, globalObject, mock);
         globalObject.$.fire();
     }
     beforeEach(done => {
         let prefix = location.protocol == "http:" ? "base/" : "";
         localStorage.clear();
-        localStorage.setItem("userId", "3315564288");
-        localStorage.setItem("replySetting", JSON.stringify({
-            "3315564288": {
-                replyAccountId: -1,
-                replyAccountIds: [],
-                replyIdForPermissionMap: {}
-            }
-        }));
         jasmine.getFixtures().fixturesPath = `${prefix}spec/javascripts/fixtures`;
         loadFixtures("fixture.html");
         $("#background").load(() => {
             background = $("#background").get(0).contentWindow;
+            background.$(() => {
+                background.modifyConfig(config => {
+                    config.authInfo = {
+                        userId: 3315564288,
+                        accessToken: null,
+                        accessTokenSecret: null
+                    };
+                    config.replySetting["3315564288"] = {
+                        recipientId: null,
+                        recipientIds: [],
+                        replyIdForPermissionMap: {}
+                    };
+                });
+            });
             $("#popup").load(() => {
                 popup = $("#popup").get(0).contentWindow;
                 popup.chrome.extension.getBackgroundPage = () => background;
@@ -52,10 +59,10 @@ describe("詳細設定から設定できる機能", () => {
         setMock(background, {});
         setMock(popup, {});
         setMock(config, {});
-        config.$("#new_account_text").val("UGEN_teacher");
-        config.$("#new_account_text").trigger("keydown");
+        config.$("#new_recipient_text").val("UGEN_teacher");
+        config.$("#new_recipient_text").trigger("keydown");
         setTimeout(() => {
-            expect(config.$("#permission_message_destination").text()).toBe("UGEN_teacher");
+            expect(config.$("#new_recipient").text()).toBe("UGEN_teacher");
             expect(config.$("#permission_message").text()).toContain("@UGEN_teacher");
             setTimeout(done, 0);
         }, 100);
@@ -69,30 +76,28 @@ describe("詳細設定から設定できる機能", () => {
                 return Promise.resolve({id: 42});
             },
             notificate(message) {
-                let myReplySetting = JSON.parse(localStorage.getItem("replySetting"))[localStorage.getItem("userId")];
+                let myReplySetting = background.loadConfig().replySetting[background.loadConfig().authInfo.userId];
                 expect(myReplySetting.replyIdForPermissionMap["3356282660"]).toEqual(42);
                 expect(message).toEqual("@UGEN_teacherにリプライを送りました");
                 setTimeout(done, 0);
             }
         });
-        config.$("#new_account_text").val("UGEN_teacher");
-        config.$("#new_account_text").trigger("keydown");
-        config.$("#new_account_button").click();
+        config.$("#new_recipient_text").val("UGEN_teacher");
+        config.$("#new_recipient_text").trigger("keydown");
+        config.$("#new_recipient_button").click();
     });
     it("タスクが見積もり時間内に終わらなかったときにリプライを送る相手を変更する", done => {
         setMock(background, {});
-        {
-            let replySetting = JSON.parse(localStorage.getItem("replySetting"));
-            replySetting[localStorage.getItem("userId")].replyIdForPermissionMap["3356282660"] = 42;
-            localStorage.setItem("replySetting", JSON.stringify(replySetting));
-        }
+        background.modifyConfig(config => {
+            config.replySetting[config.authInfo.userId].replyIdForPermissionMap["3356282660"] = 42;
+        });
         setMock(popup, {});
         setMock(config, {
             getMentions: () => Promise.resolve([{user: {id: 3356282660}, in_reply_to_status_id: 42}]),
             notificate(message) {
-                let myReplySetting = JSON.parse(localStorage.getItem("replySetting"))[localStorage.getItem("userId")];
+                let myReplySetting = background.loadConfig().replySetting[background.loadConfig().authInfo.userId];
                 expect(myReplySetting.replyIdForPermissionMap.hasOwnProperty("3356282660")).toBe(false);
-                expect(myReplySetting.replyAccountIds).toContain(3356282660);
+                expect(myReplySetting.recipientIds).toContain(3356282660);
                 expect(message).toEqual("@UGEN_teacherからリプライの許可が下りました");
                 setTimeout(done, 0);
             }
@@ -109,13 +114,11 @@ describe("詳細設定から設定できる機能", () => {
                 return Promise.resolve();
             }
         });
-        {
-            let replySetting = JSON.parse(localStorage.getItem("replySetting"));
-            let myReplySetting = replySetting[localStorage.getItem("userId")];
-            myReplySetting.replyAccountIds.push(3356282660);
-            myReplySetting.replyAccountId = 3356282660;
-            localStorage.setItem("replySetting", JSON.stringify(replySetting));
-        }
+        background.modifyConfig(config => {
+            let myReplySetting = config.replySetting[config.authInfo.userId];
+            myReplySetting.recipientId = 3356282660;
+            myReplySetting.recipientIds.push(3356282660);
+        });
         setMock(popup, {});
         setMock(config, {});
         popup.$("#task_time_text").val("0");
