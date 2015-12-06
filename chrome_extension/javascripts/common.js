@@ -118,7 +118,7 @@ function getCurrentTab() {
     return new Promise((resolve, reject) => {
         chrome.tabs.query({currentWindow: true, active: true}, tabs => {
             if (tabs.length == 1) resolve(tabs[0]);
-            else reject(new Error("Could not find current window."));
+            else reject(new Error("Could not find current tab."));
         });
     });
 }
