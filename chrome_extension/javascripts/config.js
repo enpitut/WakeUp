@@ -20,7 +20,7 @@ $(() => {
         urlList.push($("#add_url_text").val());
         localStorage.setItem("urlList", JSON.stringify(urlList));
         addRow($("#add_url_text").val());
-        $("#add_url_text").val("http://");
+        $("#add_url_text").val("");
     });
 
     function flushReplyAccount() {
