@@ -6,11 +6,8 @@ var stayNgSiteSeconds;
 var taskDescription;
 var timerState = "off";
 var oneMinuteNotified = false;
-<<<<<<< HEAD
 var saboriNum = 0;
-=======
 var wait = 1000;
->>>>>>> master
 
 const ALERT_TIME = 5;
 const TWEET_TIME = 10;
@@ -36,20 +33,6 @@ function mainLoop() {
         chrome.browserAction.setBadgeBackgroundColor({color:[255, 0, 0, 100]});
     }
     if (elapsedSeconds >= limitSeconds) {
-<<<<<<< HEAD
-        saveTaskLog(false);
-        tweet(generateTweet(
-            element => `@${localStorage.getItem("replyAccount")} 突然のリプライ失礼致します。このたび私事ながら${element}作業時間の見積もりに失敗しました。誠に申し訳ありません ${new Date()} #UGEN`,
-            {
-                element: taskDescription,
-                formatter(element, upperLimitLength, getShortenedString) {
-                    if (element == "") return "";
-                    if (element.length + 3 <= upperLimitLength) return `「${element}」の`;
-                    return `「${getShortenedString(6)}...」の`;
-                },
-            }
-        ), () => { alert("tweetしたよ^_^"); });
-=======
         let recipientId = loadConfig().replySetting[loadConfig().authInfo.userId].recipientId;
         if (recipientId !== null) {
             getScreenName(recipientId).then(screenName => {
@@ -80,7 +63,6 @@ function mainLoop() {
                 }
             )).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });
         }
->>>>>>> master
         stopTimer();
         return;
     }
@@ -94,13 +76,9 @@ function mainLoop() {
             notificate(`あと ${TWEET_TIME - ALERT_TIME} 秒 ${currentTab.title} に滞在するとTwitterに報告されます`, 5);
             break;
         case TWEET_TIME:
-<<<<<<< HEAD
-            saboriNum++;
-            if(localStorage.getItem("tweetTabinfo") === "True") {
-=======
             if (loadConfig().tweetTabInfo) {
+                saboriNum++;
                 let now = new Date();
->>>>>>> master
                 tweet(generateTweet(
                     (element1, element2) => sprintf(TWEET_PHRASES.WATCHED_NG_SITES.WITH_TAB_INFO, {taskDescription: element1, siteName: element2, siteUrl: currentTab.url, date: now}),
                     {

@@ -2,7 +2,7 @@
 
 $(() => {
 	let taskLogs = JSON.parse(localStorage.getItem("taskLog"));
-    if(taskLogs.length==0) $("#task_log").text("作業するとここにグラフが表示されます");
+    if(taskLogs == null || taskLogs.length ==0) $("#task_log").text("作業するとここにグラフが表示されます");
     else drawTaskMinutes(taskLogs);
 });
 
@@ -57,8 +57,13 @@ function drawTaskMinutes(taskLogs){
     .call(labelAxis);
     
     svg.append("g")
-    .attr("transform", `translate(50,0`)
-    .call(yAxis);
+    .attr("transform", `translate(50,0)`)
+    .call(yAxis)
+    .append("text")
+    .attr("y", 30)
+    .attr("x",30)
+    .style("text-anchor", "end")
+    .text("作業時間(分)"); 
     
     svg.selectAll("barchart")
     .data(taskLogs)
@@ -67,7 +72,10 @@ function drawTaskMinutes(taskLogs){
     .attr("x", d => labelScale(new Date(new Date(d.date).toDateString())) - (drawWidth / taskLogs.length * 0.4))
     .attr("y", d => yScale(d.workMinutes))
     .attr("width", d => (drawWidth / taskLogs.length) * 0.8)
-    .attr("height", d => drawHeight - yScale(d.workMinutes))
+    .attr("height", d => {
+        if(d.workMinutes == 0) return 0;
+        else return drawHeight - yScale(d.workMinutes);
+    })
     .attr("fill", "rgb(76,229,100)")
     .attr("stroke", "none")
     .on("mouseover", d => tooltip.style("visibility", "visible").text(getBarDescription(d)))
@@ -76,11 +84,11 @@ function drawTaskMinutes(taskLogs){
 }
 
 function getBarDescription(taskLog){
-    var taskDescriptions = taskLog.task_descriptions.map((taskDescription) => {
-        if(taskDescription != null)return taskDescription;
-        else return "-";
+    var taskDescriptions = taskLog.taskDescriptions.map((taskDescription) => {
+        if(taskDescription != "") return taskDescription;
+        else return "記入無し";
     });
     
     let date = new Date(taskLog.date);
-    return `タスク数：${taskLog.task_descriptions.length}(${taskDescriptions}(${taskLog.successNum}回成功、${taskLog.task_descriptions.length - taskLog.successNum}回失敗、${taskLog.saboriNum}回サボり))`;
+    return `タスク数：${taskLog.taskDescriptions.length}(内容：${taskDescriptions}(${taskLog.successNum}回成功、${taskLog.taskDescriptions.length - taskLog.successNum}回失敗、${taskLog.saboriNum}回サボり))`;
 }
