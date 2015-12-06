@@ -328,7 +328,7 @@ $(() => {
         createRegisterNgSiteButton();
     }
     if (localStorage.getItem("taskLog") === null) {
-        localStorage.setItem("taskLog", JSON.stringify([{ date: new Date().toDateString(), task_descriptions: [], workMinutes: 0, saboriNum: 0, successNum: 0}]));
+        localStorage.setItem("taskLog", JSON.stringify([{ date: new Date().toDateString(), taskDescriptions: [], workMinutes: 0, saboriNum: 0, successNum: 0}]));
     }
 });
 
@@ -341,7 +341,7 @@ function saveTaskLog(isSuccess) {
     
     if(lastLog.date == today.toDateString()){
         lastLog.workMinutes += workMinutes;
-        lastLog.task_descriptions.push((taskDescription=="") ? "-" : taskDescription);
+        lastLog.task_descriptions.push((taskDescription=="") ? null : taskDescription);
         lastLog.saboriNum += saboriNum;
         if(isSuccess == true)lastLog.successNum++;
         taskLog[taskLog.length-1] = lastLog;

@@ -76,6 +76,11 @@ function drawTaskMinutes(){
 }
 
 function getBarDescription(taskLog){
+    var taskDescriptions = taskLog.task_descriptions.map((taskDescription) => {
+        if(taskDescription != null)return taskDescription;
+        else return "-";
+    });
+    
     let date = new Date(taskLog.date);
-    return `タスク数：${taskLog.task_descriptions.length}(${taskLog.task_descriptions}(${taskLog.successNum}回成功、${taskLog.task_descriptions.length - taskLog.successNum}回失敗、${taskLog.saboriNum}回サボり))`;
+    return `タスク数：${taskLog.task_descriptions.length}(${taskDescriptions}(${taskLog.successNum}回成功、${taskLog.task_descriptions.length - taskLog.successNum}回失敗、${taskLog.saboriNum}回サボり))`;
 }
