@@ -78,6 +78,7 @@ $(() => {
                 }
             }
         )).then(() => { bg.notificate("tweetしたよ^_^", 5); }).catch(e => { bg.alert(e.message); });
+        bg.saveTaskLog(true);
         bg.notifyRank();
         bg.stopTimer();
         refreshPageContent();
