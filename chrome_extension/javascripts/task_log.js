@@ -79,7 +79,7 @@ function drawTaskMinutes(taskLogs){
     .attr("fill", "rgb(76,229,100)")
     .attr("stroke", "none")
     .on("mouseover", d => tooltip.style("visibility", "visible").text(getBarDescription(d)))
-    .on("mousemove", d => tooltip.style("top", (event.pageY-20)+"px").style("left",(event.pageX+10)+"px"))
+    .on("mousemove", d => tooltip.style("top", `${event.pageY - 20}px`).style("left",`${event.pageX + 10}px`))
     .on("mouseout", d => tooltip.style("visibility", "hidden"));
 }
 
