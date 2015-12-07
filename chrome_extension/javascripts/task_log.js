@@ -1,8 +1,8 @@
 "use strict";
 
 $(() => {
-	let taskLogs = JSON.parse(localStorage.getItem("taskLog"));
-    if(taskLogs == null || taskLogs.length ==0) $("#task_log").text("作業するとここにグラフが表示されます");
+    let taskLogs = loadConfig().taskLog;
+    if(taskLogs.length ==0) $("#task_log").text("作業するとここにグラフが表示されます");
     else drawTaskMinutes(taskLogs);
 });
 
