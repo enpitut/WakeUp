@@ -88,6 +88,10 @@ $(() => {
         let optionsUrl = chrome.extension.getURL("config.html");
         open(optionsUrl);
     });
+    $("#goto_tasklog").click(() => {
+        let taskLogUrl = chrome.extension.getURL("task_log.html");
+        open(taskLogUrl);
+    });
     $("#oauth_button").click(onOAuthButtonClickHandler);
     refreshPageContent();
 });
