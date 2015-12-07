@@ -84,12 +84,17 @@ $(() => {
         bg.notifyRank();
         bg.stopTimer();
         refreshPageContent();
+        bg.saveTaskLog(true);
         $("#task_description_text").val("");
         $("#task_description_text").blur();
     });
     $("#goto_option").click(() => {
         let optionsUrl = chrome.extension.getURL("config.html");
         open(optionsUrl);
+    });
+    $("#goto_tasklog").click(() => {
+        let tasklogUrl = chrome.extension.getURL("task_log.html");
+        open(tasklogUrl);
     });
     $("#oauth_button").click(onOAuthButtonClickHandler);
     refreshPageContent();
