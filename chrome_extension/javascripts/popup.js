@@ -78,6 +78,7 @@ $(() => {
                 }
             }
         )).then(() => { bg.notificate("tweetしたよ^_^", 5); }).catch(e => { bg.alert(e.message); });
+        bg.saveTaskLog(true);
         bg.notifyRank();
         bg.stopTimer();
         refreshPageContent();
@@ -87,6 +88,10 @@ $(() => {
     $("#goto_option").click(() => {
         let optionsUrl = chrome.extension.getURL("config.html");
         open(optionsUrl);
+    });
+    $("#goto_tasklog").click(() => {
+        let taskLogUrl = chrome.extension.getURL("task_log.html");
+        open(taskLogUrl);
     });
     $("#oauth_button").click(onOAuthButtonClickHandler);
     refreshPageContent();
