@@ -51,8 +51,15 @@
             <blockquote id="permission_message"></blockquote>
         </div>
         <h2 class="sub-header">Twitter連携</h2>
+        <div id="authenticated_user" class="panel panel-default">
+            <div class="panel-heading">現在の連携先</div>
+            <div class="panel-body">
+                <img src="" alt="" width="48" height="48" id="authenticated_user_profile_image" ><br>
+                <span id="authenticated_user_name"></span>（@<span id="authenticated_user_screen_name"></span>）<a href="https://twitter.com/" id="authenticated_user_twitter_link"><img src="images/twitter_logo.png" alt="on Twitter" width="32" height="32"></a>
+            </div>
+        </div>
         <p>
-        <input type="button" value="連携" id="oauth_button" class="btn btn-primary">
+            <input type="button" value="連携" id="oauth_button" class="btn btn-primary">
         </p>
         <h2 class="sub-header">追加機能</h2>
         <div class="well">
