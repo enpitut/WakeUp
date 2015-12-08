@@ -52,13 +52,17 @@ function readTimeline(id, tokens) {
 function getMentions(tokens) {
     return callTwitterApi("GET", "https://api.twitter.com/1.1/statuses/mentions_timeline.json", {count: 200}, tokens);
 }
+function getUser(idOrScreenName, tokens) {
+    let parameters = (typeof(idOrScreenName) == "number" ? {user_id: idOrScreenName} : {screen_name: idOrScreenName});
+    return callTwitterApi("GET", "https://api.twitter.com/1.1/users/show.json", parameters, tokens);
+}
 function getScreenName(id, tokens) {
     return new Promise((resolve, reject) => {
         let screenNameMap = loadConfig().screenNameMap;
         if (screenNameMap.hasOwnProperty(id) && new Date().getTime() - screenNameMap[id].lastModified < 3600000) {
             resolve(screenNameMap[id].screenName);
         } else {
-            callTwitterApi("GET", "https://api.twitter.com/1.1/users/show.json", {user_id: id}, tokens).then(user => {
+            getUser(id).then(user => {
                 modifyConfig(config => {
                     config.screenNameMap[id] = {
                         screenName: user["screen_name"],
@@ -73,7 +77,7 @@ function getScreenName(id, tokens) {
     });
 }
 function getUserId(screenName, tokens) {
-    return callTwitterApi("GET", "https://api.twitter.com/1.1/users/show.json", {screen_name: screenName}, tokens).then(user => Promise.resolve(user["id"]));
+    return getUser(screenName).then(user => Promise.resolve(user["id"]));
 }
 
 // 1個以上の文字数が不明な文字列を用いて140文字以内のツイートを作る、という問題の解決を助ける関数

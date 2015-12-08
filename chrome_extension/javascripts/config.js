@@ -113,6 +113,18 @@ $(() => {
         }).catch(e => { alert(e.message); });
     });
 
+    if (loadConfig().authInfo !== null) {
+        getUser(loadConfig().authInfo.userId).then(user => {
+            $("#authenticated_user_profile_image").attr("src", user["profile_image_url_https"]);
+            $("#authenticated_user_name").text(user["name"]);
+            $("#authenticated_user_screen_name").text(user["screen_name"]);
+            $("#authenticated_user_twitter_link").attr("href", `https://twitter.com/${user["screen_name"]}`);
+        }).catch(() => {
+            $("#authenticated_user div[class='panel-body']").text("エラーにより表示できませんでした");
+        });
+    } else {
+        $("#authenticated_user").css("display", "none");
+    }
     $("#oauth_button").click(onOAuthButtonClickHandler);
 
     $("#post_automatically_checkbox_group input").each(function () {
