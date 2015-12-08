@@ -23,95 +23,101 @@ $(() => {
         $("#add_url_text").val("");
     });
 
-    function flushCurrentRecipient() {
-        let recipientId = loadConfig().replySetting[loadConfig().authInfo.userId].recipientId;
-        (recipientId === null ? Promise.resolve("無し") : getScreenName(recipientId)).then(screenName => {
-            $("#current_recipient").text(`現在の宛先: ${screenName}`);
-        });
-    }
-    function flushRecipients() {
-        let myReplySetting = loadConfig().replySetting[loadConfig().authInfo.userId];
-        $("#modify_recipient_select").empty();
-        $("#modify_recipient_select").append($('<option value="null">無し</option>'));
-        Promise.all([].concat(
-            myReplySetting.recipientIds.map(recipientId =>
-                getScreenName(recipientId).then(screenName =>
-                    Promise.resolve($(document.createElement("option")).attr("value", recipientId).text(screenName))
-                )
-            ),
-            Object.keys(myReplySetting.replyIdForPermissionMap).map(str => parseInt(str, 10)).map(recipientId =>
-                getScreenName(recipientId).then(screenName =>
-                    Promise.resolve($(document.createElement("option")).attr("value", recipientId).prop("disabled", true).text(`${screenName}（許可待ち）`))
-                )
-            )
-        )).then(options => {
-            options.sort((x, y) => x.text() < y.text() ? 1 : -1);
-            for (let option of options) {
-                $("#modify_recipient_select").append(option);
-            }
-            $("#modify_recipient_select").val(String(myReplySetting.recipientId));
-        });
-    }
-    flushCurrentRecipient();
-    getMentions().then(statuses => {
-        let config = loadConfig();
-        let myReplySetting = config.replySetting[config.authInfo.userId];
-
-        let replyIdToRecipientId = {};
-        for (let recipientId of Object.keys(myReplySetting.replyIdForPermissionMap).map(str => parseInt(str, 10))) {
-            let replyId = myReplySetting.replyIdForPermissionMap[recipientId];
-            replyIdToRecipientId[replyId] = recipientId;
+    if (loadConfig().authInfo !== null) {
+        function flushCurrentRecipient() {
+            let recipientId = loadConfig().replySetting[loadConfig().authInfo.userId].recipientId;
+            (recipientId === null ? Promise.resolve("無し") : getScreenName(recipientId)).then(screenName => {
+                $("#current_recipient").text(`現在の宛先: ${screenName}`);
+            });
         }
-
-        for (let status of statuses) {
-            if (replyIdToRecipientId.hasOwnProperty(status["in_reply_to_status_id"]) && replyIdToRecipientId[status["in_reply_to_status_id"]] == status["user"]["id"]) {
-                let recipientId = replyIdToRecipientId[status["in_reply_to_status_id"]];
-                delete myReplySetting.replyIdForPermissionMap[recipientId];
-                myReplySetting.recipientIds.push(recipientId);
-                getScreenName(recipientId).then(screenName => {
-                    notificate(`@${screenName}からリプライの許可が下りました`, 5);
-                });
-            }
+        function flushRecipients() {
+            let myReplySetting = loadConfig().replySetting[loadConfig().authInfo.userId];
+            $("#modify_recipient_select").empty();
+            $("#modify_recipient_select").append($('<option value="null">無し</option>'));
+            Promise.all([].concat(
+                myReplySetting.recipientIds.map(recipientId =>
+                    getScreenName(recipientId).then(screenName =>
+                        Promise.resolve($(document.createElement("option")).attr("value", recipientId).text(screenName))
+                    )
+                ),
+                Object.keys(myReplySetting.replyIdForPermissionMap).map(str => parseInt(str, 10)).map(recipientId =>
+                    getScreenName(recipientId).then(screenName =>
+                        Promise.resolve($(document.createElement("option")).attr("value", recipientId).prop("disabled", true).text(`${screenName}（許可待ち）`))
+                    )
+                )
+            )).then(options => {
+                options.sort((x, y) => x.text() < y.text() ? 1 : -1);
+                for (let option of options) {
+                    $("#modify_recipient_select").append(option);
+                }
+                $("#modify_recipient_select").val(String(myReplySetting.recipientId));
+            });
         }
-
-        saveConfig(config);
-    }).catch(() => Promise.resolve()).then(flushRecipients);
-    $("#modify_recipient_button").click(() => {
-        modifyConfig(config => {
-            config.replySetting[config.authInfo.userId].recipientId = ($("#modify_recipient_select").val() == "null" ? null : parseInt($("#modify_recipient_select").val(), 10));
-        });
         flushCurrentRecipient();
-    });
+        getMentions().then(statuses => {
+            let config = loadConfig();
+            let myReplySetting = config.replySetting[config.authInfo.userId];
 
-    $("#new_recipient_text").on("keydown", () => {
-        setTimeout(() => {
-            $("#new_recipient_button").prop("disabled", $("#new_recipient_text").val() == "");
-            $("#new_recipient").text($("#new_recipient_text").val());
-            $("#permission_message").text(sprintf(TWEET_PHRASES.GET_PERMISSION, {recipient: $("#new_recipient_text").val()}));
-        }, 0);
-    });
-    $("#new_recipient_text").trigger("keydown");
-    $("#new_recipient_button").click(() => {
-        let screenName = $("#new_recipient_text").val();
-        $("#new_recipient_text").val("");
-        $("#new_recipient_text").trigger("keydown");
-        getUserId(screenName).then(recipientId => {
-            if (loadConfig().replySetting[loadConfig().authInfo.userId].recipientIds.indexOf(recipientId) == -1) {
-                let message = sprintf(TWEET_PHRASES.GET_PERMISSION, {recipient: screenName});
-                if (confirmTweet(message, false)) {
-                    return tweet(message).then(status => {
-                        modifyConfig(config => {
-                            config.replySetting[config.authInfo.userId].replyIdForPermissionMap[recipientId] = status["id"];
-                        });
-                        flushRecipients();
-                        notificate(`@${screenName}にリプライを送りました`, 5);
+            let replyIdToRecipientId = {};
+            for (let recipientId of Object.keys(myReplySetting.replyIdForPermissionMap).map(str => parseInt(str, 10))) {
+                let replyId = myReplySetting.replyIdForPermissionMap[recipientId];
+                replyIdToRecipientId[replyId] = recipientId;
+            }
+
+            for (let status of statuses) {
+                if (replyIdToRecipientId.hasOwnProperty(status["in_reply_to_status_id"]) && replyIdToRecipientId[status["in_reply_to_status_id"]] == status["user"]["id"]) {
+                    let recipientId = replyIdToRecipientId[status["in_reply_to_status_id"]];
+                    delete myReplySetting.replyIdForPermissionMap[recipientId];
+                    myReplySetting.recipientIds.push(recipientId);
+                    getScreenName(recipientId).then(screenName => {
+                        notificate(`@${screenName}からリプライの許可が下りました`, 5);
                     });
                 }
-            } else {
-                notificate(`@${screenName}からは既に許可を得ています`, 5);
             }
-        }).catch(e => { alert(e.message); });
-    });
+
+            saveConfig(config);
+        }).catch(() => Promise.resolve()).then(flushRecipients);
+        $("#modify_recipient_button").click(() => {
+            modifyConfig(config => {
+                config.replySetting[config.authInfo.userId].recipientId = ($("#modify_recipient_select").val() == "null" ? null : parseInt($("#modify_recipient_select").val(), 10));
+            });
+            flushCurrentRecipient();
+        });
+
+        $("#new_recipient_text").on("keydown", () => {
+            setTimeout(() => {
+                $("#new_recipient_button").prop("disabled", $("#new_recipient_text").val() == "");
+                $("#new_recipient").text($("#new_recipient_text").val());
+                $("#permission_message").text(sprintf(TWEET_PHRASES.GET_PERMISSION, {recipient: $("#new_recipient_text").val()}));
+            }, 0);
+        });
+        $("#new_recipient_text").trigger("keydown");
+        $("#new_recipient_button").click(() => {
+            let screenName = $("#new_recipient_text").val();
+            $("#new_recipient_text").val("");
+            $("#new_recipient_text").trigger("keydown");
+            getUserId(screenName).then(recipientId => {
+                if (loadConfig().replySetting[loadConfig().authInfo.userId].recipientIds.indexOf(recipientId) == -1) {
+                    let message = sprintf(TWEET_PHRASES.GET_PERMISSION, {recipient: screenName});
+                    if (confirmTweet(message, false)) {
+                        return tweet(message).then(status => {
+                            modifyConfig(config => {
+                                config.replySetting[config.authInfo.userId].replyIdForPermissionMap[recipientId] = status["id"];
+                            });
+                            flushRecipients();
+                            notificate(`@${screenName}にリプライを送りました`, 5);
+                        });
+                    }
+                } else {
+                    notificate(`@${screenName}からは既に許可を得ています`, 5);
+                }
+            }).catch(e => { alert(e.message); });
+        });
+    } else {
+        $("#current_recipient").parent().prev("h2").css("display", "none");
+        $("#current_recipient").parent().css("display", "none");
+        $("#new_recipient").parent().css("display", "none");
+    }
 
     if (loadConfig().authInfo !== null) {
         getUser(loadConfig().authInfo.userId).then(user => {
