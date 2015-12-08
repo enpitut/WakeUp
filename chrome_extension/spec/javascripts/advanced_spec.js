@@ -147,6 +147,77 @@ describe("詳細設定から設定できる機能", () => {
         popup.$("#task_time_text").val("0");
         popup.$("#start_button").click();
     });
+    it("ブロックサイトについてツイートする設定をしていてブロックサイトを閲覧したときサボり通知ツイートにタブの情報を含める", done => {
+        setMock(background, {
+            wait: 10,
+            getCurrentTab: () => Promise.resolve({
+                id: 0,
+                windowId: 0,
+                url: "http://www.nicovideo.jp/",
+                title: "niconico"
+            }),
+            tweet(message) {
+                expect(message).toContain("niconico( http://www.nicovideo.jp/ )");
+                setTimeout(done, 0);
+                return Promise.resolve();
+            }
+        });
+        setMock(popup, {});
+        setMock(config, {});
+        config.$("#tweet_tab_info_checkbox").click();
+        popup.$("#task_time_text").val("1");
+        popup.$("#start_button").click();
+    });
+    it("ブロックサイトについてツイートする設定をしていてブロックサイトを閲覧したときツイートを拒否できる", done => {
+        setMock(background, {
+            wait: 10,
+            getCurrentTab: () => Promise.resolve({
+                id: 0,
+                windowId: 0,
+                url: "http://www.nicovideo.jp/",
+                title: "niconico"
+            }),
+            confirmTweet(message) {
+                expect(message).toContain("niconico( http://www.nicovideo.jp/ )");
+                setTimeout(done, 0);
+                return false;
+            },
+            tweet(message) {
+                fail("tweet()が呼ばれた");
+                return Promise.resolve();
+            }
+        });
+        setMock(popup, {});
+        setMock(config, {});
+        config.$("#tweet_tab_info_checkbox").click();
+        popup.$("#task_time_text").val("1");
+        popup.$("#start_button").click();
+    });
+    it("コンテキストメニューからブロックサイトを追加・削除する", () => {
+        setMock(background, {});
+        setMock(popup, {});
+        setMock(config, {});
+        expect(background.isNgSite("http://www.pixiv.net/")).toBe(false);
+        config.$("#show_register_ngsite_button_checkbox").click();
+        config.chrome.contextMenus.onClicked.dispatch({
+            menuItemId: "register_ngsite_button",
+        }, {
+            id: 0,
+            windowId: 0,
+            url: "http://www.pixiv.net/",
+            title: "[pixiv]"
+        });
+        expect(background.isNgSite("http://www.pixiv.net/")).toBe(true);
+        config.chrome.contextMenus.onClicked.dispatch({
+            menuItemId: "remove_ngsite_button",
+        }, {
+            id: 0,
+            windowId: 0,
+            url: "http://www.pixiv.net/",
+            title: "[pixiv]"
+        });
+        expect(background.isNgSite("http://www.pixiv.net/")).toBe(false);
+    });
     it("ブロックサイトについてツイートする設定をしていてブロックサイトを閲覧したとき確認ダイアログを出さずツイートする", done => {
         setMock(background, {
             wait: 10,
@@ -259,77 +330,6 @@ describe("詳細設定から設定できる機能", () => {
         popup.$("#task_time_text").val("1");
         popup.$("#start_button").click();
         popup.$("#end_button").click();
-    });
-    it("ブロックサイトについてツイートする設定をしていてブロックサイトを閲覧したときサボり通知ツイートにタブの情報を含める", done => {
-        setMock(background, {
-            wait: 10,
-            getCurrentTab: () => Promise.resolve({
-                id: 0,
-                windowId: 0,
-                url: "http://www.nicovideo.jp/",
-                title: "niconico"
-            }),
-            tweet(message) {
-                expect(message).toContain("niconico( http://www.nicovideo.jp/ )");
-                setTimeout(done, 0);
-                return Promise.resolve();
-            }
-        });
-        setMock(popup, {});
-        setMock(config, {});
-        config.$("#tweet_tab_info_checkbox").click();
-        popup.$("#task_time_text").val("1");
-        popup.$("#start_button").click();
-    });
-    it("ブロックサイトについてツイートする設定をしていてブロックサイトを閲覧したときツイートを拒否できる", done => {
-        setMock(background, {
-            wait: 10,
-            getCurrentTab: () => Promise.resolve({
-                id: 0,
-                windowId: 0,
-                url: "http://www.nicovideo.jp/",
-                title: "niconico"
-            }),
-            confirmTweet(message) {
-                expect(message).toContain("niconico( http://www.nicovideo.jp/ )");
-                setTimeout(done, 0);
-                return false;
-            },
-            tweet(message) {
-                fail("tweet()が呼ばれた");
-                return Promise.resolve();
-            }
-        });
-        setMock(popup, {});
-        setMock(config, {});
-        config.$("#tweet_tab_info_checkbox").click();
-        popup.$("#task_time_text").val("1");
-        popup.$("#start_button").click();
-    });
-    it("コンテキストメニューからブロックサイトを追加・削除する", () => {
-        setMock(background, {});
-        setMock(popup, {});
-        setMock(config, {});
-        expect(background.isNgSite("http://www.pixiv.net/")).toBe(false);
-        config.$("#show_register_ngsite_button_checkbox").click();
-        config.chrome.contextMenus.onClicked.dispatch({
-            menuItemId: "register_ngsite_button",
-        }, {
-            id: 0,
-            windowId: 0,
-            url: "http://www.pixiv.net/",
-            title: "[pixiv]"
-        });
-        expect(background.isNgSite("http://www.pixiv.net/")).toBe(true);
-        config.chrome.contextMenus.onClicked.dispatch({
-            menuItemId: "remove_ngsite_button",
-        }, {
-            id: 0,
-            windowId: 0,
-            url: "http://www.pixiv.net/",
-            title: "[pixiv]"
-        });
-        expect(background.isNgSite("http://www.pixiv.net/")).toBe(false);
     });
 });
 ;
