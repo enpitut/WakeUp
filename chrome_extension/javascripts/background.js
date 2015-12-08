@@ -38,7 +38,7 @@ function mainLoop() {
         if (recipientId !== null) {
             getScreenName(recipientId).then(screenName => {
                 let now = new Date();
-                tweet(generateTweet(
+                let message = generateTweet(
                     element => sprintf(TWEET_PHRASES.FAILED.WITH_RECIPIENT, { recipient: screenName, taskDescription: element, date: now }),
                     {
                         element: taskDescription,
@@ -48,11 +48,14 @@ function mainLoop() {
                             return `「${getShortenedString(8) }...」の作業`;
                         }
                     }
-                    )).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });
+                );
+                if (loadConfig().postAutomatically.failed.withRecipient || confirmTweet(message, true)) {
+                    tweet(message).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });
+                }
             });
         } else {
             let now = new Date();
-            tweet(generateTweet(
+            let message = generateTweet(
                 element => sprintf(TWEET_PHRASES.FAILED.WITHOUT_RECIPIENT, { taskDescription: element, date: now }),
                 {
                     element: taskDescription,
@@ -62,7 +65,10 @@ function mainLoop() {
                         return `「${getShortenedString(8) }...」の作業`;
                     }
                 }
-                )).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });
+            );
+            if (loadConfig().postAutomatically.failed.withoutRecipient || confirmTweet(message, true)) {
+                tweet(message).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });
+            }
         }
         stopTimer();
         return;
@@ -80,7 +86,7 @@ function mainLoop() {
                 if (loadConfig().tweetTabInfo) {
                     saboriNum++;
                     let now = new Date();
-                    tweet(generateTweet(
+                    let message = generateTweet(
                         (element1, element2) => sprintf(TWEET_PHRASES.WATCHED_NG_SITES.WITH_TAB_INFO, { taskDescription: element1, siteName: element2, siteUrl: currentTab.url, date: now }),
                         {
                             element: taskDescription,
@@ -97,10 +103,13 @@ function mainLoop() {
                                 else return `${getShortenedString(3) }...`;
                             }
                         }
-                        )).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });;
+                    );
+                    if (loadConfig().postAutomatically.watchedNgSites.withTabInfo || confirmTweet(message, true)) {
+                        tweet(message).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });
+                    }
                 } else {
                     let now = new Date();
-                    tweet(generateTweet(
+                    let message = generateTweet(
                         element => sprintf(TWEET_PHRASES.WATCHED_NG_SITES.WITHOUT_TAB_INFO, { taskDescription: element, date: now }),
                         {
                             element: taskDescription,
@@ -110,7 +119,10 @@ function mainLoop() {
                                 return `「${getShortenedString(5) }...」`;
                             }
                         }
-                        )).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });;
+                    );
+                    if (loadConfig().postAutomatically.watchedNgSites.withoutTabInfo || confirmTweet(message, true)) {
+                        tweet(message).then(() => { notificate("tweetしたよ^_^", 5); }).catch(e => { alert(e.message); });
+                    }
                 }
                 chrome.tabs.update(currentTab.id, { url: "chrome://newtab/" });
                 stayNgSiteSeconds = 0;
@@ -198,18 +210,26 @@ $(() => {
             showRegisterNgSiteButton: false
         });
     }
-
     if (loadConfig().version == 1) {
         modifyConfig(config => {
             config.version++;
             config.taskLog = [];
         });
     }
+    if (loadConfig().version == 2) {
+        modifyConfig(config => {
+            config.version++;
+            config.postAutomatically = {
+                watchedNgSites: {withTabInfo: false, withoutTabInfo: false},
+                failed: {withRecipient: false, withoutRecipient: false},
+                successed: false
+            };
+        });
+    }
 
     if (loadConfig().showRegisterNgSiteButton) {
         createRegisterNgSiteButton();
     }
-
 });
 
 function saveTaskLog(isSuccess) {

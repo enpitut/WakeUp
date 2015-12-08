@@ -13,6 +13,7 @@
 <script type="text/javascript" src="javascripts/common.js"></script>
 <script type="text/javascript" src="javascripts/config.js"></script>
 <link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css" type="text/css">
+<link rel="stylesheet" href="config.css" type="text/css">
 </head>
 <body>
 <div class="container">
@@ -62,12 +63,45 @@
             <input type="button" value="連携" id="oauth_button" class="btn btn-primary">
         </p>
         <h2 class="sub-header">追加機能</h2>
-        <div class="well">
-            <p>
-            <input type="checkbox" id="tweet_tab_info_checkbox">サボり通知ツイートにタブの情報を含める
-            </p>
-            <input type="checkbox" id="show_register_ngsite_button_checkbox">コンテキストメニューにNGサイト登録機能を表示する
-        </div>
+        <ul class="list-group">
+            <li class="list-group-item">
+                <input type="checkbox" id="tweet_tab_info_checkbox">ブロックサイトを閲覧したとき、何のサイトを閲覧していたかについてもツイートする
+            </li>
+            <li class="list-group-item">
+                <input type="checkbox" id="show_register_ngsite_button_checkbox">コンテキストメニューにNGサイト登録機能を表示する
+            </li>
+            <li id="post_automatically_checkbox_group" class="list-group-item">
+                <p>以下のとき確認ダイアログを出さずにツイートする</p>
+                <div class="panel panel-default">
+                    <div class="panel-heading">ブロックサイトを閲覧したとき</div>
+                    <div class="panel-body">
+                        <p>
+                            <input type="checkbox" data-property="watchedNgSites.withTabInfo">ブロックサイトについてツイートする設定をしているとき（<span class="show_tweet_example">送信されるツイートの例</span>）
+                        </p>
+                        <p>
+                            <input type="checkbox" data-property="watchedNgSites.withoutTabInfo">ブロックサイトについてツイートしない設定をしているとき（<span class="show_tweet_example">送信されるツイートの例</span>）
+                        </p>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">作業が見積もり時間内に完了しなかったとき</div>
+                    <div class="panel-body">
+                        <p>
+                            <input type="checkbox" data-property="failed.withRecipient">リプライ相手を設定しているとき（<span class="show_tweet_example">送信されるツイートの例</span>）
+                        </p>
+                        <p>
+                            <input type="checkbox" data-property="failed.withoutRecipient">リプライ相手を設定していないとき（<span class="show_tweet_example">送信されるツイートの例</span>）
+                        </p>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <input type="checkbox" data-property="successed">作業が見積もり時間内に完了したとき（<span class="show_tweet_example">送信されるツイートの例</span>）
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <blockquote id="tweet_example"></blockquote>
     </div>
 </div>
 </body>

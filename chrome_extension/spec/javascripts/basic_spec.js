@@ -51,11 +51,45 @@ describe("基本機能", () => {
         popup.$("#start_button").click();
         popup.$("#end_button").click();
     });
+    it("タスクが見積もり時間内に終わったときツイートを拒否できる", done => {
+        setMock(background, {
+            tweet(message) {
+                fail("tweet()が呼ばれた")
+                return Promise.resolve();
+            }
+        });
+        setMock(popup, {
+            confirmTweet(message) {
+                expect(message).toContain("1分かかると見積もった作業を0分で終えました");
+                setTimeout(done, 0);
+                return false;
+            }
+        });
+        popup.$("#task_time_text").val("1");
+        popup.$("#start_button").click();
+        popup.$("#end_button").click();
+    });
     it("タスクが見積もり時間内に終わらなかったときツイートする", done => {
         setMock(background, {
             tweet(message) {
                 expect(message).toContain("私は作業時間の見積もりに失敗しました");
                 setTimeout(done, 0);
+                return Promise.resolve();
+            }
+        });
+        setMock(popup, {});
+        popup.$("#task_time_text").val("0");
+        popup.$("#start_button").click();
+    });
+    it("タスクが見積もり時間内に終わらなかったときツイートを拒否できる", done => {
+        setMock(background, {
+            confirmTweet(message) {
+                expect(message).toContain("私は作業時間の見積もりに失敗しました");
+                setTimeout(done, 0);
+                return false;
+            },
+            tweet(message) {
+                fail("tweet()が呼ばれた")
                 return Promise.resolve();
             }
         });
@@ -106,6 +140,29 @@ describe("基本機能", () => {
             tweet(message) {
                 expect(message).toContain("作業をサボっていました");
                 partiallyDone();
+                return Promise.resolve();
+            }
+        });
+        setMock(popup, {});
+        popup.$("#task_time_text").val("2");
+        popup.$("#start_button").click();
+    });
+    it("警告を無視してブロックサイトを閲覧し続けているときのサボり通知ツイートを拒否できる", done => {
+        setMock(background, {
+            wait: 10,
+            getCurrentTab: () => Promise.resolve({
+                id: 0,
+                windowId: 0,
+                url: "http://www.nicovideo.jp/",
+                title: "niconico"
+            }),
+            confirmTweet(message) {
+                expect(message).toContain("作業をサボっていました");
+                setTimeout(done, 0);
+                return false;
+            },
+            tweet(message) {
+                fail("tweet()が呼ばれた");
                 return Promise.resolve();
             }
         });

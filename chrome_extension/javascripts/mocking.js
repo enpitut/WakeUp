@@ -50,6 +50,7 @@ if (location.protocol != "chrome-extension:") {
                 "UGEN_bot": 3315564288,
                 "UGEN_teacher": 3356282660
             }[screenName]);
+            window.confirmTweet = () => true;
             window.notificate = () => {};
             window.getCurrentTab = () => Promise.resolve({
                 id: 0,

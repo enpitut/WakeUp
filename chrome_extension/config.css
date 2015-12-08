@@ -1,0 +1,10 @@
+.show_tweet_example {
+    color: #0000ff;
+    text-decoration: underline;
+    cursor: pointer;
+}
+#tweet_example {
+    display: none;
+    position: absolute;
+    background-color: #ffffff;
+}

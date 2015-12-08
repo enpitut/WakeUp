@@ -124,7 +124,30 @@ describe("詳細設定から設定できる機能", () => {
         popup.$("#task_time_text").val("0");
         popup.$("#start_button").click();
     });
-    it("サボり通知ツイートにタブの情報を含める", done => {
+    it("リプライ相手を設定していてタスクが見積もり時間内に終わらなかったとき謝罪リプライを拒否できる", done => {
+        setMock(background, {
+            confirmTweet(message) {
+                expect(message).toContain("@UGEN_teacher");
+                expect(message).toContain("申し訳ありません");
+                setTimeout(done, 0);
+                return false;
+            },
+            tweet(message) {
+                fail("tweet()が呼ばれた");
+                return Promise.resolve();
+            }
+        });
+        background.modifyConfig(config => {
+            let myReplySetting = config.replySetting[config.authInfo.userId];
+            myReplySetting.recipientId = 3356282660;
+            myReplySetting.recipientIds.push(3356282660);
+        });
+        setMock(popup, {});
+        setMock(config, {});
+        popup.$("#task_time_text").val("0");
+        popup.$("#start_button").click();
+    });
+    it("ブロックサイトについてツイートする設定をしていてブロックサイトを閲覧したときサボり通知ツイートにタブの情報を含める", done => {
         setMock(background, {
             wait: 10,
             getCurrentTab: () => Promise.resolve({
@@ -136,6 +159,31 @@ describe("詳細設定から設定できる機能", () => {
             tweet(message) {
                 expect(message).toContain("niconico( http://www.nicovideo.jp/ )");
                 setTimeout(done, 0);
+                return Promise.resolve();
+            }
+        });
+        setMock(popup, {});
+        setMock(config, {});
+        config.$("#tweet_tab_info_checkbox").click();
+        popup.$("#task_time_text").val("1");
+        popup.$("#start_button").click();
+    });
+    it("ブロックサイトについてツイートする設定をしていてブロックサイトを閲覧したときツイートを拒否できる", done => {
+        setMock(background, {
+            wait: 10,
+            getCurrentTab: () => Promise.resolve({
+                id: 0,
+                windowId: 0,
+                url: "http://www.nicovideo.jp/",
+                title: "niconico"
+            }),
+            confirmTweet(message) {
+                expect(message).toContain("niconico( http://www.nicovideo.jp/ )");
+                setTimeout(done, 0);
+                return false;
+            },
+            tweet(message) {
+                fail("tweet()が呼ばれた");
                 return Promise.resolve();
             }
         });
@@ -169,6 +217,119 @@ describe("詳細設定から設定できる機能", () => {
             title: "[pixiv]"
         });
         expect(background.isNgSite("http://www.pixiv.net/")).toBe(false);
+    });
+    it("ブロックサイトについてツイートする設定をしていてブロックサイトを閲覧したとき確認ダイアログを出さずツイートする", done => {
+        setMock(background, {
+            wait: 10,
+            getCurrentTab: () => Promise.resolve({
+                id: 0,
+                windowId: 0,
+                url: "http://www.nicovideo.jp/",
+                title: "niconico"
+            }),
+            confirmTweet(message) {
+                fail("confirmTweet()が呼ばれた");
+                return true;
+            },
+            tweet(message) {
+                expect(message).toContain("niconico( http://www.nicovideo.jp/ )");
+                setTimeout(done, 0);
+                return Promise.resolve();
+            }
+        });
+        setMock(popup, {});
+        setMock(config, {});
+        config.$("#post_automatically_checkbox_group input[data-property='watchedNgSites.withTabInfo']").click();
+        config.$("#tweet_tab_info_checkbox").click();
+        popup.$("#task_time_text").val("1");
+        popup.$("#start_button").click();
+    });
+    it("ブロックサイトについてツイートしない設定をしていてブロックサイトを閲覧したとき確認ダイアログを出さずツイートする", done => {
+        setMock(background, {
+            wait: 10,
+            getCurrentTab: () => Promise.resolve({
+                id: 0,
+                windowId: 0,
+                url: "http://www.nicovideo.jp/",
+                title: "niconico"
+            }),
+            confirmTweet(message) {
+                fail("confirmTweet()が呼ばれた");
+                return true;
+            },
+            tweet(message) {
+                expect(message).toContain("作業をサボっていました");
+                setTimeout(done, 0);
+                return Promise.resolve();
+            }
+        });
+        setMock(popup, {});
+        setMock(config, {});
+        config.$("#post_automatically_checkbox_group input[data-property='watchedNgSites.withoutTabInfo']").click();
+        popup.$("#task_time_text").val("2");
+        popup.$("#start_button").click();
+    });
+    it("リプライ相手を設定していてタスクが見積もり時間内に終わらなかったとき確認ダイアログを出さずにツイートする", done => {
+        setMock(background, {
+            confirmTweet(message) {
+                fail("confirmTweet()が呼ばれた");
+                return true;
+            },
+            tweet(message) {
+                expect(message).toContain("@UGEN_teacher");
+                expect(message).toContain("申し訳ありません");
+                setTimeout(done, 0);
+                return Promise.resolve();
+            }
+        });
+        background.modifyConfig(config => {
+            let myReplySetting = config.replySetting[config.authInfo.userId];
+            myReplySetting.recipientId = 3356282660;
+            myReplySetting.recipientIds.push(3356282660);
+        });
+        setMock(popup, {});
+        setMock(config, {});
+        config.$("#post_automatically_checkbox_group input[data-property='failed.withRecipient']").click();
+        popup.$("#task_time_text").val("0");
+        popup.$("#start_button").click();
+    });
+    it("リプライ相手を未設定でタスクが見積もり時間内に終わらなかったとき確認ダイアログを出さずにツイートする", done => {
+        setMock(background, {
+            confirmTweet(message) {
+                fail("confirmTweet()が呼ばれた");
+                return true;
+            },
+            tweet(message) {
+                expect(message).toContain("私は作業時間の見積もりに失敗しました");
+                setTimeout(done, 0);
+                return Promise.resolve();
+            }
+        });
+        setMock(popup, {});
+        setMock(config, {});
+        config.$("#post_automatically_checkbox_group input[data-property='failed.withoutRecipient']").click();
+        popup.$("#task_time_text").val("0");
+        popup.$("#start_button").click();
+    });
+    it("タスクが見積もり時間内に終わったとき確認ダイアログを出さずにツイートする", done => {
+        setMock(background, {
+            tweet(message) {
+                expect(message).toContain("1分かかると見積もった作業を0分で終えました");
+                setTimeout(done, 0);
+                return Promise.resolve();
+            }
+        });
+        setMock(popup, {
+            confirmTweet(message) {
+                fail("confirmTweet()が呼ばれた");
+                return true;
+            }
+        });
+        setMock(config, {});
+        config.$("#post_automatically_checkbox_group input[data-property='successed']").click();
+        popup.$("#task_time_text").val("1");
+        popup.$("#start_button").click();
+        popup.$("#end_button").click();
     });
 });
 ;
