@@ -81,10 +81,10 @@ $(() => {
         if (loadConfig().postAutomatically.successed || confirmTweet(message, true)) {
             bg.tweet(message).then(() => { bg.notificate("tweetしたよ^_^", 5); }).catch(e => { bg.alert(e.message); });
         }
+        bg.saveTaskLog(true);
         bg.notifyRank();
         bg.stopTimer();
         refreshPageContent();
-        bg.saveTaskLog(true);
         $("#task_description_text").val("");
         $("#task_description_text").blur();
     });
@@ -93,8 +93,8 @@ $(() => {
         open(optionsUrl);
     });
     $("#goto_tasklog").click(() => {
-        let tasklogUrl = chrome.extension.getURL("task_log.html");
-        open(tasklogUrl);
+        let taskLogUrl = chrome.extension.getURL("task_log.html");
+        open(taskLogUrl);
     });
     $("#oauth_button").click(onOAuthButtonClickHandler);
     refreshPageContent();

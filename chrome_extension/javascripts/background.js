@@ -33,6 +33,7 @@ function mainLoop() {
         chrome.browserAction.setBadgeBackgroundColor({ color: [255, 0, 0, 100] });
     }
     if (elapsedSeconds >= limitSeconds) {
+        saveTaskLog(false);
         let recipientId = loadConfig().replySetting[loadConfig().authInfo.userId].recipientId;
         if (recipientId !== null) {
             getScreenName(recipientId).then(screenName => {
@@ -229,7 +230,6 @@ $(() => {
     if (loadConfig().showRegisterNgSiteButton) {
         createRegisterNgSiteButton();
     }
-
 });
 
 function saveTaskLog(isSuccess) {
