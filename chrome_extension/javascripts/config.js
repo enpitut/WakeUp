@@ -186,12 +186,12 @@ $(() => {
     $("#show_loop_button_checkbox").change(function () {
         if ($(this).is(":checked")) {
 			modifyConfig(config=>{
-					config.showLoopButton = True;
+					config.showLoopButton = true;
 				});
             $("#loop").css("display","block");
         } else {
 	 		modifyConfig(config=>{
-	  			config.showLoopButton = False;
+	  			config.showLoopButton = false;
 				});
             $("#loop").css("display","none");
         }
