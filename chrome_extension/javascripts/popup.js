@@ -78,7 +78,7 @@ $(() => {
                 }
             }
         );
-        if (loadConfig().postAutomatically.successed || confirmTweet(message, true)) {
+        if (loadConfig().postAutomatically.successed || bg.confirmTweet(message, true)) {
             bg.tweet(message).then(() => { bg.notificate("tweetしたよ^_^", 5); }).catch(e => { bg.alert(e.message); });
         }
         bg.saveTaskLog(true);

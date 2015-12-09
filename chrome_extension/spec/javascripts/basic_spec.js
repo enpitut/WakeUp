@@ -53,18 +53,17 @@ describe("基本機能", () => {
     });
     it("タスクが見積もり時間内に終わったときツイートを拒否できる", done => {
         setMock(background, {
+            confirmTweet(message) {
+                expect(message).toContain("1分かかると見積もった作業を0分で終えました");
+                setTimeout(done, 0);
+                return false;
+            },
             tweet(message) {
                 fail("tweet()が呼ばれた")
                 return Promise.resolve();
             }
         });
-        setMock(popup, {
-            confirmTweet(message) {
-                expect(message).toContain("1分かかると見積もった作業を0分で終えました");
-                setTimeout(done, 0);
-                return false;
-            }
-        });
+        setMock(popup, {});
         popup.$("#task_time_text").val("1");
         popup.$("#start_button").click();
         popup.$("#end_button").click();
