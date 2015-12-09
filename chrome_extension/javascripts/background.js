@@ -125,7 +125,7 @@ function mainLoop() {
                     }
                 }
                 chrome.tabs.update(currentTab.id, { url: "chrome://newtab/" });
-	stayNgSiteSeconds = 0;
+    stayNgSiteSeconds = 0;
 break;
 }
 next();
@@ -192,91 +192,91 @@ function stopTimer() {
 
 function isNgSite(targetUrl) {
     return loadConfig().urlList.map(url => new RegExp(url.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1"))).some(re => targetUrl.match(re));
-									}
+                                    }
 
-		function notifyRank() {
-		searchTweets("#UGEN")
-			.then(responseJson => {
-					let re = /\d+分かかると見積もった.*を(\d+)分で終えました!/;
-					let userIds = [...new Set(
+        function notifyRank() {
+        searchTweets("#UGEN")
+            .then(responseJson => {
+                    let re = /\d+分かかると見積もった.*を(\d+)分で終えました!/;
+                    let userIds = [...new Set(
                 responseJson.statuses
-				.filter(status => status.lang == "ja" && status.text.match(re))
-				.filter(status => new Date(status.created_at).toDateString() == new Date().toDateString()) //toDateString()で日付だけを取得できる
-				.map(status => status.user.id)
-				.concat([loadConfig().authInfo.userId])
-											  )];
+                .filter(status => status.lang == "ja" && status.text.match(re))
+                .filter(status => new Date(status.created_at).toDateString() == new Date().toDateString()) //toDateString()で日付だけを取得できる
+                .map(status => status.user.id)
+                .concat([loadConfig().authInfo.userId])
+                                              )];
 
-					return Promise.all(userIds.map(userId => readTimeline(userId)
-												   .then(statuses => [
-																	  userId,
-																	  statuses.filter(status => status.text.match(re))
-																	  .filter(status => new Date(status.created_at).toDateString() == new Date().toDateString()) //toDateString()で日付だけを取得できる
-																	  .map(status => Number(status.text.match(re)[1]))
-																	  .reduce((sum, minutes) => sum + minutes, 0)])
-												   )).then(pairs => new Map(pairs));
-				}).then(workTimeMap => {
-						let myWorkTime = Math.round((elapsedSeconds / 60) + workTimeMap.get(loadConfig().authInfo.userId));
-						let myRank = [...workTimeMap.values()].filter(workTime => workTime > myWorkTime).length + 1;
-						notificate(`今日のあなたの作業時間合計は${myWorkTime}分で、${workTimeMap.size}人中${myRank}位です！`, 5);
-					});
-	}
+                    return Promise.all(userIds.map(userId => readTimeline(userId)
+                                                   .then(statuses => [
+                                                                      userId,
+                                                                      statuses.filter(status => status.text.match(re))
+                                                                      .filter(status => new Date(status.created_at).toDateString() == new Date().toDateString()) //toDateString()で日付だけを取得できる
+                                                                      .map(status => Number(status.text.match(re)[1]))
+                                                                      .reduce((sum, minutes) => sum + minutes, 0)])
+                                                   )).then(pairs => new Map(pairs));
+                }).then(workTimeMap => {
+                        let myWorkTime = Math.round((elapsedSeconds / 60) + workTimeMap.get(loadConfig().authInfo.userId));
+                        let myRank = [...workTimeMap.values()].filter(workTime => workTime > myWorkTime).length + 1;
+                        notificate(`今日のあなたの作業時間合計は${myWorkTime}分で、${workTimeMap.size}人中${myRank}位です！`, 5);
+                    });
+    }
 
 
-	$(() => {
-			if (loadConfig() === null) {
-				saveConfig({
-						version: 1,
-						urlList: ["nicovideo.jp", "youtube.com"],
-						authInfo: null,
-						replySetting: {},
-						screenNameMap: {},
-						tweetTabInfo: false,
-						showRegisterNgSiteButton: false
-					});
-			}
-			if (loadConfig().version == 1) {
-				modifyConfig(config => {
-						config.version++;
-						config.taskLog = [];
-					});
-			}
-			if (loadConfig().version == 2) {
-				modifyConfig(config => {
-						config.version++;
-						config.postAutomatically = {
-							watchedNgSites: {withTabInfo: false, withoutTabInfo: false},
-							failed: {withRecipient: false, withoutRecipient: false},
-							successed: false
-						};
-					});
-			}
+    $(() => {
+            if (loadConfig() === null) {
+                saveConfig({
+                        version: 1,
+                        urlList: ["nicovideo.jp", "youtube.com"],
+                        authInfo: null,
+                        replySetting: {},
+                        screenNameMap: {},
+                        tweetTabInfo: false,
+                        showRegisterNgSiteButton: false
+                    });
+            }
+            if (loadConfig().version == 1) {
+                modifyConfig(config => {
+                        config.version++;
+                        config.taskLog = [];
+                    });
+            }
+            if (loadConfig().version == 2) {
+                modifyConfig(config => {
+                        config.version++;
+                        config.postAutomatically = {
+                            watchedNgSites: {withTabInfo: false, withoutTabInfo: false},
+                            failed: {withRecipient: false, withoutRecipient: false},
+                            successed: false
+                        };
+                    });
+            }
 
-			if (loadConfig().showRegisterNgSiteButton) {
-				createRegisterNgSiteButton();
-			}
-		});
+            if (loadConfig().showRegisterNgSiteButton) {
+                createRegisterNgSiteButton();
+            }
+        });
 
 function saveTaskLog(isSuccess) {
-	let config = loadConfig();
-	let taskLog = config.taskLog;
-	let today = new Date();
-	
-	if (taskLog.length == 0 || taskLog[taskLog.length - 1].date != today.toDateString()) {
-		taskLog.push({
-				date: today.toDateString(),
-					taskDescriptions: [],
-					workMinutes: 0,
-					saboriNum: 0,
-					successNum: 0
-					});
-	}
-	
-	let lastLog = taskLog[taskLog.length - 1];
-	lastLog.taskDescriptions.push(taskDescription);
-	lastLog.workMinutes += Math.floor(elapsedSeconds / 60);
-	lastLog.saboriNum += saboriNum;
-	if (isSuccess) lastLog.successNum++;
-		saveConfig(config);
+    let config = loadConfig();
+    let taskLog = config.taskLog;
+    let today = new Date();
+    
+    if (taskLog.length == 0 || taskLog[taskLog.length - 1].date != today.toDateString()) {
+        taskLog.push({
+                date: today.toDateString(),
+                    taskDescriptions: [],
+                    workMinutes: 0,
+                    saboriNum: 0,
+                    successNum: 0
+                    });
+    }
+    
+    let lastLog = taskLog[taskLog.length - 1];
+    lastLog.taskDescriptions.push(taskDescription);
+    lastLog.workMinutes += Math.floor(elapsedSeconds / 60);
+    lastLog.saboriNum += saboriNum;
+    if (isSuccess) lastLog.successNum++;
+        saveConfig(config);
 }
 
 

@@ -15,9 +15,9 @@ $(() => {
 
         $("#loop").css("display", "none");
         $("#default").css("display", "none");
-		if(loadConfig().showLoopButton=="True"){
-			$("#loop").css("display","block");
-		}
+        if(loadConfig().showLoopButton){
+            $("#loop").css("display","block");
+        }
 
         $("#guide_message").text({
             off: "ボタンを押すと監視がはじまるよ！",
@@ -43,7 +43,7 @@ $(() => {
             $("#start_control").css("display", "block");
             $("#oauth_control").css("display", "none");
         }
-		}
+        }
     let isEmptyDescription;
     $("#task_description_text").focus(() => {
         if (isEmptyDescription) {
@@ -57,7 +57,7 @@ $(() => {
             $("#task_description_text").val("（空欄でも可）");
             $("#task_description_text").css("color", "#999999");
         }
-	});
+    });
     $("#task_description_text").blur();
     
     $("#start_button").click(() => {
@@ -105,8 +105,8 @@ $(() => {
         refreshPageContent();
         $("#task_description_text").val("");
         $("#task_description_text").blur();
-	  });
-	}
+      });
+    }
     $("#goto_option").click(() => {
         let optionsUrl = chrome.extension.getURL("config.html");
         open(optionsUrl);
@@ -119,5 +119,5 @@ $(() => {
 
     $("#oauth_button").click(onOAuthButtonClickHandler);
         refreshPageContent();
-	});
+    });
 

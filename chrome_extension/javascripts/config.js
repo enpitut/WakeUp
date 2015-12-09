@@ -182,17 +182,17 @@ $(() => {
             chrome.contextMenus.removeAll();
         }
     });
-	
+    
     $("#show_loop_button_checkbox").change(function () {
         if ($(this).is(":checked")) {
-			modifyConfig(config=>{
-					config.showLoopButton = true;
-				});
+            modifyConfig(config=>{
+                    config.showLoopButton = true;
+                });
             $("#loop").css("display","block");
         } else {
-	 		modifyConfig(config=>{
-	  			config.showLoopButton = false;
-				});
+            modifyConfig(config=>{
+                config.showLoopButton = false;
+                });
             $("#loop").css("display","none");
         }
     });
