@@ -15,11 +15,9 @@ $(() => {
 
         $("#loop").css("display", "none");
         $("#default").css("display", "none");
-
-        $({
-            True: "#loop",
-            False: "#default",
-        }[getLocalStorageData("showLoopButton")]).css("display", "block");
+		if(loadConfig().showLoopButton=="True"){
+			$("#loop").css("display","block");
+		}
 
         $("#guide_message").text({
             off: "ボタンを押すと監視がはじまるよ！",
@@ -27,7 +25,17 @@ $(() => {
             on: "監視中",
         }[bg.timerState]);      
 
-        if(!getLocalStorageData("accessToken") || !getLocalStorageData("accessTokenSecret")) {
+        if(!loadConfig().accessToken || !loadConfig().accessTokenSecret) {
+        $("#idling_image").css("display", "none");
+        $("#resting_image").css("display", "none");
+        $("#running_image").css("display", "none");
+        $({
+            off: "#idling_image",
+            pause: "#resting_image",
+            on: "#running_image",
+        }[bg.timerState]).css("display", "block");
+       
+        if (loadConfig().authInfo === null) {
             $("#guide_message").text("Twitter連携をしてね！");
             $("#start_control").css("display", "none");
             $("#oauth_control").css("display", "block");
@@ -35,14 +43,12 @@ $(() => {
             $("#start_control").css("display", "block");
             $("#oauth_control").css("display", "none");
         }
-    }
-
-
+		}
     let isEmptyDescription;
     $("#task_description_text").focus(() => {
         if (isEmptyDescription) {
             $("#task_description_text").val("");
-            $("#task_description_text").css("color", "#000000");
+            $("#task_description_text").css("color", "#555555");
         }
     });
     $("#task_description_text").blur(() => {
@@ -51,7 +57,7 @@ $(() => {
             $("#task_description_text").val("（空欄でも可）");
             $("#task_description_text").css("color", "#999999");
         }
-    });
+	});
     $("#task_description_text").blur();
     
     $("#start_button").click(() => {
@@ -78,28 +84,40 @@ $(() => {
         refreshPageContent();
     });
     $("#end_button").click(() => {
-        bg.tweet(bg.generateTweet(
-            element => `${Math.round(bg.limitSeconds / 60)}分かかると見積もった${element}を${Math.round(bg.elapsedSeconds / 60)}分で終えました! ${new Date()} #UGEN`,
+        let now = new Date();
+        let message = generateTweet(
+            element => sprintf(TWEET_PHRASES.SUCCESSED, {taskDescription: element, estimatedMinutes: Math.round(bg.limitSeconds / 60), actualMinutes: Math.round(bg.elapsedSeconds / 60), date: now}),
             {
                 element: bg.taskDescription,
                 formatter(element, upperLimitLength, getShortenedString) {
                     if (element == "") return "作業";
                     if (element.length + 2 <= upperLimitLength) return `「${element}」`;
                     return `「${getShortenedString(5)}...」`;
-                },
+                }
             }
-        ), () => { bg.alert("tweetしたよ^_^"); });
+        );
+        if (loadConfig().postAutomatically.successed || bg.confirmTweet(message, true)) {
+            bg.tweet(message).then(() => { bg.notificate("tweetしたよ^_^", 5); }).catch(e => { bg.alert(e.message); });
+        }
+        bg.saveTaskLog(true);
         bg.notifyRank();
         bg.stopTimer();
         refreshPageContent();
         $("#task_description_text").val("");
         $("#task_description_text").blur();
-    });
+	  });
+	}
     $("#goto_option").click(() => {
         let optionsUrl = chrome.extension.getURL("config.html");
         open(optionsUrl);
     });
+
+    $("#goto_tasklog").click(() => {
+        let taskLogUrl = chrome.extension.getURL("task_log.html");
+        open(taskLogUrl);
+    });
+
     $("#oauth_button").click(onOAuthButtonClickHandler);
-    refreshPageContent();
-});
+        refreshPageContent();
+	});
 

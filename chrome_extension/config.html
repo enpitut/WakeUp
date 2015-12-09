@@ -2,41 +2,110 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>UGEN 詳細設定</title>
-<script type="text/javascript" src="javascripts/jquery-1.11.3.min.js"></script>
-<script type="text/javascript" src="javascripts/sha1.js"></script>
-<script type="text/javascript" src="javascripts/oauth.js"></script>
-<script type="text/javascript" src="javascripts/consumer_key_and_secret.js"></script>
+<title>UGEN 環境設定</title>
+<script type="text/javascript" src="lib/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="lib/bootstrap/bootstrap.min.js"></script>
+<script type="text/javascript" src="lib/sha1.js"></script>
+<script type="text/javascript" src="lib/oauth.js"></script>
+<script type="text/javascript" src="lib/sprintf.min.js"></script>
+<script type="text/javascript" src="javascripts/tweet_phrases.js"></script>
 <script type="text/javascript" src="javascripts/mocking.js"></script>
-<script type="text/javascript" src="javascripts/config.js"></script>
 <script type="text/javascript" src="javascripts/common.js"></script>
+<script type="text/javascript" src="javascripts/config.js"></script>
+<link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css" type="text/css">
 <link rel="stylesheet" href="config.css" type="text/css">
 </head>
 <body>
-    <h1>UGEN 詳細設定</h1>
-    <h2>ブロックサイト一覧</h2>
-    <table id="url_list"><tbody></tbody></table>
-    <p>
-        <input type="text" value="example.com" id="add_url_text"><input type="button" value="追加" id="add_url_button">
-    </p>
-    <h2>タスク失敗時にリプライを送る相手</h2>
-    <span id="account"></span>
-    <p>
-        @<input type="text" size="15" id="modify_account_text">に<input type="button" value="修正" id="modify_account_button">
-    </p>
-    <h2>Twitter連携</h2>
-    <p>
-        <input type="button" value="連携する" id="oauth_button">
-    </p>
-    <h2>追加機能</h2>
-    <div>
-        <input type="checkbox" id="tweet_tabinfo_checkbox">サボり通知ツイートにタブの情報を含める(非推奨)
+<div class="container">
+    <div class="row">
+        <h1 class="page-header">UGEN 環境設定</h1>
+        <h2 class="sub-header">ブロックサイト一覧</h2>
+        <div class="well">
+            <table id="url_list" class="table table-condensed"><tbody></tbody></table>
+            <form class="form-inline">
+                <input type="text" value="example.com" id="add_url_text" class="form-control">
+                <input type="button" value="追加" id="add_url_button" class="btn btn-primary">
+            </form>
+        </div>
+        <h2 class="sub-header">タスク失敗時にリプライを送る相手</h2>
+        <div class="well">
+            <p id="current_recipient">
+            </p>
+            <form class="form-inline">
+                <div class="input-group">
+                    <span class="input-group-addon">@</span>
+                    <select id="modify_recipient_select" class="form-control">
+                    </select>
+                </div>
+                <input type="button" value="設定" id="modify_recipient_button" class="btn btn-primary">
+            </form>
+        </div>
+        <div class="well">
+            <form class="form-inline">
+                <div class="input-group">
+                    <span class="input-group-addon">@</span>
+                    <input type="text" size="15" id="new_recipient_text" class="form-control">
+                </div>
+                <input type="button" value="新規追加" id="new_recipient_button" class="btn btn-primary">
+            </form>
+            新規追加ボタンを押すと @<span id="new_recipient"></span> に以下のリプライを送り許可待ち状態になります。
+            <blockquote id="permission_message"></blockquote>
+        </div>
+        <h2 class="sub-header">Twitter連携</h2>
+        <div id="authenticated_user" class="panel panel-default">
+            <div class="panel-heading">現在の連携先</div>
+            <div class="panel-body">
+                <img src="" alt="" width="48" height="48" id="authenticated_user_profile_image" ><br>
+                <span id="authenticated_user_name"></span>（@<span id="authenticated_user_screen_name"></span>）<a href="https://twitter.com/" id="authenticated_user_twitter_link"><img src="images/twitter_logo.png" alt="on Twitter" width="32" height="32"></a>
+            </div>
+        </div>
+        <p>
+            <input type="button" value="連携" id="oauth_button" class="btn btn-primary">
+        </p>
+        <h2 class="sub-header">追加機能</h2>
+        <ul class="list-group">
+            <li class="list-group-item">
+                <input type="checkbox" id="tweet_tab_info_checkbox">ブロックサイトを閲覧したとき、何のサイトを閲覧していたかについてもツイートする
+            </li>
+            <li class="list-group-item">
+                <input type="checkbox" id="show_register_ngsite_button_checkbox">コンテキストメニューにNGサイト登録機能を表示する
+            </li>
+            <li id="post_automatically_checkbox_group" class="list-group-item">
+                <p>以下のとき確認ダイアログを出さずにツイートする</p>
+                <div class="panel panel-default">
+                    <div class="panel-heading">ブロックサイトを閲覧したとき</div>
+                    <div class="panel-body">
+                        <p>
+                            <input type="checkbox" data-property="watchedNgSites.withTabInfo">ブロックサイトについてツイートする設定をしているとき（<span class="show_tweet_example">送信されるツイートの例</span>）
+                        </p>
+                        <p>
+                            <input type="checkbox" data-property="watchedNgSites.withoutTabInfo">ブロックサイトについてツイートしない設定をしているとき（<span class="show_tweet_example">送信されるツイートの例</span>）
+                        </p>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">作業が見積もり時間内に完了しなかったとき</div>
+                    <div class="panel-body">
+                        <p>
+                            <input type="checkbox" data-property="failed.withRecipient">リプライ相手を設定しているとき（<span class="show_tweet_example">送信されるツイートの例</span>）
+                        </p>
+                        <p>
+                            <input type="checkbox" data-property="failed.withoutRecipient">リプライ相手を設定していないとき（<span class="show_tweet_example">送信されるツイートの例</span>）
+                        </p>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <input type="checkbox" data-property="successed">作業が見積もり時間内に完了したとき（<span class="show_tweet_example">送信されるツイートの例</span>）
+                    </div>
+					<div class="panel-heading">
+					    <input type="checkbox" data-property="" id="show_loop_button_checkbox">単純な繰り返し機能（<span class="show_tweet_example">送信されるツイートの例</span>）
+					</div>
+                </div>
+            </li>
+        </ul>
+        <blockquote id="tweet_example"></blockquote>
     </div>
-    <div>
-        <input type="checkbox" id="show_register_ngsite_button_checkbox">コンテキストメニューにNGサイト登録機能を表示する
-    </div>
-    <div>
-        <input type="checkbox" id="show_loop_button_checkbox">単純な繰り返し機能
-    </div>
+</div>
 </body>
 </html>
