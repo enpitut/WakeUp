@@ -83,8 +83,8 @@ function mainLoop() {
                 notificate(`あと ${TWEET_TIME - ALERT_TIME} 秒 ${currentTab.title} に滞在するとTwitterに報告されます`, 5);
                 break;
             case TWEET_TIME:
+                saboriNum++;
                 if (loadConfig().tweetTabInfo) {
-                    saboriNum++;
                     let now = new Date();
                     let message = generateTweet(
                         (element1, element2) => sprintf(TWEET_PHRASES.WATCHED_NG_SITES.WITH_TAB_INFO, { taskDescription: element1, siteName: element2, siteUrl: currentTab.url, date: now }),
