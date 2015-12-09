@@ -28,7 +28,7 @@ if (location.protocol != "chrome-extension:") {
                         }
                     },
                 };
-            }(),
+            },
         },
         extension: {},
         tabs: {
@@ -56,5 +56,5 @@ if (location.protocol != "chrome-extension:") {
                 onloadFunc();
             }
         };
-    }();
+    };
 }
