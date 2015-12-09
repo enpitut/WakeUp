@@ -313,18 +313,17 @@ describe("詳細設定から設定できる機能", () => {
     });
     it("タスクが見積もり時間内に終わったとき確認ダイアログを出さずにツイートする", done => {
         setMock(background, {
+            confirmTweet(message) {
+                fail("confirmTweet()が呼ばれた");
+                return true;
+            },
             tweet(message) {
                 expect(message).toContain("1分かかると見積もった作業を0分で終えました");
                 setTimeout(done, 0);
                 return Promise.resolve();
             }
         });
-        setMock(popup, {
-            confirmTweet(message) {
-                fail("confirmTweet()が呼ばれた");
-                return true;
-            }
-        });
+        setMock(popup, {});
         setMock(config, {});
         config.$("#post_automatically_checkbox_group input[data-property='successed']").click();
         popup.$("#task_time_text").val("1");
