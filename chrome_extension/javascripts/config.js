@@ -56,6 +56,15 @@ $(() => {
             chrome.contextMenus.removeAll();
         }
     });
+    $("#show_loop_button_checkbox").change(function () {
+        if ($(this).is(":checked")) {
+            localStorage.setItem("showLoopButton", "True");
+            $("#loop").css("display","block");
+        } else {
+            localStorage.setItem("showLoopButton", "False");
+            $("#loop").css("display","none");
+        }
+    });
     if (localStorage.getItem("showRegisterNgSiteButton") === "True") {
         $("#show_register_ngsite_button_checkbox").prop("checked", true);
     }

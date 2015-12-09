@@ -135,8 +135,7 @@ function isNgSite(url) {
     let urlList = JSON.parse(localStorage.getItem("urlList"));
     for (let str of urlList) {
         let re = new RegExp(str.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1"));
-        if (url.match(re)) return true;                            
-        }
+        if (url.match(re)) return true;                                                     
     }
     return false;
 }
@@ -214,7 +213,6 @@ function tweet(str, callBack){
     });
 };
 
-
 function loopTimer(taskTime, restTime, loopCount, taskDescription) {
     let leftRestTime = 0;
     let leftLoopCount = loopCount;
@@ -236,8 +234,6 @@ function loopTimer(taskTime, restTime, loopCount, taskDescription) {
         setTimeout(tick, 1000);
     })();
 }
-
-
 
 function searchTweets(str){
   return new Promise(function(resolve, reject) {

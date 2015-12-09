@@ -2,6 +2,7 @@
 
 $(() => {
     let bg = chrome.extension.getBackgroundPage();
+    
     function refreshPageContent() {
         $("#start_button").parent().css("display", "none");
         $("#restart_button").parent().css("display", "none");
@@ -11,12 +12,21 @@ $(() => {
             pause: "#restart_button",
             on: "#end_button",
         }[bg.timerState]).parent().css("display", "block");
+
+        $("#loop").css("display", "none");
+        $("#default").css("display", "none");
+
+        $({
+            True: "#loop",
+            False: "#default",
+        }[getLocalStorageData("showLoopButton")]).css("display", "block");
+
         $("#guide_message").text({
             off: "ボタンを押すと監視がはじまるよ！",
             pause: "ボタンを押すと監視を再開するよ！",
             on: "監視中",
-        }[bg.timerState]);
-        
+        }[bg.timerState]);      
+
         if(!getLocalStorageData("accessToken") || !getLocalStorageData("accessTokenSecret")) {
             $("#guide_message").text("Twitter連携をしてね！");
             $("#start_control").css("display", "none");
@@ -26,6 +36,7 @@ $(() => {
             $("#oauth_control").css("display", "none");
         }
     }
+
 
     let isEmptyDescription;
     $("#task_description_text").focus(() => {
@@ -42,21 +53,22 @@ $(() => {
         }
     });
     $("#task_description_text").blur();
+    
     $("#start_button").click(() => {
         let time = Number($("#task_time_text").val()) * 60;
         if(isNaN(time) || time < 0) return false;
         bg.startTimer(time, isEmptyDescription ? "" : $("#task_description_text").val());
         refreshPageContent();
     });
-
+    
     $("#loop_button").click(() => {
-        let taskTime = Number($("#rest_time_text").val()) * 60;
-        let restTime = Number($("#task_time_text").val()) * 60;
+        let taskTime = Number($("#rest_loop_time_text").val()) * 60;
+        let restTime = Number($("#task_loop_time_text").val()) * 60;
         let loopCount = Number($("#loop_time_text").val());   
         if(isNaN(taskTime) || taskTime < 0) return false;
-        bg.loopTimer(taskTime,restTime,loopCount,isEmptyDescription ? "" : $("#task_description_text").val());
-        refreshPageContent();
-        });
+        bg.loopTimer(taskTime,restTime,loopCount,isEmptyDescription ? "" : $("#task_loop_description_text").val());
+        refreshPageContent(x);
+    });
     $("#pause_button").click(() => {
         bg.pauseTimer();
         refreshPageContent();
