@@ -182,18 +182,14 @@ $(() => {
             chrome.contextMenus.removeAll();
         }
     });
-    
+    $("#show_loop_button_checkbox").prop("checked", loadConfig().showLoopButton);
     $("#show_loop_button_checkbox").change(function () {
-        if ($(this).is(":checked")) {
-            modifyConfig(config=>{
-                    config.showLoopButton = true;
-                });
-            $("#loop").css("display","block");
-        } else {
-            modifyConfig(config=>{
-                config.showLoopButton = false;
-                });
-            $("#loop").css("display","none");
-        }
+         modifyConfig(config=>{
+             config.showLoopButton = true;
+         }); 
+         let newValue = $(this).is(":checked");
+         modifyConfig(config => {
+             config.showLoopButton = newValue;
+         });      
     });
 });
