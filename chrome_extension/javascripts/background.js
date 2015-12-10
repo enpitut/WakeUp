@@ -151,7 +151,7 @@ function loopTimer(taskTime, restTime, loopCount, taskDescription) {
     let previousTimerState = "off";
     (function tick() {
         if (previousTimerState == "on" && timerState == "off") {
-            notificate("休憩‼!!作業お疲れ様!!", 2);
+            notificate("休憩‼作業お疲れ様!!", 2);
             leftRestTime = restTime;
         }
         if (timerState == "off") {

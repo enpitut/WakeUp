@@ -5,19 +5,14 @@ $(() => {
     
     function refreshPageContent() {
         $("#start_button").parent().css("display", "none");
+        $("#loop_button").parent().css("display", "none");
         $("#restart_button").parent().css("display", "none");
         $("#end_button").parent().css("display", "none");
         $({
-            off: "#start_button",
+            off: loadConfig().showLoopButton ? "#loop_button" : "#start_button",
             pause: "#restart_button",
             on: "#end_button",
-        }[bg.timerState]).parent().css("display", "block");
-
-        $("#loop").css("display", "none");
-        $("#default").css("display", "none");
-        if(loadConfig().showLoopButton){
-            $("#loop").css("display","block");
-        }
+        }[bg.timerState]).parent().css("display", "block");  
 
         $("#guide_message").text({
             off: "ボタンを押すと監視がはじまるよ！",
@@ -25,7 +20,6 @@ $(() => {
             on: "監視中",
         }[bg.timerState]);      
 
-        if(!loadConfig().accessToken || !loadConfig().accessTokenSecret) {
         $("#idling_image").css("display", "none");
         $("#resting_image").css("display", "none");
         $("#running_image").css("display", "none");
@@ -43,7 +37,7 @@ $(() => {
             $("#start_control").css("display", "block");
             $("#oauth_control").css("display", "none");
         }
-        }
+        
     let isEmptyDescription;
     $("#task_description_text").focus(() => {
         if (isEmptyDescription) {
@@ -68,12 +62,12 @@ $(() => {
     });
     
     $("#loop_button").click(() => {
-        let taskTime = Number($("#rest_loop_time_text").val()) * 60;
-        let restTime = Number($("#task_loop_time_text").val()) * 60;
+        let restTime = Number($("#rest_loop_time_text").val()) * 60;
+        let taskTime = Number($("#task_loop_time_text").val()) * 60;
         let loopCount = Number($("#loop_time_text").val());   
         if(isNaN(taskTime) || taskTime < 0) return false;
         bg.loopTimer(taskTime,restTime,loopCount,isEmptyDescription ? "" : $("#task_loop_description_text").val());
-        refreshPageContent(x);
+        refreshPageContent();
     });
     $("#pause_button").click(() => {
         bg.pauseTimer();
@@ -107,6 +101,7 @@ $(() => {
         $("#task_description_text").blur();
       });
     }
+
     $("#goto_option").click(() => {
         let optionsUrl = chrome.extension.getURL("config.html");
         open(optionsUrl);
