@@ -62,10 +62,12 @@ $(() => {
     });
     
     $("#loop_button").click(() => {
-        let restTime = Number($("#rest_loop_time_text").val()) * 60;
-        let taskTime = Number($("#task_loop_time_text").val()) * 60;
-        let loopCount = Number($("#loop_time_text").val());   
-        if(isNaN(taskTime) || taskTime < 0) return false;
+        let restTime = Math.floor(Number($("#rest_loop_time_text").val()) * 60);
+        let taskTime = Math.floor(Number($("#task_loop_time_text").val()) * 60);
+        let loopCount = Math.floor(Number($("#loop_time_text").val()));
+        if (isNaN(restTime) || restTime < 0) return false;
+        if (isNaN(taskTime) || taskTime < 0) return false;
+        if (isNaN(loopCount) || loopCount < 0) return false;
         bg.loopTimer(taskTime,restTime,loopCount,isEmptyDescription ? "" : $("#task_loop_description_text").val());
         refreshPageContent();
     });

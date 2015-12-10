@@ -159,7 +159,7 @@ function loopTimer(taskTime, restTime, loopCount, taskDescription) {
                 if (leftLoopCount == 0) return;
                 startTimer(taskTime, taskDescription);
                 leftLoopCount--;
-                }
+            }
             leftRestTime--;
         }
         previousTimerState = timerState;

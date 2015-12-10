@@ -18,9 +18,9 @@ $(() => {
     $("#add_url_button").click(() => {
         modifyConfig(config => {
             config.urlList.push($("#add_url_text").val());
-        });
-        addRow($("#add_url_text").val());
-        $("#add_url_text").val("");
+    });
+    addRow($("#add_url_text").val());
+    $("#add_url_text").val("");
     });
 
     if (loadConfig().authInfo !== null) {
@@ -184,12 +184,9 @@ $(() => {
     });
     $("#show_loop_button_checkbox").prop("checked", loadConfig().showLoopButton);
     $("#show_loop_button_checkbox").change(function () {
-         modifyConfig(config=>{
-             config.showLoopButton = true;
-         }); 
-         let newValue = $(this).is(":checked");
-         modifyConfig(config => {
-             config.showLoopButton = newValue;
-         });      
+        let newValue = $(this).is(":checked");
+        modifyConfig(config => {
+            config.showLoopButton = newValue;
+        });      
     });
 });
