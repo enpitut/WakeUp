@@ -250,6 +250,13 @@ function isNgSite(targetUrl) {
                         };
                     });
             }
+            if (loadConfig().version == 3) {
+                modifyConfig(config => {
+                        config.version++;
+                        config.showLoopButton = false;
+                    });
+            }
+
 
             if (loadConfig().showRegisterNgSiteButton) {
                 createRegisterNgSiteButton();

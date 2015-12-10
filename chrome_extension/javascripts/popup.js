@@ -37,7 +37,7 @@ $(() => {
             $("#start_control").css("display", "block");
             $("#oauth_control").css("display", "none");
         }
-        
+    }        
     let isEmptyDescription;
     $("#task_description_text").focus(() => {
         if (isEmptyDescription) {
@@ -99,19 +99,19 @@ $(() => {
         refreshPageContent();
         $("#task_description_text").val("");
         $("#task_description_text").blur();
-      });
-    }
-
+        });
+    
+    
     $("#goto_option").click(() => {
         let optionsUrl = chrome.extension.getURL("config.html");
         open(optionsUrl);
     });
-
+    
     $("#goto_tasklog").click(() => {
         let taskLogUrl = chrome.extension.getURL("task_log.html");
         open(taskLogUrl);
     });
-
+    
     $("#oauth_button").click(onOAuthButtonClickHandler);
         refreshPageContent();
     });
