@@ -190,11 +190,11 @@ function stopTimer() {
 }
 
 function isNgSite(targetUrl) {
-	return loadConfig().urlList.map(url => new RegExp(url.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1"))).some(re => targetUrl.match(re));
+    return loadConfig().urlList.map(url => new RegExp(url.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1"))).some(re => targetUrl.match(re));
 }
 function notifyRank() {
     searchTweets("#UGEN")
-            .then(responseJson => {
+        .then(responseJson => {
             let re = /\d+分かかると見積もった.*を(\d+)分で終えました!/;
             let userIds = [...new Set(
                 responseJson.statuses
@@ -208,15 +208,15 @@ function notifyRank() {
                 .then(statuses => [
                     userId,
                     statuses.filter(status => status.text.match(re))
-                       .filter(status => new Date(status.created_at).toDateString() == new Date().toDateString()) //toDateString()で日付だけを取得できる
-                       .map(status => Number(status.text.match(re)[1]))
-                       .reduce((sum, minutes) => sum + minutes, 0)])
+                        .filter(status => new Date(status.created_at).toDateString() == new Date().toDateString()) //toDateString()で日付だけを取得できる
+                        .map(status => Number(status.text.match(re)[1]))
+                        .reduce((sum, minutes) => sum + minutes, 0)])
                 )).then(pairs => new Map(pairs));
-           }).then(workTimeMap => {
-               let myWorkTime = Math.round((elapsedSeconds / 60) + workTimeMap.get(loadConfig().authInfo.userId));
-               let myRank = [...workTimeMap.values()].filter(workTime => workTime > myWorkTime).length + 1;
-               notificate(`今日のあなたの作業時間合計は${myWorkTime}分で、${workTimeMap.size}人中${myRank}位です！`, 5);
-           });
+        }).then(workTimeMap => {
+            let myWorkTime = Math.round((elapsedSeconds / 60) + workTimeMap.get(loadConfig().authInfo.userId));
+            let myRank = [...workTimeMap.values()].filter(workTime => workTime > myWorkTime).length + 1;
+            notificate(`今日のあなたの作業時間合計は${myWorkTime}分で、${workTimeMap.size}人中${myRank}位です！`, 5);
+        });
 }
 
 $(() => {
@@ -244,7 +244,7 @@ $(() => {
                 watchedNgSites: {withTabInfo: false, withoutTabInfo: false},
                 failed: {withRecipient: false, withoutRecipient: false},
                 successed: false
-			};
+            };
         });
     }
     if (loadConfig().version == 3) {
@@ -252,7 +252,8 @@ $(() => {
             config.version++;
             config.showLoopButton = false;
         });
-    }               
+    }
+
     if (loadConfig().showRegisterNgSiteButton) {
         createRegisterNgSiteButton();
     }
@@ -262,6 +263,7 @@ function saveTaskLog(isSuccess) {
     let config = loadConfig();
     let taskLog = config.taskLog;
     let today = new Date();    
+  
     if (taskLog.length == 0 || taskLog[taskLog.length - 1].date != today.toDateString()) {
         taskLog.push({
             date: today.toDateString(),
@@ -277,5 +279,6 @@ function saveTaskLog(isSuccess) {
     lastLog.workMinutes += Math.floor(elapsedSeconds / 60);
     lastLog.saboriNum += saboriNum;
     if (isSuccess) lastLog.successNum++;
+    
     saveConfig(config);
 }

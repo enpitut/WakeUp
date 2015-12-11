@@ -46,7 +46,7 @@ $(() => {
             $("#task_description_text").css("color", "#555555");
         }
     });
-
+    
     $("#task_description_text").blur(() => {
         isEmptyDescription = ($("#task_description_text").val() == "");
         if (isEmptyDescription) {
@@ -54,8 +54,8 @@ $(() => {
             $("#task_description_text").css("color", "#999999");
         }
     });
-
     $("#task_description_text").blur();    
+
     $("#start_button").click(() => {
         let time = Number($("#task_time_text").val()) * 60;
         if(isNaN(time) || time < 0) return false;
@@ -83,7 +83,6 @@ $(() => {
         bg.restartTimer();
         refreshPageContent();
     });
-
     $("#end_button").click(() => {
         let now = new Date();
         let message = generateTweet(
@@ -107,7 +106,7 @@ $(() => {
         $("#task_description_text").val("");
         $("#task_description_text").blur();
     });
-        
+       
     $("#goto_option").click(() => {
         let optionsUrl = chrome.extension.getURL("config.html");
         open(optionsUrl);
@@ -119,6 +118,5 @@ $(() => {
     });
     
     $("#oauth_button").click(onOAuthButtonClickHandler);
-        refreshPageContent();
-    });
-
+    refreshPageContent();
+});
