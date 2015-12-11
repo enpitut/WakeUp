@@ -145,6 +145,28 @@ function startTimer(limitSecondsAsParameter, taskDescriptionAsParameter) {
     mainLoop();
 }
 
+function loopTimer(taskTime, restTime, loopCount, taskDescription) {
+    let leftRestTime = 0;
+    let leftLoopCount = loopCount;
+    let previousTimerState = "off";
+    (function tick() {
+        if (previousTimerState == "on" && timerState == "off") {
+            notificate("休憩!!作業お疲れ様!!", 5);
+            leftRestTime = restTime;
+        }
+        if (timerState == "off") {
+            if (leftRestTime == 0) {
+                if (leftLoopCount == 0) return;
+                startTimer(taskTime, taskDescription);
+                leftLoopCount--;
+            }
+            leftRestTime--;
+        }
+        previousTimerState = timerState;
+        setTimeout(tick, 1000);
+    })();
+}
+
 function pauseTimer() {
     if (timerState != "on") throw new Error("Illegal state.");
     timerState = "pause";
@@ -181,7 +203,7 @@ function notifyRank() {
                     .filter(status => new Date(status.created_at).toDateString() == new Date().toDateString()) //toDateString()で日付だけを取得できる
                     .map(status => status.user.id)
                     .concat([loadConfig().authInfo.userId])
-                )];
+            )];
 
             return Promise.all(userIds.map(userId => readTimeline(userId)
                 .then(statuses => [
@@ -226,6 +248,12 @@ $(() => {
             };
         });
     }
+    if (loadConfig().version == 3) {
+        modifyConfig(config => {
+            config.version++;
+            config.showLoopButton = false;
+        });
+    }
 
     if (loadConfig().showRegisterNgSiteButton) {
         createRegisterNgSiteButton();
@@ -236,7 +264,7 @@ function saveTaskLog(isSuccess) {
     let config = loadConfig();
     let taskLog = config.taskLog;
     let today = new Date();
-
+  
     if (taskLog.length == 0 || taskLog[taskLog.length - 1].date != today.toDateString()) {
         taskLog.push({
             date: today.toDateString(),
@@ -246,12 +274,12 @@ function saveTaskLog(isSuccess) {
             successNum: 0
         });
     }
-
+    
     let lastLog = taskLog[taskLog.length - 1];
     lastLog.taskDescriptions.push(taskDescription);
     lastLog.workMinutes += Math.floor(elapsedSeconds / 60);
     lastLog.saboriNum += saboriNum;
     if (isSuccess) lastLog.successNum++;
-
+    
     saveConfig(config);
 }

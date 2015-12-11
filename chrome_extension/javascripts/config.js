@@ -182,4 +182,12 @@ $(() => {
             chrome.contextMenus.removeAll();
         }
     });
+
+    $("#show_loop_button_checkbox").prop("checked", loadConfig().showLoopButton);
+    $("#show_loop_button_checkbox").change(function () {
+        let newValue = $(this).is(":checked");
+        modifyConfig(config => {
+            config.showLoopButton = newValue;
+        });      
+    });
 });
