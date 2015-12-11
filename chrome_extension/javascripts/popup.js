@@ -12,13 +12,13 @@ $(() => {
             off: loadConfig().showLoopButton ? "#loop_button" : "#start_button",
             pause: "#restart_button",
             on: "#end_button",
-        }[bg.timerState]).parent().css("display", "block");  
+        }[bg.timerState]).parent().css("display", "block");
 
         $("#guide_message").text({
             off: "ボタンを押すと監視がはじまるよ！",
             pause: "ボタンを押すと監視を再開するよ！",
             on: "監視中",
-        }[bg.timerState]);      
+        }[bg.timerState]);
 
         $("#idling_image").css("display", "none");
         $("#resting_image").css("display", "none");
@@ -37,7 +37,8 @@ $(() => {
             $("#start_control").css("display", "block");
             $("#oauth_control").css("display", "none");
         }
-    }        
+    }
+
     let isEmptyDescription;
     $("#task_description_text").focus(() => {
         if (isEmptyDescription) {
@@ -45,6 +46,7 @@ $(() => {
             $("#task_description_text").css("color", "#555555");
         }
     });
+
     $("#task_description_text").blur(() => {
         isEmptyDescription = ($("#task_description_text").val() == "");
         if (isEmptyDescription) {
@@ -52,8 +54,8 @@ $(() => {
             $("#task_description_text").css("color", "#999999");
         }
     });
-    $("#task_description_text").blur();
-    
+
+    $("#task_description_text").blur();    
     $("#start_button").click(() => {
         let time = Number($("#task_time_text").val()) * 60;
         if(isNaN(time) || time < 0) return false;
@@ -71,14 +73,17 @@ $(() => {
         bg.loopTimer(taskTime,restTime,loopCount,isEmptyDescription ? "" : $("#task_loop_description_text").val());
         refreshPageContent();
     });
+
     $("#pause_button").click(() => {
         bg.pauseTimer();
         refreshPageContent();
     });
+
     $("#restart_button").click(() => {
         bg.restartTimer();
         refreshPageContent();
     });
+
     $("#end_button").click(() => {
         let now = new Date();
         let message = generateTweet(
@@ -101,9 +106,8 @@ $(() => {
         refreshPageContent();
         $("#task_description_text").val("");
         $("#task_description_text").blur();
-        });
-    
-    
+    });
+        
     $("#goto_option").click(() => {
         let optionsUrl = chrome.extension.getURL("config.html");
         open(optionsUrl);

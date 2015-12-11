@@ -198,4 +198,3 @@ function setValue(object) {
         setValue(object[propertyNames[0]], ...propertyNames.slice(1), newValue);
     }
 }
-
