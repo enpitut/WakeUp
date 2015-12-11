@@ -192,6 +192,7 @@ function stopTimer() {
 function isNgSite(targetUrl) {
     return loadConfig().urlList.map(url => new RegExp(url.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1"))).some(re => targetUrl.match(re));
 }
+
 function notifyRank() {
     searchTweets("#UGEN")
         .then(responseJson => {
@@ -202,7 +203,7 @@ function notifyRank() {
                     .filter(status => new Date(status.created_at).toDateString() == new Date().toDateString()) //toDateString()で日付だけを取得できる
                     .map(status => status.user.id)
                     .concat([loadConfig().authInfo.userId])
-             )];
+            )];
 
             return Promise.all(userIds.map(userId => readTimeline(userId)
                 .then(statuses => [
@@ -262,7 +263,7 @@ $(() => {
 function saveTaskLog(isSuccess) {
     let config = loadConfig();
     let taskLog = config.taskLog;
-    let today = new Date();    
+    let today = new Date();
   
     if (taskLog.length == 0 || taskLog[taskLog.length - 1].date != today.toDateString()) {
         taskLog.push({
