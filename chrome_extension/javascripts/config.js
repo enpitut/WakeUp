@@ -16,9 +16,9 @@ $(() => {
         addRow(url);
     }
     $("#add_url_button").click(() => {
-			modifyConfig(config => {
-			    config.urlList.push($("#add_url_text").val());
-			});
+	    modifyConfig(config => {
+		    config.urlList.push($("#add_url_text").val());
+		});
 		addRow($("#add_url_text").val());
 		$("#add_url_text").val("");
 	});

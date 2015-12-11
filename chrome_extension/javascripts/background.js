@@ -129,7 +129,7 @@ function mainLoop() {
                 break;
         }
         next();
-        }).catch_( => { alert(e.message); });
+    }).catch(e => { alert(e.message); });
 }
 
 function startTimer(limitSecondsAsParameter, taskDescriptionAsParameter) {
@@ -167,7 +167,6 @@ function loopTimer(taskTime, restTime, loopCount, taskDescription) {
     })();
 }
 
-
 function pauseTimer() {
     if (timerState != "on") throw new Error("Illegal state.");
     timerState = "pause";
@@ -191,71 +190,72 @@ function stopTimer() {
 }
 
 function isNgSite(targetUrl) {
-    return loadConfig().urlList.map(url => new RegExp(url.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1"))).some(re => targetUrl.match(re));
+	return loadConfig().urlList.map(url => new RegExp(url.replace(/([.*+?^=!:${}()|[\]\/\\])/g, "\\$1"))).some(re => targetUrl.match(re));
 }
 function notifyRank() {
-        searchTweets("#UGEN")
+    searchTweets("#UGEN")
             .then(responseJson => {
             let re = /\d+分かかると見積もった.*を(\d+)分で終えました!/;
             let userIds = [...new Set(
-             responseJson.statuses
-                .filter(status => status.lang == "ja" && status.text.match(re))
-                .filter(status => new Date(status.created_at).toDateString() == new Date().toDateString()) //toDateString()で日付だけを取得できる
-                .map(status => status.user.id)
-                .concat([loadConfig().authInfo.userId])
+                responseJson.statuses
+                    .filter(status => status.lang == "ja" && status.text.match(re))
+                    .filter(status => new Date(status.created_at).toDateString() == new Date().toDateString()) //toDateString()で日付だけを取得できる
+                    .map(status => status.user.id)
+                    .concat([loadConfig().authInfo.userId])
              )];
 
             return Promise.all(userIds.map(userId => readTimeline(userId)
                 .then(statuses => [
                     userId,
                     statuses.filter(status => status.text.match(re))
-                   .filter(status => new Date(status.created_at).toDateString() == new Date().toDateString()) //toDateString()で日付だけを取得できる
-                   .map(status => Number(status.text.match(re)[1]))
-                   .reduce((sum, minutes) => sum + minutes, 0)])
+                       .filter(status => new Date(status.created_at).toDateString() == new Date().toDateString()) //toDateString()で日付だけを取得できる
+                       .map(status => Number(status.text.match(re)[1]))
+                       .reduce((sum, minutes) => sum + minutes, 0)])
                 )).then(pairs => new Map(pairs));
            }).then(workTimeMap => {
-            let myWorkTime = Math.round((elapsedSeconds / 60) + workTimeMap.get(loadConfig().authInfo.userId));
-            let myRank = [...workTimeMap.values()].filter(workTime => workTime > myWorkTime).length + 1;
-            notificate(`今日のあなたの作業時間合計は${myWorkTime}分で、${workTimeMap.size}人中${myRank}位です！`, 5);
+               let myWorkTime = Math.round((elapsedSeconds / 60) + workTimeMap.get(loadConfig().authInfo.userId));
+               let myRank = [...workTimeMap.values()].filter(workTime => workTime > myWorkTime).length + 1;
+               notificate(`今日のあなたの作業時間合計は${myWorkTime}分で、${workTimeMap.size}人中${myRank}位です！`, 5);
            });
 }
+
 $(() => {
-        if (loadConfig() === null) {
-            saveConfig({
-                version: 1,
-                urlList: ["nicovideo.jp", "youtube.com"],
-                authInfo: null,
-                replySetting: {},
-                screenNameMap: {},
-                tweetTabInfo: false,
-                showRegisterNgSiteButton: false
-            });
-        }
-        if (loadConfig().version == 1) {
-            modifyConfig(config => {
-                config.version++;
-                config.taskLog = [];
-            });
-        }
-        if (loadConfig().version == 2) {
-            modifyConfig(config => {
-                config.version++;
-                config.postAutomatically = {
-                    watchedNgSites: {withTabInfo: false, withoutTabInfo: false},
-                    failed: {withRecipient: false, withoutRecipient: false},
-                    successed: false
-                };
-            });
-        }
-        if (loadConfig().version == 3) {
-            modifyConfig(config => {
-                config.version++;
-                config.showLoopButton = false;
-            });
-        }               
-        if (loadConfig().showRegisterNgSiteButton) {
-            createRegisterNgSiteButton();
-        }
+    if (loadConfig() === null) {
+        saveConfig({
+            version: 1,
+            urlList: ["nicovideo.jp", "youtube.com"],
+            authInfo: null,
+            replySetting: {},
+            screenNameMap: {},
+            tweetTabInfo: false,
+            showRegisterNgSiteButton: false
+        });
+    }
+    if (loadConfig().version == 1) {
+        modifyConfig(config => {
+            config.version++;
+            config.taskLog = [];
+        });
+    }
+    if (loadConfig().version == 2) {
+        modifyConfig(config => {
+            config.version++;
+            config.postAutomatically = {
+                watchedNgSites: {withTabInfo: false, withoutTabInfo: false},
+                failed: {withRecipient: false, withoutRecipient: false},
+                successed: false
+			};
+        });
+    }
+    if (loadConfig().version == 3) {
+        modifyConfig(config => {
+            config.version++;
+            config.showLoopButton = false;
+        });
+    }               
+    if (loadConfig().showRegisterNgSiteButton) {
+        createRegisterNgSiteButton();
+    }
 });
 
 function saveTaskLog(isSuccess) {
@@ -269,7 +269,7 @@ function saveTaskLog(isSuccess) {
             workMinutes: 0,
             saboriNum: 0,
             successNum: 0
-         });
+        });
     }
     
     let lastLog = taskLog[taskLog.length - 1];
@@ -279,5 +279,3 @@ function saveTaskLog(isSuccess) {
     if (isSuccess) lastLog.successNum++;
     saveConfig(config);
 }
-
-
