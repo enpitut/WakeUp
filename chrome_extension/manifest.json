@@ -23,6 +23,10 @@
   ],
   "browser_action": {
     "default_title": "UGEN",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "19": "images/icon16.png",
+      "38": "images/icon48.png"
+    }
   }
 }
