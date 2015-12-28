@@ -139,7 +139,12 @@ function startTimer(limitSecondsAsParameter, taskDescriptionAsParameter) {
     stayNgSiteSeconds = -1;
     taskDescription = taskDescriptionAsParameter;
     timerState = "on";
-    chrome.browserAction.setIcon({ path: "images/watchicon19.png" });
+    chrome.browserAction.setIcon({
+        path: {
+            19: "images/watchicon19.png",
+            38: "images/watchicon38.png"
+        }
+    });
     oneMinuteNotified = false;
     saboriNum = 0;
     mainLoop();
@@ -170,14 +175,24 @@ function loopTimer(taskTime, restTime, loopCount, taskDescription) {
 function pauseTimer() {
     if (timerState != "on") throw new Error("Illegal state.");
     timerState = "pause";
-    chrome.browserAction.setIcon({ path: "images/icon19.png" });
+    chrome.browserAction.setIcon({
+        path: {
+            19: "images/icon19.png",
+            38: "images/icon38.png"
+        }
+    });
     clearTimeout(timerId);
 }
 
 function restartTimer() {
     if (timerState != "pause") throw new Error("Illegal state.");
     timerState = "on";
-    chrome.browserAction.setIcon({ path: "images/watchicon19.png" });
+    chrome.browserAction.setIcon({
+        path: {
+            19: "images/watchicon19.png",
+            38: "images/watchicon38.png"
+        }
+    });
     mainLoop();
 }
 
@@ -185,7 +200,12 @@ function stopTimer() {
     if (timerState != "on") throw new Error("Illegal state.");
     timerState = "off";
     chrome.browserAction.setBadgeText({ "text": "" });
-    chrome.browserAction.setIcon({ path: "images/icon19.png" });
+    chrome.browserAction.setIcon({
+        path: {
+            19: "images/icon19.png",
+            38: "images/icon38.png"
+        }
+    });
     clearTimeout(timerId);
 }
 
