@@ -1,8 +1,10 @@
 {
   "manifest_version": 2,
-  "name": "UGEN",
-  "version": "0.0.1",
-  "description": "人間関係を利用した行動強制アプリケーション",
+  "name": "作業強制タイマーUGEN",
+  "short_name": "UGEN",
+  "version": "1.0.0",
+  "minimum_chrome_version": "47",
+  "description": "人間関係を利用した作業強制タイマーアプリ",
   "icons": {
     "16": "images/icon16.png",
     "48": "images/icon48.png",
@@ -21,6 +23,10 @@
   ],
   "browser_action": {
     "default_title": "UGEN",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "19": "images/icon19.png",
+      "38": "images/icon38.png"
+    }
   }
 }
