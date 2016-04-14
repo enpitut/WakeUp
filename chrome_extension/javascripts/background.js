@@ -196,8 +196,7 @@ function restartTimer() {
     mainLoop();
 }
 
-function stopTimer() {
-    if (timerState != "on") throw new Error("Illegal state.");
+function initializeTimer() {
     timerState = "off";
     chrome.browserAction.setBadgeText({ "text": "" });
     chrome.browserAction.setIcon({
@@ -207,6 +206,11 @@ function stopTimer() {
         }
     });
     clearTimeout(timerId);
+}
+
+function stopTimer() {
+    if (timerState != "on") throw new Error("Illegal state.");
+    initializeTimer();
 }
 
 function isNgSite(targetUrl) {
@@ -278,13 +282,15 @@ $(() => {
     if (loadConfig().showRegisterNgSiteButton) {
         createRegisterNgSiteButton();
     }
+
+    initializeTimer();
 });
 
 function saveTaskLog(isSuccess) {
     let config = loadConfig();
     let taskLog = config.taskLog;
     let today = new Date();
-  
+
     if (taskLog.length == 0 || taskLog[taskLog.length - 1].date != today.toDateString()) {
         taskLog.push({
             date: today.toDateString(),
@@ -294,12 +300,12 @@ function saveTaskLog(isSuccess) {
             successNum: 0
         });
     }
-    
+
     let lastLog = taskLog[taskLog.length - 1];
     lastLog.taskDescriptions.push(taskDescription);
     lastLog.workMinutes += Math.floor(elapsedSeconds / 60);
     lastLog.saboriNum += saboriNum;
     if (isSuccess) lastLog.successNum++;
-    
+
     saveConfig(config);
 }
