@@ -282,8 +282,6 @@ $(() => {
     if (loadConfig().showRegisterNgSiteButton) {
         createRegisterNgSiteButton();
     }
-
-    initializeTimer();
 });
 
 function saveTaskLog(isSuccess) {
@@ -308,4 +306,8 @@ function saveTaskLog(isSuccess) {
     if (isSuccess) lastLog.successNum++;
 
     saveConfig(config);
+}
+
+if (!chrome.windows.onRemoved.hasListeners()) {
+    chrome.windows.onRemoved.addListener(initializeTimer);
 }
