@@ -207,6 +207,7 @@ function initializeTimer() {
     });
     clearTimeout(timerId);
 }
+initializeTimer();
 
 function stopTimer() {
     if (timerState != "on") throw new Error("Illegal state.");
@@ -244,7 +245,7 @@ function notifyRank() {
         });
 }
 
-$(() => {
+$(() => {    
     if (loadConfig() === null) {
         saveConfig({
             version: 1,
@@ -306,8 +307,4 @@ function saveTaskLog(isSuccess) {
     if (isSuccess) lastLog.successNum++;
 
     saveConfig(config);
-}
-
-if (!chrome.windows.onRemoved.hasListeners()) {
-    chrome.windows.onRemoved.addListener(initializeTimer);
 }
