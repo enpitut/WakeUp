@@ -196,7 +196,8 @@ function restartTimer() {
     mainLoop();
 }
 
-function initializeTimer() {
+function stopTimer() {
+    if (timerState != "on") throw new Error("Illegal state.");
     timerState = "off";
     chrome.browserAction.setBadgeText({ "text": "" });
     chrome.browserAction.setIcon({
@@ -206,12 +207,6 @@ function initializeTimer() {
         }
     });
     clearTimeout(timerId);
-}
-initializeTimer();
-
-function stopTimer() {
-    if (timerState != "on") throw new Error("Illegal state.");
-    initializeTimer();
 }
 
 function isNgSite(targetUrl) {
@@ -245,7 +240,7 @@ function notifyRank() {
         });
 }
 
-$(() => {    
+$(() => {
     if (loadConfig() === null) {
         saveConfig({
             version: 1,
@@ -283,6 +278,14 @@ $(() => {
     if (loadConfig().showRegisterNgSiteButton) {
         createRegisterNgSiteButton();
     }
+
+    chrome.browserAction.setBadgeText({ "text": "" });
+    chrome.browserAction.setIcon({
+        path: {
+            19: "images/icon19.png",
+            38: "images/icon38.png"
+        }
+    });
 });
 
 function saveTaskLog(isSuccess) {
