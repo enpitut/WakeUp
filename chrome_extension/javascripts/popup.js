@@ -19,6 +19,8 @@ $(() => {
             pause: "ボタンを押すと監視を再開するよ！",
             on: "監視中",
         }[bg.timerState]);
+        
+        $("#remaining_time_select").css("background-color", "lightgray");
 
         $("#idling_image").css("display", "none");
         $("#resting_image").css("display", "none");
@@ -54,7 +56,17 @@ $(() => {
             $("#task_description_text").css("color", "#999999");
         }
     });
-    $("#task_description_text").blur();    
+    $("#task_description_text").blur();
+    
+    $("#remaining_time_checkbox").click(() => {
+        if($("#remaining_time_checkbox").prop('checked')){
+            $("#remaining_time_select").css("background-color", "transparent");
+            $("#remaining_time_select").prop("disabled", false);
+        }else{
+            $("#remaining_time_select").css("background-color", "lightgray");
+            $("#remaining_time_select").prop("disabled", true);
+        }
+    });
 
     $("#start_button").click(() => {
         let time = Number($("#task_time_text").val()) * 60;

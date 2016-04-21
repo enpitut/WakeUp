@@ -33,6 +33,20 @@
                         <label for="task_description_text" class="control-label small text-center">作業名</label>
                         <input type="text" id="task_description_text" class="form-control input-sm">
                     </div>
+                    <div class="form-group col-xs-12">
+                        <label for="remaining_time_checkbox" class="checkbox-inline small">
+                            <input type="checkbox" id="remaining_time_checkbox" />
+                            <select id="remaining_time_select" disabled>
+                                <option>10</option>
+                                <option>20</option>
+                                <option>30</option>
+                                <option>40</option>
+                                <option>50</option>
+                                <option>60</option>
+                            </select>
+                            分ごとに警告を出す
+                        </label>
+                    </div>
                     <input type="submit" value="開始" id="start_button" class="btn btn-success btn-block" />
                 </form>
             </div>
@@ -53,6 +67,20 @@
                     <div class="form-group col-xs-6">
                         <label for="loop_time_text" class="control-label small">試行回数</label>
                         <input type="text" value="10" class="form-control input-sm" id="loop_time_text">
+                    </div>
+                    <div class="form-group col-xs-12">
+                        <label for="remaining_time_checkbox" class="checkbox-inline small">
+                            <input type="checkbox" id="remaining_time_checkbox" />
+                            <select id="remaining_time_select" disabled>
+                                <option>10</option>
+                                <option>20</option>
+                                <option>30</option>
+                                <option>40</option>
+                                <option>50</option>
+                                <option>60</option>
+                            </select>
+                            分ごとに警告を出す
+                        </label>
                     </div>
                     <input type="submit" value="ループ" id="loop_button" class="btn btn-success btn-block" /> 
                 </form>
