@@ -70,10 +70,10 @@ $(() => {
 
     $("#start_button").click(() => {
         let time = Math.floor(Number($("#task_time_text").val()) * 60);
-        let regularlyAlertTimes = Math.floor(Number($("#periodically_time_select").val()) * 60);
-        if(!$("#periodically_time_checkbox").prop("checked"))regularlyAlertTimes = 0;
+        let periodicallyAlertTimes = Math.floor(Number($("#periodically_time_select").val()) * 60);
+        if(!$("#periodically_time_checkbox").prop("checked"))periodicallyAlertTimes = 0;
         if(isNaN(time) || time < 0) return false;
-        bg.startTimer(time, isEmptyDescription ? "" : $("#task_description_text").val(), regularlyAlertTimes);
+        bg.startTimer(time, isEmptyDescription ? "" : $("#task_description_text").val(), periodicallyAlertTimes);
         refreshPageContent();
     });
     
