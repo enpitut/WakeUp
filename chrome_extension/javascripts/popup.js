@@ -20,7 +20,7 @@ $(() => {
             on: "監視中",
         }[bg.timerState]);
         
-        $("#remaining_time_select").css("background-color", "lightgray");
+        $("#periodically_time_select").css("background-color", "lightgray");
 
         $("#idling_image").css("display", "none");
         $("#resting_image").css("display", "none");
@@ -58,20 +58,22 @@ $(() => {
     });
     $("#task_description_text").blur();
     
-    $("#remaining_time_checkbox").click(() => {
-        if($("#remaining_time_checkbox").prop('checked')){
-            $("#remaining_time_select").css("background-color", "transparent");
-            $("#remaining_time_select").prop("disabled", false);
+    $("#periodically_time_checkbox").click(() => {
+        if($("#periodically_time_checkbox").prop("checked")){
+            $("#periodically_time_select").css("background-color", "transparent");
+            $("#periodically_time_select").prop("disabled", false);
         }else{
-            $("#remaining_time_select").css("background-color", "lightgray");
-            $("#remaining_time_select").prop("disabled", true);
+            $("#periodically_time_select").css("background-color", "lightgray");
+            $("#periodically_time_select").prop("disabled", true);
         }
     });
 
     $("#start_button").click(() => {
-        let time = Number($("#task_time_text").val()) * 60;
+        let time = Math.floor(Number($("#task_time_text").val()) * 60);
+        let regularlyAlertTimes = Math.floor(Number($("#periodically_time_select").val()) * 60);
+        if(!$("#periodically_time_checkbox").prop("checked"))regularlyAlertTimes = 0;
         if(isNaN(time) || time < 0) return false;
-        bg.startTimer(time, isEmptyDescription ? "" : $("#task_description_text").val());
+        bg.startTimer(time, isEmptyDescription ? "" : $("#task_description_text").val(), regularlyAlertTimes);
         refreshPageContent();
     });
     
