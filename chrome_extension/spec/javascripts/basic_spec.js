@@ -239,10 +239,21 @@ describe("基本機能", () => {
         setMock(background, {
             chrome: {
                 browserAction: {
-                    setBadgeText(parameter) {
-                        expect(parameter.text).toEqual("2");
-                        partiallyDone();
-                    },
+                    setBadgeText: (() => {
+                        let callCount = 0;
+                        return parameter => {
+                            switch (callCount) {
+                            case 0:
+                                expect(parameter.text).toEqual("");
+                                break;
+                            case 1:
+                                expect(parameter.text).toEqual("2");
+                                partiallyDone();
+                                break;
+                            }
+                            callCount++;
+                        };
+                    })(),
                     setBadgeBackgroundColor(parameter) {
                         expect(parameter.color).toEqual([0, 0, 255, 100]);
                         partiallyDone();
@@ -263,10 +274,21 @@ describe("基本機能", () => {
         setMock(background, {
             chrome: {
                 browserAction: {
-                    setBadgeText(parameter) {
-                        expect(parameter.text).toEqual("60");
-                        partiallyDone();
-                    },
+                    setBadgeText: (() => {
+                        let callCount = 0;
+                        return parameter => {
+                            switch (callCount) {
+                            case 0:
+                                expect(parameter.text).toEqual("");
+                                break;
+                            case 1:
+                                expect(parameter.text).toEqual("60");
+                                partiallyDone();
+                                break;
+                            }
+                            callCount++;
+                        };
+                    })(),
                     setBadgeBackgroundColor(parameter) {
                         expect(parameter.color).toEqual([255, 0, 0, 100]);
                         partiallyDone();

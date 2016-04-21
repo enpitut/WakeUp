@@ -278,13 +278,21 @@ $(() => {
     if (loadConfig().showRegisterNgSiteButton) {
         createRegisterNgSiteButton();
     }
+
+    chrome.browserAction.setBadgeText({ "text": "" });
+    chrome.browserAction.setIcon({
+        path: {
+            19: "images/icon19.png",
+            38: "images/icon38.png"
+        }
+    });
 });
 
 function saveTaskLog(isSuccess) {
     let config = loadConfig();
     let taskLog = config.taskLog;
     let today = new Date();
-  
+
     if (taskLog.length == 0 || taskLog[taskLog.length - 1].date != today.toDateString()) {
         taskLog.push({
             date: today.toDateString(),
@@ -294,12 +302,12 @@ function saveTaskLog(isSuccess) {
             successNum: 0
         });
     }
-    
+
     let lastLog = taskLog[taskLog.length - 1];
     lastLog.taskDescriptions.push(taskDescription);
     lastLog.workMinutes += Math.floor(elapsedSeconds / 60);
     lastLog.saboriNum += saboriNum;
     if (isSuccess) lastLog.successNum++;
-    
+
     saveConfig(config);
 }
