@@ -21,6 +21,7 @@ $(() => {
         }[bg.timerState]);
         
         $("#periodically_time_select").css("background-color", "lightgray");
+        $("#loop_periodically_time_select").css("background-color", "lightgray");
 
         $("#idling_image").css("display", "none");
         $("#resting_image").css("display", "none");
@@ -60,18 +61,32 @@ $(() => {
     
     $("#periodically_time_checkbox").click(() => {
         if($("#periodically_time_checkbox").prop("checked")){
-            $("#periodically_time_select").css("background-color", "transparent");
-            $("#periodically_time_select").prop("disabled", false);
+            $("#periodically_time_select")
+            .css("background-color", "transparent")
+            .prop("disabled", false);
         }else{
-            $("#periodically_time_select").css("background-color", "lightgray");
-            $("#periodically_time_select").prop("disabled", true);
+            $("#periodically_time_select")
+            .css("background-color", "lightgray")
+            .prop("disabled", true);
+        }
+    });
+    
+    $("#loop_periodically_time_checkbox").click(() => {
+        if($("#loop_periodically_time_checkbox").prop("checked")){
+            $("#loop_periodically_time_select")
+            .css("background-color", "transparent")
+            .prop("disabled", false);
+        }else{
+            $("#loop_periodically_time_select")
+            .css("background-color", "lightgray")
+            .prop("disabled", true);
         }
     });
 
     $("#start_button").click(() => {
         let time = Math.floor(Number($("#task_time_text").val()) * 60);
         let periodicallyAlertTimes = Math.floor(Number($("#periodically_time_select").val()) * 60);
-        if(!$("#periodically_time_checkbox").prop("checked"))periodicallyAlertTimes = 0;
+        if(!$("#periodically_time_checkbox").prop("checked"))periodicallyAlertTimes = Infinity;
         if(isNaN(time) || time < 0) return false;
         bg.startTimer(time, isEmptyDescription ? "" : $("#task_description_text").val(), periodicallyAlertTimes);
         refreshPageContent();
@@ -81,10 +96,12 @@ $(() => {
         let restTime = Math.floor(Number($("#rest_loop_time_text").val()) * 60);
         let taskTime = Math.floor(Number($("#task_loop_time_text").val()) * 60);
         let loopCount = Math.floor(Number($("#loop_time_text").val()));
+        let periodicallyAlertTimes = Math.floor(Number($("#loop_periodically_time_select").val()) * 60);
+        if(!$("#loop_periodically_time_checkbox").prop("checked"))periodicallyAlertTimes = Infinity;
         if (isNaN(restTime) || restTime < 0) return false;
         if (isNaN(taskTime) || taskTime < 0) return false;
         if (isNaN(loopCount) || loopCount < 0) return false;
-        bg.loopTimer(taskTime,restTime,loopCount,isEmptyDescription ? "" : $("#task_loop_description_text").val());
+        bg.loopTimer(taskTime,restTime,loopCount,isEmptyDescription ? "" : $("#task_loop_description_text").val(), periodicallyAlertTimes);
         refreshPageContent();
     });
 

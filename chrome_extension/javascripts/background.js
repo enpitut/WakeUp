@@ -21,7 +21,7 @@ function mainLoop() {
 
     elapsedSeconds++;
     let remainingSeconds = limitSeconds - elapsedSeconds;
-    if(periodicallyAlertSeconds != 0 && remainingSeconds % periodicallyAlertSeconds == 0){
+    if(periodicallyAlertSeconds != Infinity && remainingSeconds % periodicallyAlertSeconds == 0){
         notificate(`あと${remainingSeconds / 60}分でtweetされます`);
     }
     if (remainingSeconds > 60) {
