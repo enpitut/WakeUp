@@ -4,3 +4,9 @@ html {
 p {
     text-align : center;
 }
+.col-xs-6 {
+    padding: 5px;
+}
+.col-xs-12 {
+    padding: 5px;
+}

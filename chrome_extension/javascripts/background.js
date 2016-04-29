@@ -3,9 +3,9 @@
 var limitSeconds;
 var elapsedSeconds;
 var stayNgSiteSeconds;
+var periodicallyAlertSeconds;
 var taskDescription;
 var timerState = "off";
-var oneMinuteNotified = false;
 var saboriNum = 0;
 var wait = 1000;
 
@@ -21,14 +21,14 @@ function mainLoop() {
 
     elapsedSeconds++;
     let remainingSeconds = limitSeconds - elapsedSeconds;
+    if(periodicallyAlertSeconds != Infinity && remainingSeconds % periodicallyAlertSeconds == 0){
+        notificate(`あと${remainingSeconds / 60}分でtweetされます`);
+    }
     if (remainingSeconds > 60) {
         chrome.browserAction.setBadgeText({ text: Math.ceil(remainingSeconds / 60).toString() });
         chrome.browserAction.setBadgeBackgroundColor({ color: [0, 0, 255, 100] });
     } else {
-        if (!oneMinuteNotified) {
-            notificate("あと1分でtweetされます", 5);
-            oneMinuteNotified = true;
-        }
+        if(remainingSeconds == 60) notificate("あと1分でtweetされます", 5);
         chrome.browserAction.setBadgeText({ text: Math.round(remainingSeconds).toString() });
         chrome.browserAction.setBadgeBackgroundColor({ color: [255, 0, 0, 100] });
     }
@@ -132,11 +132,12 @@ function mainLoop() {
     }).catch(e => { alert(e.message); });
 }
 
-function startTimer(limitSecondsAsParameter, taskDescriptionAsParameter) {
+function startTimer(limitSecondsAsParameter, taskDescriptionAsParameter, periodicallyAlertSecondsAsParameter) {
     if (timerState != "off") throw new Error("Illegal state.");
     limitSeconds = limitSecondsAsParameter;
     elapsedSeconds = -1;
     stayNgSiteSeconds = -1;
+    periodicallyAlertSeconds = periodicallyAlertSecondsAsParameter;
     taskDescription = taskDescriptionAsParameter;
     timerState = "on";
     chrome.browserAction.setIcon({
@@ -145,12 +146,11 @@ function startTimer(limitSecondsAsParameter, taskDescriptionAsParameter) {
             38: "images/watchicon38.png"
         }
     });
-    oneMinuteNotified = false;
     saboriNum = 0;
     mainLoop();
 }
 
-function loopTimer(taskTime, restTime, loopCount, taskDescription) {
+function loopTimer(taskTime, restTime, loopCount, taskDescription, periodicallyAlertTimes) {
     let leftRestTime = 0;
     let leftLoopCount = loopCount;
     let previousTimerState = "off";
@@ -162,7 +162,7 @@ function loopTimer(taskTime, restTime, loopCount, taskDescription) {
         if (timerState == "off") {
             if (leftRestTime == 0) {
                 if (leftLoopCount == 0) return;
-                startTimer(taskTime, taskDescription);
+                startTimer(taskTime, taskDescription, periodicallyAlertTimes);
                 leftLoopCount--;
             }
             leftRestTime--;
