@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "作業強制タイマーUGEN",
   "short_name": "UGEN",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "minimum_chrome_version": "47",
   "description": "人間関係を利用した作業強制タイマーアプリ",
   "icons": {
